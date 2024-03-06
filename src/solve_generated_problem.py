@@ -5,7 +5,6 @@ from typing import Optional
 import numpy as np
 
 from .utils import config_utils
-from .slack import Slack
 from .logger import get_main_logger, setup_logger
 from .solver import get_solvers
 from .solver.solver import LPVariables
@@ -14,7 +13,6 @@ from .utils.run_utils import path_solved_result_by_date, optimize, write_result_
 
 
 logger = get_main_logger()
-aSlack = Slack()
 
 
 def generate_problem(n: int, m: int) -> tuple[LPS, LPVariables]:
@@ -83,5 +81,4 @@ if __name__ == "__main__":
     try:
         main(args.n, args.m, args.solver, args.config_section)
     except: # NOQA
-        aSlack.notify_error()
         logger.exception(sys.exc_info())
