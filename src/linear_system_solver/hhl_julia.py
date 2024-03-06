@@ -1,12 +1,11 @@
 import numpy as np
-from julia import Julia
+from julia import Julia, Pkg, Main
 
 from ..logger import get_main_logger
 from .inexact_linear_system_solver import AbstractInexactLinearSystemSolver
 
 # サーバー環境で実行するためのおまじない
 jl = Julia(compiled_modules=False)
-from julia import Pkg, Main
 Pkg.activate(".")
 Pkg.instantiate()
 Main.include("src/linear_system_solver/HHLlib.jl")
