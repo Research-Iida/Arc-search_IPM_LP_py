@@ -2,6 +2,7 @@
 
 import matplotlib.pyplot as plt
 from matplotlib import cm
+from matplotlib.ticker import MaxNLocator
 import numpy as np
 
 from ..utils import str_util
@@ -60,10 +61,10 @@ class Drawer:
             return
 
         fig, ax = plt.subplots()
-        # 軸のスケールを対数に
         ax.set_yscale("log")
-        # 軸ラベル
         ax.set_xlabel('iteration number')
+        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+
         ax.plot(lst_mu, "-", label="$\mu$")
         ax.plot(lst_norm_main, "--", label="primal constraint max norm")
         ax.plot(lst_norm_dual, "-.", label="dual constraint max norm")
@@ -113,6 +114,7 @@ class Drawer:
         # step size の幅は 0 ~ pi/2(line は1まで)なので, それよりちょっと大きいところまで目盛りをとる
         ax1.set_ylim(0, 1.6)
         ax1.set_xlabel("Iteration number")
+        ax1.xaxis.set_major_locator(MaxNLocator(integer=True))
         ax1.set_ylabel("alpha")
         # グラフの本体設定時に, ラベルを手動で設定する必要があるのは barplot のみ. plotは自動で設定される
         handler1, label1 = ax1.get_legend_handles_labels()
@@ -179,6 +181,7 @@ class Drawer:
 
         # 軸ラベル
         ax.set_xlabel('iteration number')
+        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
         ax.plot(lst_min_x, "-", label="min $x$")
         ax.plot(lst_min_s, "--", label="min $s$")
         ax.legend()
@@ -217,6 +220,7 @@ class Drawer:
 
         # 軸ラベル
         ax.set_xlabel('iteration number')
+        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
         ax.plot(lst_max_x, "-", label="max $x$")
         ax.plot(lst_max_ynorm, "-.", label="max $|y|$")
         ax.plot(lst_max_s, "--", label="max $s$")
@@ -249,7 +253,8 @@ class Drawer:
         # 軸のスケールを対数に
         ax.set_yscale("log")
         # 軸ラベル
-        ax.set_xlabel('iteration number')
+        ax.set_xlabel("Iteration number")
+        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
 
         color_1 = cm.Set1.colors[0]
         ax.plot(lst_residual_inexact_vdot, "-", color=color_1, label="$\dot{v}$ residual")
