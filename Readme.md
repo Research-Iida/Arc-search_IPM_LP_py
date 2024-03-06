@@ -1,7 +1,6 @@
-# 使い方
+# Usage
 ---
-
-## スクリプトの実行
+## Run scripts
 ### `src/__main__.py`
 ```
 poetry run python -m src -n {求解する問題数} -s {使用するソルバー} -c {config のセクション名} -sn {何番目の問題から解くか}
@@ -13,45 +12,35 @@ NETLIB のベンチマーク問題を読み取り, ソルバーにかけ, 必要
 
 ### 特定の問題を求解
 ```
-poetry run python -m src.solve_netlib {解きたい問題名} -s {使用するソルバー} -c {config のセクション名} {-m: 計算完了時に slack で mention する場合追加}
+poetry run python -m src.solve_netlib {instance name of Netlib} -s {solver name} -c {section name of config}
 ```
-
-NETLIB のベンチマーク問題を読み取り, アルゴリズムにかけ, 必要な反復回数や実行可能性を記録
 
 ### Preprocess a instance of Netlib
-
 ```
-poetry run python -m src.preprocess_netlib {解きたい問題名} -c {config のセクション名}
+poetry run python -m src.preprocess_netlib {instance name of Netlib} -c {section name of config}
 ```
 
 ---
 ## Set up
-`poetry` を使用するためインストールが必要
+Before setting up,
+you need to install `poetry`.
+Please check [here](https://python-poetry.org/docs/).
 
-### パッケージインストール
-#### プロジェクトのディレクトリ配下に仮想環境を作成するようにする
-```
-poetry config virtualenvs.in-project true
-```
+### Prepare Netlib instances
+1. Get SIF files from the Netlib site; such as [here](https://www.netlib.org/lp/data/index.html).
+2. Place them in directory `data/raw/netlib`.
 
-プロジェクトの root 配下に `.venv` ディレクトリが作成され, 仮想環境にかかわるファイルはそこへ格納されるようになる
-
-#### 開発環境
+### Install packages
 ```
 poetry install
 ```
 
-#### 本番環境
-```
-poetry install --no-dev
-```
-
-## テスト
+## Testing programs
 ```
 poetry run pytest
 ```
 
-### テストの対象関数
+### Targets for test
 `test_*.py` のファイルにある `test_*`という形式のメソッド.
 テストを追加する際は上記の形式
 
