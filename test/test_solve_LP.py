@@ -11,6 +11,9 @@ target_algorithms: list[str] = [
     "arc",
     "arc_restarting",
     "arc_restarting_proven",
+    "inexact_arc",
+    "inexact_line",
+    "iterative_refinement",
 ]
 config = read_config(section=config_section)
 

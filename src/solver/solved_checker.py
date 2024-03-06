@@ -114,3 +114,36 @@ class AbsoluteSolvedChecker(SolvedChecker):
         r_c = problem.residual_dual_constraint(v.y, v.s)
         is_small_residual_dual = np.linalg.norm(r_c) < self.stop_criteria_threshold * np.linalg.norm(kwargs["r_c_0"]) / mu_0
         return is_small_mu and is_small_residual_main and is_small_residual_dual
+
+
+class InexactSolvedChecker(SolvedChecker):
+    """Inexact IPM における求解条件
+
+    Attributes:
+        check_relative_solved(bool) : relative な求解条件で判定するか否か
+            inexact IPM の時は判定したい, iterative refinement の時は判定したくないため分ける必要あり
+    """
+    check_relative_solved: bool
+
+    def __init__(self, stop_criteria_threshold: float, threshold_xs_negative: float, check_relative_solved: bool = True):
+        super().__init__(stop_criteria_threshold, threshold_xs_negative)
+        self.check_relative_solved = check_relative_solved
+
+    def run(
+        self, v: LPVariables, problem: LPS,
+        *args, **kwargs,
+    ) -> bool:
+        """アルゴリズムが最適性を満たし, 最適解にたどり着いたか"""
+        # x, s のどちらかが0未満だった場合実行不可能となる
+        if not self.is_xs_positive(v):
+            return False
+
+        if self.check_relative_solved:
+            if self.is_relative_solved(v, problem):
+                return True
+
+        is_small_mu = v.mu <= self.stop_criteria_threshold
+        r_b = problem.residual_main_constraint(v.x)
+        r_c = problem.residual_dual_constraint(v.y, v.s)
+        is_small_residual = np.linalg.norm(np.concatenate([r_b, r_c]), ord=np.inf) <= self.stop_criteria_threshold
+        return is_small_mu and is_small_residual

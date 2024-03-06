@@ -4,6 +4,7 @@ from datetime import date
 from typing import Optional
 
 from .utils import config_utils, str_util
+from .slack import Slack
 from .profiler.profiler import profile_decorator
 from .data_access import CsvHandler, MpsLoader
 from .logger import get_main_logger, setup_logger
@@ -13,6 +14,7 @@ from .utils.run_utils import path_solved_result_by_date, path_solved_result_by_p
 from .preprocess_netlib import preprocess
 
 logger = get_main_logger()
+aSlack = Slack()
 
 
 def solve(
@@ -113,5 +115,8 @@ if __name__ == "__main__":
 
     try:
         profile_decorator(main, profile_name, problem_name, solver_name, config_section)
+        if args.mention:
+            aSlack.notify_mentioned("End calculation.")
     except: # NOQA
+        aSlack.notify_error()
         logger.exception(sys.exc_info())

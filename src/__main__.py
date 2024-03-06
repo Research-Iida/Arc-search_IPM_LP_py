@@ -8,12 +8,14 @@ from .utils import config_utils, str_util
 from .data_access import CsvHandler, MpsLoader
 from .logger import setup_logger, get_main_logger
 from .profiler.profiler import profile_decorator
+from .slack import Slack
 from .solver import get_solver, get_solvers
 from .solve_netlib import solve, solve_and_write
 from .utils.run_utils import path_solved_result_by_date, write_result_by_problem_solver_config
 
 logger = get_main_logger()
 setup_logger(__name__)
+aSlack = Slack()
 
 # スキップする問題群. 基本的にサイズがでかすぎて解けなかったもの
 skip_problems = {
@@ -88,6 +90,7 @@ def decide_solved_problems(
     if not all_problem_files:
         msg = "There are no problem files! Did you open .tar file?"
         logger.exception(msg)
+        aSlack.notify_error()
         raise TargetProblemError(msg)
 
     # skip 対象の問題を除外
@@ -105,6 +108,7 @@ def decide_solved_problems(
     if start_problem_number > end_problem_number:
         msg = f"start_problem_number {start_problem_number} is too large! Must be smaller than {end_problem_number}"
         logger.exception(msg)
+        aSlack.notify_error()
         raise TargetProblemError(msg)
 
     return problem_files[start_problem_number:end_problem_number]
@@ -132,6 +136,7 @@ def main(
     else:
         msg_solving_benchmarks = f"solving {num_problem} NETLIB benchmarks from {start_problem_number}th problem."
     msg = f"{msg_for_logging_today}Start {msg_solving_benchmarks}"
+    aSlack.notify(msg)
     logger.info(msg)
 
     # 各種インスタンスの用意
@@ -161,6 +166,7 @@ def main(
         solving_msg = f"solving {idx + 1}/{target_problem_number} problem: {filename} (sum idx: {sum_probelm_idx})"
         msg = f"{msg_for_logging_today}Start {solving_msg}"
         logger.info(msg)
+        aSlack.notify(msg)
 
         # 最初にline search で解いてキャッシュに入れる
         _ = solve(filename, get_solver("line", config_utils.test_section), aMpsLoader, aCsvHandler)
@@ -170,12 +176,28 @@ def main(
             aSolvedDetail = solve_and_write(filename, solver, aMpsLoader, aCsvHandler, name_result, path_result)
             write_result_by_problem_solver_config(aSolvedDetail, path_result)
 
+        # 並列処理: メモリが爆発して逆に遅くなるためやらないほうがいい
+        # from multiprocessing import Process
+        # process_list = []
+        # for solver in lst_solver:
+        #     kwargs = {
+        #         "filename": filename, "solver": solver, "aMpsLoader": aMpsLoader, "aCsvHandler": aCsvHandler,
+        #         "name_result": name_result, "path_result": path_result
+        #     }
+        #     process = Process(target=solve_and_write, kwargs=kwargs)
+        #     process.start()
+        #     process_list.append(process)
+        # for process in process_list:
+        #     process.join()
+
         # 何番目の処理が終わったか
         msg = f"{msg_for_logging_today}End {solving_msg}"
         logger.info(msg)
+        aSlack.notify(msg)
 
     msg = f"{msg_for_logging_today}End {msg_solving_benchmarks}"
     logger.info(msg)
+    aSlack.notify(msg)
 
 
 if __name__ == "__main__":
@@ -188,5 +210,8 @@ if __name__ == "__main__":
 
     try:
         profile_decorator(main, "solve_all_problems", args.num_problem, args.solver, args.config_section, args.start_problem_number)
+        aSlack.notify_mentioned(f"{msg_for_logging_today}End calculation.")
     except: # NOQA
+        aSlack.notify(f"{msg_for_logging_today}Occured error!")
+        aSlack.notify_error()
         logger.exception(sys.exc_info())

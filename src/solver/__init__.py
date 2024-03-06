@@ -4,13 +4,18 @@ from ..utils.config_utils import default_section
 from .solver import LPSolver
 from .interior_point_method import LineSearchIPM, ArcSearchIPM
 from .interior_point_method_with_restarting_strategy import ArcSearchIPMWithRestartingStrategy, ArcSearchIPMWithRestartingStrategyProven
+from .inexact_interior_point_method import InexactArcSearchIPM, InexactLineSearchIPM
+from .iterative_refinement import IterativeRefinementMethod
 
 # 計算対象のアルゴリズム一覧
 target_algorithms: list[str] = [
-    "line",
-    "arc",
-    "arc_restarting",
-    "arc_restarting_proven",
+    # "line",
+    # "arc",
+    # "arc_restarting",
+    # "arc_restarting_proven",
+    "inexact_arc",
+    "inexact_line",
+    # "iterative_refinement",
 ]
 # アルゴリズム別計算対象の config セクション一覧
 # 計算対象にさせたくないアルゴリズムは, すべての config セクションをコメントアウトする
@@ -42,6 +47,29 @@ target_config_sections_by_algorithm: dict[str, list[str]] = {
         # "RESTART_0999",
         # "RESTART_1",
     ],
+    "inexact_arc": [
+        # "INEXACT_ARC_CG_MNES",
+        "INEXACT_ARC_CG_NES",
+        "INEXACT_ARC_EXACT_NES",
+        # "INEXACT_ARC_BICG_NES",
+        # "INEXACT_ARC_BICGSTAB_NES",
+        # "INEXACT_ARC_CGS_NES",
+        # "INEXACT_ARC_QMR_NES",
+        # "INEXACT_ARC_TFQMR_NES",
+    ],
+    "inexact_line": [
+        # "INEXACT_LINE_CG_MNES",
+        "INEXACT_LINE_CG_NES",
+        # "LINE_EXACT_MNES",
+        # "LINE_EXACT_NES",
+    ],
+    "iterative_refinement": [
+        # "INEXACT_ARC_CG_MNES",
+        "INEXACT_ARC_CG_NES",
+        "INEXACT_ARC_EXACT_NES",
+        # "INEXACT_LINE_CG_MNES",
+        "INEXACT_LINE_CG_NES",
+    ],
 }
 
 
@@ -66,6 +94,12 @@ def get_solver(solver: str, config_section: str) -> LPSolver:
             anLPSolver = ArcSearchIPMWithRestartingStrategy(config_section)
         case "arc_restarting_proven":
             anLPSolver = ArcSearchIPMWithRestartingStrategyProven(config_section)
+        case "inexact_arc":
+            anLPSolver = InexactArcSearchIPM(config_section)
+        case "inexact_line":
+            anLPSolver = InexactLineSearchIPM(config_section)
+        case "iterative_refinement":
+            anLPSolver = IterativeRefinementMethod(config_section)
         case _:
             raise SolverSelectionError("指定されたソルバーが存在しません")
 
