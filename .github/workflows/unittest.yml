@@ -24,18 +24,11 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Set up Julia
-      uses: julia-actions/setup-julia@latest
-      with:
-        version: '1.7'
-    - name: Julia build
-      uses: julia-actions/julia-buildpkg@v1
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         curl -sSL https://install.python-poetry.org | python3 -
         poetry config virtualenvs.create false
         poetry install --no-root
-        poetry run python -c "import julia; julia.install()"
     - name: Unitest with coverage
       run: poetry run pytest -v --cov=src/ -m 'slow or not slow'
