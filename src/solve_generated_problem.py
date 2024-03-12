@@ -3,6 +3,7 @@ import argparse
 from typing import Optional
 
 import numpy as np
+from scipy.linalg import toeplitz
 
 from .utils import config_utils
 from .slack import Slack
@@ -28,6 +29,7 @@ def generate_problem(n: int, m: int) -> tuple[LPS, LPVariables]:
         LPS: 問題
         LPVariables: 最適解
     """
+    # x,s においてどの index が0になるか決める
     mask = [1 if ind < m else 0 for ind in range(n)]
     np.random.shuffle(mask)
 
@@ -37,9 +39,13 @@ def generate_problem(n: int, m: int) -> tuple[LPS, LPVariables]:
     opt_s = opt_s - np.multiply(opt_s, mask)
     opt_y = np.random.rand(m) - 0.5
 
-    A = np.random.rand(m, n) - 0.5
-    b = np.matmul(A, opt_x)
-    c = np.matmul(A.T, opt_y) + opt_s
+    # A は各行で log(m) のスパース性を持ち full row rank
+    # A = np.random.rand(m, n) - 0.5
+    n_nonzero = int(np.log2(m))
+    nonzero_elements = np.random.rand(n_nonzero) - 0.5
+    A = toeplitz(np.concatenate([[nonzero_elements[0]], np.zeros(m - 1)]), np.concatenate([nonzero_elements, np.zeros(n - n_nonzero)]))
+    b = A @ opt_x
+    c = A.T @ opt_y + opt_s
 
     return LPS(A, b, c), LPVariables(opt_x, opt_y, opt_s)
 
@@ -56,7 +62,8 @@ def main(n: int, m: int, solver_name: Optional[str], config_section: Optional[st
     setup_logger(log_file_name)
 
     config = config_utils.read_config(section=config_section)
-    path_result = path_solved_result_by_date(config.get("PATH_RESULT"))
+    path_result_date = path_solved_result_by_date(config.get("PATH_RESULT"))
+    path_result = f"{path_result_date}generated_problem/n_{n}_m_{m}/"
 
     problem, opt_sol = generate_problem(n, m)
 
