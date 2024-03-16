@@ -1,5 +1,6 @@
 import numpy as np
-from julia import Julia, Pkg, Main
+from julia import Julia
+from julia import Pkg, Main
 
 from ..logger import get_main_logger
 from .inexact_linear_system_solver import AbstractInexactLinearSystemSolver

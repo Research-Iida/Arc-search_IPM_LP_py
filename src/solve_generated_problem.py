@@ -85,7 +85,6 @@ if __name__ == "__main__":
     parser.add_argument("-s", "--solver", default=None, help="solver for solving problem")
     parser.add_argument("-c", "--config_section", type=str, default=None, help="config section for solving problem")
     parser.add_argument("-rs", "--random_seed", type=int, default=None, help="random seed")
-    parser.add_argument("-me", "--mention", action='store_true', help="slack mention flag")
     args = parser.parse_args()
 
     aSlack = Slack()
@@ -93,8 +92,7 @@ if __name__ == "__main__":
 
     try:
         main(args.n, args.m, args.solver, args.config_section, args.random_seed)
-        if args.mention:
-            aSlack.notify_mentioned("End solving generated problem")
+        aSlack.notify("End solving generated problem")
     except: # NOQA
         aSlack.notify_error()
         logger.exception(sys.exc_info())
