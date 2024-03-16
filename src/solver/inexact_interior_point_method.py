@@ -61,7 +61,7 @@ class InexactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
             case "HHLJulia":
                 # いちいち import すると Julia のコンパイルに時間がかかるので指定されたときだけ
                 from ..linear_system_solver.hhl_julia import HHLJuliaLinearSystemSolver
-                return HHLJuliaLinearSystemSolver()
+                return HHLJuliaLinearSystemSolver(self.parameters.INEXACT_HHL_NUM_PHASE_ESTIMATOR_QUBITS)
             case "exact":
                 return ExactLinearSystemSolver()
             case _:

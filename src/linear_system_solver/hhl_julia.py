@@ -16,6 +16,15 @@ logger = get_main_logger()
 class HHLJuliaLinearSystemSolver(AbstractInexactLinearSystemSolver):
     """HHL アルゴリズムによる求解
     """
+    def __init__(self, n_pe_qubits: int):
+        """インスタンス初期化
+
+        Args:
+            n_pe_qubits (int): Phase Estimator に使用する qubit 数.
+                Aの固有値の精度に関わる
+        """
+        self.n_pe_qubits = n_pe_qubits
+
     def solve(
         self, A: np.ndarray, b: np.ndarray,
         tolerance: float = 10**-7, *args
@@ -50,5 +59,5 @@ class HHLJuliaLinearSystemSolver(AbstractInexactLinearSystemSolver):
         rhs_modified = np.zeros(dim_for_hhl)
         rhs_modified[0:m] = right_hand_side
 
-        sol_hhl = Main.hhlsolve(coef_matrix_modified, rhs_modified, 20)
+        sol_hhl = Main.hhlsolve(coef_matrix_modified, rhs_modified, self.n_pe_qubits)
         return sol_hhl[0:m].real * coef_rhs_normalize / coef_eig_val_normalize
