@@ -200,6 +200,7 @@ class InexactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
         tol = self.calc_tolerance_for_inexact_first_derivative(v, problem)
         # もし最適解に近づいていれば inexact solver だと計算時間的に不利になるので, exact solver に変更する
         if self.is_close_to_optimal(v, problem) and self.parameters.INEXACT_SOLVE_EXACTLY_FROM_THE_MIDDLE:
+            logger.info("Solve first derivative exactly.")
             x_dot, y_dot, s_dot, norm_residual = self.exact_search_direction_calculator.run(v, problem, right_hand_side, tol)
         else:
             x_dot, y_dot, s_dot, norm_residual = self.search_direction_calculator.run(v, problem, right_hand_side, tol)

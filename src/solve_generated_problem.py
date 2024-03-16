@@ -1,6 +1,5 @@
 import sys
 import argparse
-from typing import Optional
 
 import numpy as np
 from scipy.linalg import toeplitz
@@ -50,11 +49,16 @@ def generate_problem(n: int, m: int) -> tuple[LPS, LPVariables]:
     return LPS(A, b, c), LPVariables(opt_x, opt_y, opt_s)
 
 
-def main(n: int, m: int, solver_name: Optional[str], config_section: Optional[str]):
+def main(n: int, m: int, solver_name: str | None, config_section: str | None, random_seed: int | None):
     """main 関数
     """
+    postfix_random_seed = ""
+    if random_seed is not None:
+        np.random.seed(random_seed)
+        postfix_random_seed = f"_random_seed_{random_seed}"
+
     # 直接実行された場合ファイルに起こす必要があるため, 新たにlogger設定
-    log_file_name = f"solve_generated_problem_n_{n}_m_{m}"
+    log_file_name = f"solve_generated_problem_n_{n}_m_{m}{postfix_random_seed}"
     if solver_name is not None:
         log_file_name = f"{log_file_name}_{solver_name}"
     if config_section is not None:
@@ -63,7 +67,7 @@ def main(n: int, m: int, solver_name: Optional[str], config_section: Optional[st
 
     config = config_utils.read_config(section=config_section)
     path_result_date = path_solved_result_by_date(config.get("PATH_RESULT"))
-    path_result = f"{path_result_date}generated_problem/n_{n}_m_{m}/"
+    path_result = f"{path_result_date}generated_problem/n_{n}_m_{m}{postfix_random_seed}/"
 
     problem, opt_sol = generate_problem(n, m)
 
@@ -78,17 +82,14 @@ def main(n: int, m: int, solver_name: Optional[str], config_section: Optional[st
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-n", default=10, help="variable size")
-    parser.add_argument("-m", default=4, help="constraint number")
+    parser.add_argument("-m", default=8, help="constraint number")
     parser.add_argument("-s", "--solver", default=None, help="solver for solving problem")
     parser.add_argument("-c", "--config_section", type=str, default=None, help="config section for solving problem")
     parser.add_argument("-rs", "--random_seed", type=int, default=None, help="random seed")
     args = parser.parse_args()
 
-    if args.random_seed is not None:
-        np.random.seed(args.random_seed)
-
     try:
-        main(args.n, args.m, args.solver, args.config_section)
+        main(args.n, args.m, args.solver, args.config_section, args.random_seed)
     except: # NOQA
         aSlack.notify_error()
         logger.exception(sys.exc_info())
