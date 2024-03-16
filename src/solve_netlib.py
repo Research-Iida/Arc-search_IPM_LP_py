@@ -14,7 +14,6 @@ from .utils.run_utils import path_solved_result_by_date, path_solved_result_by_p
 from .preprocess_netlib import preprocess
 
 logger = get_main_logger()
-aSlack = Slack()
 
 
 def solve(
@@ -112,6 +111,8 @@ if __name__ == "__main__":
     config_section = args.config_section
     if config_section is not None:
         profile_name = f"{profile_name}_{config_section}"
+
+    aSlack = Slack()
 
     try:
         profile_decorator(main, profile_name, problem_name, solver_name, config_section)

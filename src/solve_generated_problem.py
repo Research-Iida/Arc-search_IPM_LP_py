@@ -14,7 +14,6 @@ from .utils.run_utils import path_solved_result_by_date, optimize, write_result_
 
 
 logger = get_main_logger()
-aSlack = Slack()
 
 
 def generate_problem(n: int, m: int) -> tuple[LPS, LPVariables]:
@@ -86,10 +85,16 @@ if __name__ == "__main__":
     parser.add_argument("-s", "--solver", default=None, help="solver for solving problem")
     parser.add_argument("-c", "--config_section", type=str, default=None, help="config section for solving problem")
     parser.add_argument("-rs", "--random_seed", type=int, default=None, help="random seed")
+    parser.add_argument("-me", "--mention", action='store_true', help="slack mention flag")
     args = parser.parse_args()
+
+    aSlack = Slack()
+    aSlack.notify("Start solving generated problem")
 
     try:
         main(args.n, args.m, args.solver, args.config_section, args.random_seed)
+        if args.mention:
+            aSlack.notify_mentioned("End solving generated problem")
     except: # NOQA
         aSlack.notify_error()
         logger.exception(sys.exc_info())
