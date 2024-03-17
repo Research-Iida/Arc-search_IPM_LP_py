@@ -2,50 +2,17 @@ import sys
 import argparse
 
 import numpy as np
-from scipy.linalg import toeplitz
 
 from .utils import config_utils
-from .slack import Slack
 from .logger import get_main_logger, setup_logger
 from .solver import get_solvers
-from .solver.solver import LPVariables
-from .problem import LinearProgrammingProblemStandard as LPS
-from .utils.run_utils import path_solved_result_by_date, optimize, write_result_by_problem_solver_config
+
+from .run_utils.define_paths import path_solved_result_by_date
+from .run_utils.solve_problem import optimize, write_result_by_problem_solver_config
+from .run_utils.generate_problem import generate_problem
 
 
 logger = get_main_logger()
-
-
-def generate_problem(n: int, m: int) -> tuple[LPS, LPVariables]:
-    """変数サイズと制約数を与えて LP を作成
-
-    Args:
-        n (int): 変数サイズ
-        m (int): 制約数
-
-    Returns:
-        LPS: 問題
-        LPVariables: 最適解
-    """
-    # x,s においてどの index が0になるか決める
-    mask = [1 if ind < m else 0 for ind in range(n)]
-    np.random.shuffle(mask)
-
-    # 最適解の決定
-    opt_x = np.multiply(np.random.rand(n), mask)
-    opt_s = np.random.rand(n)
-    opt_s = opt_s - np.multiply(opt_s, mask)
-    opt_y = np.random.rand(m) - 0.5
-
-    # A は各行で log(m) のスパース性を持ち full row rank
-    # A = np.random.rand(m, n) - 0.5
-    n_nonzero = int(np.log2(m))
-    nonzero_elements = np.random.rand(n_nonzero) - 0.5
-    A = toeplitz(np.concatenate([[nonzero_elements[0]], np.zeros(m - 1)]), np.concatenate([nonzero_elements, np.zeros(n - n_nonzero)]))
-    b = A @ opt_x
-    c = A.T @ opt_y + opt_s
-
-    return LPS(A, b, c), LPVariables(opt_x, opt_y, opt_s)
 
 
 def main(n: int, m: int, solver_name: str | None, config_section: str | None, random_seed: int | None):
@@ -72,6 +39,8 @@ def main(n: int, m: int, solver_name: str | None, config_section: str | None, ra
 
     # ソルバーごとに解く
     for solver in get_solvers(solver_name, config_section):
+        msg = f"Start solving with {solver.__class__.__name__}"
+        logger.info(msg)
         aSolvedDetail = optimize(problem, solver)
         if not aSolvedDetail.v.isclose(opt_sol, threshold=10**(-3)):
             logger.warning(f"Isn't close solution! opt: {opt_sol}, sol: {aSolvedDetail.v}")
@@ -87,12 +56,7 @@ if __name__ == "__main__":
     parser.add_argument("-rs", "--random_seed", type=int, default=None, help="random seed")
     args = parser.parse_args()
 
-    aSlack = Slack()
-    aSlack.notify("Start solving generated problem")
-
     try:
         main(args.n, args.m, args.solver, args.config_section, args.random_seed)
-        aSlack.notify("End solving generated problem")
     except: # NOQA
-        aSlack.notify_error()
         logger.exception(sys.exc_info())

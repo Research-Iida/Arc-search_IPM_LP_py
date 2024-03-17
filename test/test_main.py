@@ -3,7 +3,7 @@ import glob
 
 from src.utils.config_utils import read_config
 from src.data_access import MpsLoader
-from src.utils.run_utils import path_solved_result_by_date
+from src.run_utils.define_paths import path_solved_result_by_date
 from src.__main__ import main, decide_solved_problems, name_result
 
 config_section = "TEST"
