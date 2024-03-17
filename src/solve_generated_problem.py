@@ -39,8 +39,6 @@ def main(n: int, m: int, solver_name: str | None, config_section: str | None, ra
 
     # ソルバーごとに解く
     for solver in get_solvers(solver_name, config_section):
-        msg = f"Start solving with {solver.__class__.__name__}"
-        logger.info(msg)
         aSolvedDetail = optimize(problem, solver)
         if not aSolvedDetail.v.isclose(opt_sol, threshold=10**(-3)):
             logger.warning(f"Isn't close solution! opt: {opt_sol}, sol: {aSolvedDetail.v}")

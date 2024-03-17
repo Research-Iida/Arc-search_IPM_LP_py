@@ -35,4 +35,4 @@ def generate_problem(n: int, m: int) -> tuple[LPS, LPVariables]:
     b = A @ opt_x
     c = A.T @ opt_y + opt_s
 
-    return LPS(A, b, c), LPVariables(opt_x, opt_y, opt_s)
+    return LPS(A, b, c, f"random_problem_n_{n}_m_{m}"), LPVariables(opt_x, opt_y, opt_s)
