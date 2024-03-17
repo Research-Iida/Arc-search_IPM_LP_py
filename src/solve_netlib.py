@@ -7,11 +7,14 @@ from .utils import config_utils, str_util
 from .profiler.profiler import profile_decorator
 from .data_access import CsvHandler, MpsLoader
 from .logger import get_main_logger, setup_logger
-from .solver import get_solvers
+from .slack.slack import get_slack_api
+from .run_utils.get_solvers import get_solvers
 from .run_utils.define_paths import path_solved_result_by_date, path_solved_result_by_problem
-from .run_utils.solve_problem import solve_and_write, write_result_by_problem_solver_config
+from .run_utils.solve_problem import solve_and_write
+from .run_utils.write_files import write_result_by_problem_solver_config
 
 logger = get_main_logger()
+aSlack = get_slack_api()
 
 
 def main(problem_name: str, solver_name: Optional[str], config_section: Optional[str]):
@@ -61,5 +64,7 @@ if __name__ == "__main__":
 
     try:
         profile_decorator(main, profile_name, problem_name, solver_name, config_section)
+        aSlack.notify_mentioned("End calculation")
     except: # NOQA
+        aSlack.notify_error()
         logger.exception(sys.exc_info())

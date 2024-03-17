@@ -1,4 +1,4 @@
-from src.solver import ArcSearchIPMWithRestartingStrategy, ArcSearchIPMWithRestartingStrategyProven
+from src.solver.interior_point_method_with_restarting_strategy import ArcSearchIPMWithRestartingStrategy, ArcSearchIPMWithRestartingStrategyProven
 from .utils import solver_by_test_LP
 
 

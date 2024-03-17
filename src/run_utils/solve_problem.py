@@ -1,15 +1,13 @@
-import numpy as np
-
 from ..logger import get_main_logger
+from ..slack.slack import get_slack_api
 from ..data_access import CsvHandler, MpsLoader
 from ..problem import LPPreprocessor, LinearProgrammingProblemStandard as LPS
-from ..solver import LPSolver
-from ..solver.solver import LPVariables, SolvedDetail
-from ..drawer import Drawer
-from .decolators import deco_logging
-from .define_paths import path_solved_result_by_problem, path_solved_result_by_solver_with_config
+from ..solver.solver import LPSolver
+from ..solver.variables import LPVariables
+from ..solver.solved_data import SolvedDetail
 
 logger = get_main_logger()
+aSlack = get_slack_api()
 
 
 def preprocess(
@@ -43,17 +41,24 @@ def optimize(aLP: LPS, aLPSolver: LPSolver, v_0: LPVariables | None = None) -> S
     """
     problem_name = aLP.name
     solver_name = aLPSolver.__class__.__name__
+    config_section = aLPSolver.config_section
 
-    # 入力をデコレータに渡すための実質のmain関数
-    @deco_logging(problem_name, aLPSolver)
-    def _optimize():
-        return aLPSolver.run(aLP, v_0)
+    msg_prefix = f"[{solver_name}] [{config_section}]"
+    msg_start = f"{msg_prefix} Start solving {problem_name}."
+    logger.info(msg_start)
+    aSlack.notify(msg_start)
 
-    output = _optimize()
+    output = aLPSolver.run(aLP, v_0)
+
+    msg_end = f"{msg_prefix} End solving {problem_name}."
+    logger.info(msg_end)
+    aSlack.notify(msg_end)
+
     # 求解できなかったら warning
     if not output.aSolvedSummary.is_solved:
         msg = f"[{solver_name}] [{aLPSolver.config_section}] Algorithm cannot solve {problem_name}!"
         logger.warning(msg)
+        aSlack.notify(msg)
     return output
 
 
@@ -105,22 +110,3 @@ def solve_and_write(
         is_append=True
     )
     return aSolvedDetail
-
-
-def write_result_by_problem_solver_config(aSolvedDetail: SolvedDetail, path_result: str):
-    """計算に関わるいろいろな設定を書き込む
-
-    Args:
-        path_result: result ディレクトリ. この下に `問題名/ソルバー名/セクション名` というディレクトリを作成して書き込みを行う
-    """
-    summary = aSolvedDetail.aSolvedSummary
-    path_result_by_problem = path_solved_result_by_problem(path_result, summary.problem_name)
-    path_result_by_problem_solver_config = path_solved_result_by_solver_with_config(path_result_by_problem, summary.solver_name, summary.config_section)
-
-    # 変数の反復列をcsvで出力
-    if len(aSolvedDetail.lst_variables_by_iter) > 0:
-        variables = np.stack([np.concatenate([v.x, v.y, v.s]) for v in aSolvedDetail.lst_variables_by_iter])
-        CsvHandler().write_numpy("variables", variables, path_result_by_problem_solver_config)
-
-    # グラフ描画
-    Drawer(path_result_by_problem_solver_config).run(aSolvedDetail)

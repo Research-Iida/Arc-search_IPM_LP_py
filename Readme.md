@@ -35,6 +35,12 @@ Please check [here](https://python-poetry.org/docs/).
 poetry install
 ```
 
+### Advanced
+#### Setting slack notification
+`config` ディレクトリ配下に `config_slack.ini` というファイルを追加し,
+通知先の API URL とメンションする際の ID を設定する.
+設定しなくても問題ない（その場合は通知をしない）.
+
 ## Testing programs
 ```
 poetry run pytest

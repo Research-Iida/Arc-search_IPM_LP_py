@@ -5,8 +5,8 @@ import math
 import numpy as np
 
 from src.problem import LinearProgrammingProblemStandard as LPS
-from src.solver import LPSolver
-from src.solver.solver import LPVariables
+from src.solver.solver import LPSolver
+from src.solver.variables import LPVariables
 from src.solver.optimization_parameters import OptimizationParameters
 
 

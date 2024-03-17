@@ -125,3 +125,5 @@ profile/*.prof
 
 # linux 環境と windows 環境で異なるとエラーになるっぽいので ignore
 Manifest.toml
+
+config/config_slack.ini

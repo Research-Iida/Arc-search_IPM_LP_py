@@ -1,19 +1,21 @@
 
 import sys
 import argparse
-import shutil
 from datetime import date
 
 from .utils import config_utils, str_util
 from .data_access import CsvHandler, MpsLoader
 from .logger import setup_logger, get_main_logger
+from .slack.slack import get_slack_api
 from .profiler.profiler import profile_decorator
-from .solver import get_solver, get_solvers
+from .run_utils.get_solvers import get_solver, get_solvers
 from .run_utils.define_paths import path_solved_result_by_date
-from .run_utils.solve_problem import solve, solve_and_write, write_result_by_problem_solver_config
+from .run_utils.solve_problem import solve, solve_and_write
+from .run_utils.write_files import copy_optimization_parameters, write_result_by_problem_solver_config
 
 logger = get_main_logger()
 setup_logger(__name__)
+aSlack = get_slack_api()
 
 # スキップする問題群. 基本的にサイズがでかすぎて解けなかったもの
 skip_problems = {
@@ -53,21 +55,6 @@ msg_for_logging_today = f"[{str_today}] "
 
 class TargetProblemError(Exception):
     pass
-
-
-def copy_optimization_parameters(path_result: str, config_section: str = config_utils.default_section):
-    """`config_optimizer.ini` を結果を格納するディレクトリにコピー
-
-    Args:
-        path_result (str): 結果を書き込む先のディレクトリ
-    """
-    config = config_utils.read_config(section=config_section)
-    path_config = config.get("PATH_CONFIG")
-    name_config_opt = config.get("CONFIG_OPTIMIZER")
-    origin_config_opt = f"{path_config}{name_config_opt}"
-    destination_config_opt = f"{path_result}{name_config_opt}"
-    logger.info(f"Write {origin_config_opt} to {destination_config_opt}")
-    shutil.copyfile(origin_config_opt, destination_config_opt)
 
 
 def decide_solved_problems(
@@ -132,6 +119,7 @@ def main(
         msg_solving_benchmarks = f"solving {num_problem} NETLIB benchmarks from {start_problem_number}th problem."
     msg = f"{msg_for_logging_today}Start {msg_solving_benchmarks}"
     logger.info(msg)
+    aSlack.notify(msg)
 
     # 各種インスタンスの用意
     config = config_utils.read_config(section=config_section)
@@ -160,6 +148,7 @@ def main(
         solving_msg = f"solving {idx + 1}/{target_problem_number} problem: {filename} (sum idx: {sum_probelm_idx})"
         msg = f"{msg_for_logging_today}Start {solving_msg}"
         logger.info(msg)
+        aSlack.notify(msg)
 
         # 最初にline search で解いてキャッシュに入れる
         _ = solve(filename, get_solver("line", config_utils.test_section), aMpsLoader, aCsvHandler)
@@ -186,9 +175,11 @@ def main(
         # 何番目の処理が終わったか
         msg = f"{msg_for_logging_today}End {solving_msg}"
         logger.info(msg)
+        aSlack.notify(msg)
 
     msg = f"{msg_for_logging_today}End {msg_solving_benchmarks}"
     logger.info(msg)
+    aSlack.notify(msg)
 
 
 if __name__ == "__main__":
@@ -201,5 +192,7 @@ if __name__ == "__main__":
 
     try:
         profile_decorator(main, "solve_all_problems", args.num_problem, args.solver, args.config_section, args.start_problem_number)
+        aSlack.notify_mentioned(f"{msg_for_logging_today}End calculation.")
     except: # NOQA
+        aSlack.notify_error()
         logger.exception(sys.exc_info())

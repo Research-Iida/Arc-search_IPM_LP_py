@@ -2,8 +2,8 @@ import numpy as np
 import pytest
 
 from src.problem import LinearProgrammingProblemStandard as LPS
-from src.solver import ArcSearchIPM, LineSearchIPM
-from src.solver.solver import LPVariables
+from src.solver.variables import LPVariables
+from src.solver.interior_point_method import ArcSearchIPM, LineSearchIPM
 from .utils import solver_by_test_LP
 
 config_section = "TEST"
