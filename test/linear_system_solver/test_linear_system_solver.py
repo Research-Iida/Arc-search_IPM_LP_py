@@ -28,7 +28,7 @@ def test_HHL_julia():
     # 解: [2, 1, 0]
     A = np.array([[1.0, 1.0, 0.0], [1.0, 2.0, 0.0], [0.0, 0.0, 1.0]])
     b = np.array([3.0, 4.0, 0.0])
-    test_result = HHLJuliaLinearSystemSolver().solve(A, b)
+    test_result = HHLJuliaLinearSystemSolver(20).solve(A, b)
     solution = np.linalg.inv(A) @ b
 
     assert np.linalg.norm(A @ test_result - b) <= 0.1
