@@ -2,8 +2,8 @@
 import numpy as np
 from scipy.linalg import toeplitz
 
-from .solver.solver import LPVariables
-from .problem import LinearProgrammingProblemStandard as LPS
+from ..solver.variables import LPVariables
+from ..problem.problem import LinearProgrammingProblemStandard as LPS
 
 
 def generate_problem(n: int, m: int) -> tuple[LPS, LPVariables]:
