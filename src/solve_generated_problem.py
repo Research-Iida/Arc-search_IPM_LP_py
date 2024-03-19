@@ -32,8 +32,7 @@ def main(n: int, m: int, solver_name: str | None, config_section: str | None, ra
     setup_logger(log_file_name)
 
     config = config_utils.read_config(section=config_section)
-    path_result_date = path_solved_result_by_date(config.get("PATH_RESULT"))
-    path_result = f"{path_result_date}generated_problem/n_{n}_m_{m}{postfix_random_seed}/"
+    path_result = path_solved_result_by_date(config.get("PATH_RESULT"))
 
     problem, opt_sol = generate_problem(n, m)
 
