@@ -1,20 +1,27 @@
-from abc import ABCMeta
 import time
+from abc import ABCMeta
 
 import numpy as np
 
-from ..utils import config_utils
+from ..linear_system_solver import inexact_linear_system_solver as ilss
+from ..linear_system_solver.exact_linear_system_solver import (
+    AbstractLinearSystemSolver,
+    ExactLinearSystemSolver,
+)
+from ..linear_system_solver.hhl_qiskit import HHLLinearSystemSolver
 from ..logger import get_main_logger, indent
 from ..problem import LinearProgrammingProblemStandard as LPS
-from ..linear_system_solver.exact_linear_system_solver import AbstractLinearSystemSolver, ExactLinearSystemSolver
-from ..linear_system_solver import inexact_linear_system_solver as ilss
-from ..linear_system_solver.hhl_qiskit import HHLLinearSystemSolver
+from ..utils import config_utils
+from .interior_point_method import InteriorPointMethod
+from .search_direction_calculator import (
+    AbstractSearchDirectionCalculator,
+    MNESSearchDirectionCalculator,
+    NESSearchDirectionCalculator,
+)
+from .solved_checker import InexactSolvedChecker, SolvedChecker
+from .solved_data import SolvedDetail
 from .variable_updater import ArcVariableUpdater, LineVariableUpdater
 from .variables import LPVariables
-from .solved_checker import SolvedChecker, InexactSolvedChecker
-from .search_direction_calculator import AbstractSearchDirectionCalculator, NESSearchDirectionCalculator, MNESSearchDirectionCalculator
-from .solved_data import SolvedDetail
-from .interior_point_method import InteriorPointMethod
 
 logger = get_main_logger()
 
@@ -32,8 +39,8 @@ class SearchDirectionCalculatorSelectionError(Exception):
 
 
 class InexactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
-    """Inexact に線形方程式を解きながら内点法を実施するクラス
-    """
+    """Inexact に線形方程式を解きながら内点法を実施するクラス"""
+
     search_direction_calculator: AbstractSearchDirectionCalculator
     # 初期点時点で決定できるものや1回計算すればいいものは Attributes として使いまわす
     A_base_indexes: list[int] | None = None
@@ -41,8 +48,7 @@ class InexactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
     exact_search_direction_calculator: AbstractSearchDirectionCalculator
 
     def _get_linear_system_solver(self, str_solver: str) -> AbstractLinearSystemSolver:
-        """内部で実行する linear system solver の取得
-        """
+        """内部で実行する linear system solver の取得"""
         match str_solver:
             case "CG":
                 return ilss.CGLinearSystemSolver()
@@ -61,22 +67,30 @@ class InexactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
             case "HHLJulia":
                 # いちいち import すると Julia のコンパイルに時間がかかるので指定されたときだけ
                 from ..linear_system_solver.hhl_julia import HHLJuliaLinearSystemSolver
-                return HHLJuliaLinearSystemSolver(self.parameters.INEXACT_HHL_NUM_PHASE_ESTIMATOR_QUBITS)
+
+                return HHLJuliaLinearSystemSolver(
+                    self.parameters.INEXACT_HHL_NUM_PHASE_ESTIMATOR_QUBITS
+                )
             case "exact":
                 return ExactLinearSystemSolver()
             case _:
-                raise LinearSystemSolverSelectionError(f"Don't match solver for ``{str_solver}''")
+                raise LinearSystemSolverSelectionError(
+                    f"Don't match solver for ``{str_solver}''"
+                )
 
-    def _get_search_direction_calculator(self, str_calculator: str, linear_system_solver: AbstractLinearSystemSolver) -> AbstractSearchDirectionCalculator:
-        """内部で実行する linear system solver の取得
-        """
+    def _get_search_direction_calculator(
+        self, str_calculator: str, linear_system_solver: AbstractLinearSystemSolver
+    ) -> AbstractSearchDirectionCalculator:
+        """内部で実行する linear system solver の取得"""
         match str_calculator:
             case "MNES":
                 return MNESSearchDirectionCalculator(linear_system_solver)
             case "NES":
                 return NESSearchDirectionCalculator(linear_system_solver)
             case _:
-                raise SearchDirectionCalculatorSelectionError(f"Don't match search direction calculator for ``{str_calculator}''")
+                raise SearchDirectionCalculatorSelectionError(
+                    f"Don't match search direction calculator for ``{str_calculator}''"
+                )
 
     def __init__(
         self,
@@ -87,24 +101,37 @@ class InexactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
         self._set_config_and_parameters(config_section)
 
         if solved_checker is None:
-            self.solved_checker = InexactSolvedChecker(self.parameters.STOP_CRITERIA_PARAMETER, self.parameters.THRESHOLD_XS_NEGATIVE)
+            self.solved_checker = InexactSolvedChecker(
+                self.parameters.STOP_CRITERIA_PARAMETER,
+                self.parameters.THRESHOLD_XS_NEGATIVE,
+            )
         else:
             self.solved_checker = solved_checker
 
         if linear_system_solver is None:
-            linear_system_solver = self._get_linear_system_solver(self.parameters.INEXACT_LINEAR_SYSTEM_SOLVER)
-        logger.info(f"Linear system solver is {linear_system_solver.__class__.__name__}.")
+            linear_system_solver = self._get_linear_system_solver(
+                self.parameters.INEXACT_LINEAR_SYSTEM_SOLVER
+            )
+        logger.info(
+            f"Linear system solver is {linear_system_solver.__class__.__name__}."
+        )
 
-        self.search_direction_calculator = self._get_search_direction_calculator(self.parameters.INEXACT_SEARCH_DIRECTION_CALCULATOR, linear_system_solver)
-        logger.info(f"Search direction calculator is {self.search_direction_calculator.__class__.__name__}.")
+        self.search_direction_calculator = self._get_search_direction_calculator(
+            self.parameters.INEXACT_SEARCH_DIRECTION_CALCULATOR, linear_system_solver
+        )
+        logger.info(
+            f"Search direction calculator is {self.search_direction_calculator.__class__.__name__}."
+        )
 
         self.exact_search_direction_calculator = self._get_search_direction_calculator(
             self.parameters.INEXACT_SEARCH_DIRECTION_CALCULATOR,
-            self._get_linear_system_solver("exact")
+            self._get_linear_system_solver("exact"),
         )
 
         if self.parameters.INEXACT_SOLVE_EXACTLY_FROM_THE_MIDDLE:
-            logger.info("When iteration point is close to optimal, Solve linear systems exactly.")
+            logger.info(
+                "When iteration point is close to optimal, Solve linear systems exactly."
+            )
 
     @property
     def beta(self) -> float:
@@ -122,7 +149,9 @@ class InexactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
     def gamma_1(self) -> float:
         return self.parameters.INEXACT_COEF_NEIGHBORHOOD_DUALITY
 
-    def initial_problem_and_point(self, problem_0: LPS, v_0: LPVariables) -> tuple[LPS, LPVariables, list[int]]:
+    def initial_problem_and_point(
+        self, problem_0: LPS, v_0: LPVariables
+    ) -> tuple[LPS, LPVariables, list[int]]:
         """数値的に安定させるため, 与えられた問題と初期点に改良を加えて出力
 
         Args:
@@ -152,15 +181,20 @@ class InexactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
         remove_constraint_rows = []
 
         # 初期点が近傍に入っていなければ, 新しく近傍に入る初期点を作成
-        if not self.is_in_center_path_neighborhood(v, problem, self.calculate_gamma_2(v, problem)):
-            logger.info("Initial points is not in neighborhood! Start with general initial point.")
+        if not self.is_in_center_path_neighborhood(
+            v, problem, self.calculate_gamma_2(v, problem)
+        ):
+            logger.info(
+                "Initial points is not in neighborhood! Start with general initial point."
+            )
             v = self._initial_variables_constant(problem)
 
         return problem, v, remove_constraint_rows
 
-    def calc_tolerance_for_inexact_first_derivative(self, v: LPVariables, problem: LPS) -> float:
-        """一階微分を inexact に解く際の誤差許容度
-        """
+    def calc_tolerance_for_inexact_first_derivative(
+        self, v: LPVariables, problem: LPS
+    ) -> float:
+        """一階微分を inexact に解く際の誤差許容度"""
         return self.eta * np.sqrt(v.mu / problem.n)
 
     def is_close_to_optimal(self, v: LPVariables, problem: LPS) -> bool:
@@ -179,8 +213,11 @@ class InexactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
         # return self.calc_tolerance_for_inexact_first_derivative(v, problem) < 10**(-4)
 
     def calc_first_derivatives(
-        self, v: LPVariables, problem: LPS,
-        *args, **kwargs,
+        self,
+        v: LPVariables,
+        problem: LPS,
+        *args,
+        **kwargs,
     ) -> tuple[np.ndarray, np.ndarray, np.ndarray, float]:
         """一次微分の値を出力. MNES の定式化で計算するため中身を内点法のものから変更
 
@@ -190,23 +227,36 @@ class InexactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
             np.ndarray: s の一次微分
             float: 線形方程式を解いた際の誤差ノルム
         """
-        right_hand_side = np.concatenate([
-            problem.residual_main_constraint(v.x),
-            problem.residual_dual_constraint(v.y, v.s),
-            v.x * v.s - self.sigma * v.mu
-        ])
+        right_hand_side = np.concatenate(
+            [
+                problem.residual_main_constraint(v.x),
+                problem.residual_dual_constraint(v.y, v.s),
+                v.x * v.s - self.sigma * v.mu,
+            ]
+        )
 
         # 求解
         tol = self.calc_tolerance_for_inexact_first_derivative(v, problem)
         # もし最適解に近づいていれば inexact solver だと計算時間的に不利になるので, exact solver に変更する
-        if self.is_close_to_optimal(v, problem) and self.parameters.INEXACT_SOLVE_EXACTLY_FROM_THE_MIDDLE:
+        if (
+            self.is_close_to_optimal(v, problem)
+            and self.parameters.INEXACT_SOLVE_EXACTLY_FROM_THE_MIDDLE
+        ):
             logger.info("Solve first derivative exactly.")
-            x_dot, y_dot, s_dot, norm_residual = self.exact_search_direction_calculator.run(v, problem, right_hand_side, tol)
+            x_dot, y_dot, s_dot, norm_residual = (
+                self.exact_search_direction_calculator.run(
+                    v, problem, right_hand_side, tol
+                )
+            )
         else:
-            x_dot, y_dot, s_dot, norm_residual = self.search_direction_calculator.run(v, problem, right_hand_side, tol)
+            x_dot, y_dot, s_dot, norm_residual = self.search_direction_calculator.run(
+                v, problem, right_hand_side, tol
+            )
         logger.debug(f"torelance: {tol}, ||M_1 z - sigma_1||: {norm_residual}")
         if norm_residual > tol:
-            logger.warning(f"First derivative residual over tolerance! torelance: {tol}, ||M_1 z - sigma_1||: {norm_residual}")
+            logger.warning(
+                f"First derivative residual over tolerance! torelance: {tol}, ||M_1 z - sigma_1||: {norm_residual}"
+            )
 
         return x_dot, y_dot, s_dot, norm_residual
 
@@ -228,9 +278,15 @@ class InexactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
         resi_main = problem.residual_main_constraint(v_0.x)
         resi_dual = problem.residual_dual_constraint(v_0.y, v_0.s)
         norm_residuals = np.linalg.norm(np.concatenate([resi_main, resi_dual]))
-        return self.parameters.INEXACT_COEF_NEIGHBORHOOD_CONSTRAINTS * norm_residuals / v_0.mu
+        return (
+            self.parameters.INEXACT_COEF_NEIGHBORHOOD_CONSTRAINTS
+            * norm_residuals
+            / v_0.mu
+        )
 
-    def is_in_center_path_neighborhood(self, v: LPVariables, problem: LPS, gamma_2: float) -> bool:
+    def is_in_center_path_neighborhood(
+        self, v: LPVariables, problem: LPS, gamma_2: float
+    ) -> bool:
         """現在の点が論文上の近傍に入っているかを判定する関数
 
         Args:
@@ -254,7 +310,9 @@ class InexactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
         resi_dual = problem.residual_dual_constraint(v.y, v.s)
         return np.linalg.norm(np.concatenate([resi_main, resi_dual])) <= gamma_2 * mu
 
-    def is_G_and_g_no_less_than_0(self, v_alpha: LPVariables, v: LPVariables, alpha: float) -> bool:
+    def is_G_and_g_no_less_than_0(
+        self, v_alpha: LPVariables, v: LPVariables, alpha: float
+    ) -> bool:
         """論文上の G^k, g^k が0以上になっているかを判定する関数
         理論的には gamma_2 が適切に設定されていれば中心パスに入るが,
         数値誤差でずれることもあるため正しく計算する
@@ -276,7 +334,9 @@ class InexactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
         # g^k >= 0
         return mu_alpha >= (1 - alpha) * v.mu
 
-    def is_h_no_less_than_0(self, v_alpha: LPVariables, v: LPVariables, alpha: float) -> bool:
+    def is_h_no_less_than_0(
+        self, v_alpha: LPVariables, v: LPVariables, alpha: float
+    ) -> bool:
         """論文上の h^k が0以上になっているかを判定する関数
 
         Args:
@@ -289,7 +349,9 @@ class InexactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
         """
         return (1 - (1 - self.beta) * np.sin(alpha)) * v.mu - v_alpha.mu >= 0
 
-    def log_constraints_residual_decreasing(self, v: LPVariables, problem: LPS, alpha: float, pre_r_b: np.ndarray):
+    def log_constraints_residual_decreasing(
+        self, v: LPVariables, problem: LPS, alpha: float, pre_r_b: np.ndarray
+    ):
         """制約残差が減っているかロギング
 
         Args:
@@ -307,11 +369,15 @@ class InexactLineSearchIPM(InexactInteriorPointMethod):
         """
         is_sigma_more_than_eta = self.sigma > self.eta
         if not is_sigma_more_than_eta:
-            logger.warning(f"sigma must be more than eta! sigma: {self.sigma}, eta: {self.eta}")
+            logger.warning(
+                f"sigma must be more than eta! sigma: {self.sigma}, eta: {self.eta}"
+            )
 
         is_beta_more_than_sigma_plus_eta = self.beta > self.sigma + self.eta
         if not is_beta_more_than_sigma_plus_eta:
-            logger.warning(f"beta must be more than sigma + eta! beta: {self.beta}, sigma: {self.sigma}, eta: {self.eta}")
+            logger.warning(
+                f"beta must be more than sigma + eta! beta: {self.beta}, sigma: {self.sigma}, eta: {self.eta}"
+            )
 
         if not (is_sigma_more_than_eta and is_beta_more_than_sigma_plus_eta):
             logger.warning("Algorithm is not satisfied for convergence.")
@@ -334,7 +400,10 @@ class InexactLineSearchIPM(InexactInteriorPointMethod):
         Args:
             iter_num: 反復回数
         """
-        upper = max(self.parameters.ITER_UPPER_COEF * (problem.n ** 1.5), self.parameters.ITER_UPPER)
+        upper = max(
+            self.parameters.ITER_UPPER_COEF * (problem.n**1.5),
+            self.parameters.ITER_UPPER,
+        )
         # upper = self.parameters.ITER_UPPER
         return iter_num >= upper
 
@@ -351,7 +420,9 @@ class InexactLineSearchIPM(InexactInteriorPointMethod):
         # 実行時間記録開始
         start_time = time.time()
 
-        problem, v, remove_constraint_rows = self.initial_problem_and_point(problem_0, v_0)
+        problem, v, remove_constraint_rows = self.initial_problem_and_point(
+            problem_0, v_0
+        )
 
         # 初期点や問題が変わることで状況が変わるのでログ
         # logger.info("Logging problem information.")
@@ -369,7 +440,9 @@ class InexactLineSearchIPM(InexactInteriorPointMethod):
 
         iter_num = 0
         is_solved = self.solved_checker.run(v_0, problem_0)
-        is_terminated = self.is_terminate(is_solved, iter_num, problem_0, time.time() - start_time)
+        is_terminated = self.is_terminate(
+            is_solved, iter_num, problem_0, time.time() - start_time
+        )
 
         # SolvedDetail の出力
         lst_variables = [v]
@@ -389,27 +462,39 @@ class InexactLineSearchIPM(InexactInteriorPointMethod):
         while not is_terminated:
             iter_num += 1
             logger.info(f"Iteration number: {iter_num}, mu: {mu}")
-            logger.info(f"{indent}max_r_b: {np.linalg.norm(r_b, ord=np.inf)}, max_r_c: {np.linalg.norm(r_c, ord=np.inf)}")
+            logger.info(
+                f"{indent}max_r_b: {np.linalg.norm(r_b, ord=np.inf)}, max_r_c: {np.linalg.norm(r_c, ord=np.inf)}"
+            )
 
             # 探索方向の決定
-            lst_tolerance_inexact_vdot.append(self.calc_tolerance_for_inexact_first_derivative(v, problem))
+            lst_tolerance_inexact_vdot.append(
+                self.calc_tolerance_for_inexact_first_derivative(v, problem)
+            )
 
-            x_dot, y_dot, s_dot, residual_first_derivative = self.calc_first_derivatives(v, problem)
+            x_dot, y_dot, s_dot, residual_first_derivative = (
+                self.calc_first_derivatives(v, problem)
+            )
             lst_norm_vdot.append(np.linalg.norm(np.concatenate([x_dot, y_dot, s_dot])))
             lst_residual_inexact_vdot.append(residual_first_derivative)
 
             # 近傍に入る step size になるまで Armijo のルールに従う
-            alpha_x_max = self.variable_updater.max_step_size_guarantee_positive(v.x, x_dot, xs_ddot)
-            alpha_s_max = self.variable_updater.max_step_size_guarantee_positive(v.s, s_dot, xs_ddot)
+            alpha_x_max = self.variable_updater.max_step_size_guarantee_positive(
+                v.x, x_dot, xs_ddot
+            )
+            alpha_s_max = self.variable_updater.max_step_size_guarantee_positive(
+                v.s, s_dot, xs_ddot
+            )
             alpha = min(alpha_x_max, alpha_s_max)
             logger.debug(f"{indent}Max step size: {alpha}")
             while alpha > self.min_step_size:
                 v_alpha = LPVariables(
                     self.variable_updater.run(v.x, x_dot, xs_ddot, alpha),
                     self.variable_updater.run(v.y, y_dot, y_ddot, alpha),
-                    self.variable_updater.run(v.s, s_dot, xs_ddot, alpha)
+                    self.variable_updater.run(v.s, s_dot, xs_ddot, alpha),
                 )
-                is_in_neighborhood = self.is_in_center_path_neighborhood(v_alpha, problem, gamma_2) and self.is_G_and_g_no_less_than_0(v_alpha, v, alpha)
+                is_in_neighborhood = self.is_in_center_path_neighborhood(
+                    v_alpha, problem, gamma_2
+                ) and self.is_G_and_g_no_less_than_0(v_alpha, v, alpha)
                 if is_in_neighborhood and self.is_h_no_less_than_0(v_alpha, v, alpha):
                     break
                 alpha /= 2
@@ -417,7 +502,7 @@ class InexactLineSearchIPM(InexactInteriorPointMethod):
             v = LPVariables(
                 self.variable_updater.run(v.x, x_dot, xs_ddot, alpha),
                 self.variable_updater.run(v.y, y_dot, y_ddot, alpha),
-                self.variable_updater.run(v.s, s_dot, xs_ddot, alpha)
+                self.variable_updater.run(v.s, s_dot, xs_ddot, alpha),
             )
             logger.info(f"{indent}Step size: {alpha}")
 
@@ -444,10 +529,16 @@ class InexactLineSearchIPM(InexactInteriorPointMethod):
             # 停止条件更新
             is_solved = self.solved_checker.run(v, problem)
             is_terminated = self.is_terminate(
-                is_solved, iter_num, problem, time.time() - start_time,
-                alpha_x=alpha, alpha_s=alpha,
-                pre_r_b=pre_r_b, pre_r_c=pre_r_c,
-                r_b=r_b, r_c=r_c,
+                is_solved,
+                iter_num,
+                problem,
+                time.time() - start_time,
+                alpha_x=alpha,
+                alpha_s=alpha,
+                pre_r_b=pre_r_b,
+                pre_r_c=pre_r_c,
+                r_b=r_b,
+                r_c=r_c,
             )
 
         # 時間計測終了
@@ -455,12 +546,19 @@ class InexactLineSearchIPM(InexactInteriorPointMethod):
 
         # 出力の作成
         aSolvedSummary = self.make_SolvedSummary(
-            v, problem, is_solved,
-            iter_num, self.is_iteration_number_reached_upper(iter_num, problem),
-            elapsed_time
+            v,
+            problem,
+            is_solved,
+            iter_num,
+            self.is_iteration_number_reached_upper(iter_num, problem),
+            elapsed_time,
         )
         output = SolvedDetail(
-            aSolvedSummary, v, problem, v_0, problem_0,
+            aSolvedSummary,
+            v,
+            problem,
+            v_0,
+            problem_0,
             lst_variables_by_iter=lst_variables,
             lst_main_step_size_by_iter=lst_alpha,
             lst_dual_step_size_by_iter=lst_alpha,
@@ -481,17 +579,29 @@ class InexactArcSearchIPM(InexactInteriorPointMethod):
         """
         is_sigma_more_than_eta = self.sigma > self.eta
         if not is_sigma_more_than_eta:
-            logger.warning(f"sigma must be more than eta! sigma: {self.sigma}, eta: {self.eta}")
+            logger.warning(
+                f"sigma must be more than eta! sigma: {self.sigma}, eta: {self.eta}"
+            )
 
-        is_G_i_more_than_zero = (1 - self.gamma_1) * self.sigma > (1 + self.gamma_1) * self.eta
+        is_G_i_more_than_zero = (1 - self.gamma_1) * self.sigma > (
+            1 + self.gamma_1
+        ) * self.eta
         if not is_G_i_more_than_zero:
-            logger.warning(f"(1 - gamma_1) sigma must be more than (1 + gamma_1) eta! gamma_1: {self.gamma_1}, sigma: {self.sigma}, eta: {self.eta}")
+            logger.warning(
+                f"(1 - gamma_1) sigma must be more than (1 + gamma_1) eta! gamma_1: {self.gamma_1}, sigma: {self.sigma}, eta: {self.eta}"
+            )
 
         is_beta_more_than_sigma_plus_eta = self.beta > self.sigma + self.eta
         if not is_beta_more_than_sigma_plus_eta:
-            logger.warning(f"beta must be more than sigma + eta! beta: {self.beta}, sigma: {self.sigma}, eta: {self.eta}")
+            logger.warning(
+                f"beta must be more than sigma + eta! beta: {self.beta}, sigma: {self.sigma}, eta: {self.eta}"
+            )
 
-        if not (is_sigma_more_than_eta and is_G_i_more_than_zero and is_beta_more_than_sigma_plus_eta):
+        if not (
+            is_sigma_more_than_eta
+            and is_G_i_more_than_zero
+            and is_beta_more_than_sigma_plus_eta
+        ):
             logger.warning("Algorithm is not satisfied for convergence.")
 
     def __init__(
@@ -512,20 +622,28 @@ class InexactArcSearchIPM(InexactInteriorPointMethod):
         Args:
             iter_num: 反復回数
         """
-        upper = max(self.parameters.ITER_UPPER_COEF * (problem.n ** 1.5), self.parameters.ITER_UPPER)
+        upper = max(
+            self.parameters.ITER_UPPER_COEF * (problem.n**1.5),
+            self.parameters.ITER_UPPER,
+        )
         # upper = self.parameters.ITER_UPPER
         return iter_num >= upper
 
-    def calc_tolerance_for_inexact_second_derivative(self, v: LPVariables, problem: LPS) -> float:
-        """二階微分を inexact に解く際の誤差許容度
-        """
+    def calc_tolerance_for_inexact_second_derivative(
+        self, v: LPVariables, problem: LPS
+    ) -> float:
+        """二階微分を inexact に解く際の誤差許容度"""
         return self.calc_tolerance_for_inexact_first_derivative(v, problem)
 
     def calc_second_derivative(
-        self, v: LPVariables,
-        x_dot: np.ndarray, y_dot: np.ndarray, s_dot: np.ndarray,
+        self,
+        v: LPVariables,
+        x_dot: np.ndarray,
+        y_dot: np.ndarray,
+        s_dot: np.ndarray,
         problem: LPS,
-        *args, **kwargs,
+        *args,
+        **kwargs,
     ) -> tuple[np.ndarray, np.ndarray, np.ndarray, float]:
         """二次微分の値を出力. OSS の定式化で計算するため中身を内点法のものから変更
 
@@ -544,28 +662,52 @@ class InexactArcSearchIPM(InexactInteriorPointMethod):
         tol_for_max_norm = self.eta * v.mu
         if residual_with_0_vector <= tol_for_max_norm:
             logger.info("RHS of second derivative is too small, so return zero vector.")
-            logger.info(f"norm of RHS: {residual_with_0_vector}, tolerance: {tol_for_max_norm}")
+            logger.info(
+                f"norm of RHS: {residual_with_0_vector}, tolerance: {tol_for_max_norm}"
+            )
             return xs_ddot_zero, y_ddot_zero, xs_ddot_zero, residual_with_0_vector
 
         # 求解
-        right_hand_side = np.concatenate([np.zeros(problem.m + problem.n), rhs_elements_nonzero])
+        right_hand_side = np.concatenate(
+            [np.zeros(problem.m + problem.n), rhs_elements_nonzero]
+        )
         tol = self.calc_tolerance_for_inexact_second_derivative(v, problem)
         # もし最適解に近づいていれば inexact solver だと計算時間的に不利になるので, exact solver に変更する
-        if self.is_close_to_optimal(v, problem) and self.parameters.INEXACT_SOLVE_EXACTLY_FROM_THE_MIDDLE:
-            x_ddot, y_ddot, s_ddot, norm_residual = self.exact_search_direction_calculator.run(v, problem, right_hand_side, tol)
+        if (
+            self.is_close_to_optimal(v, problem)
+            and self.parameters.INEXACT_SOLVE_EXACTLY_FROM_THE_MIDDLE
+        ):
+            x_ddot, y_ddot, s_ddot, norm_residual = (
+                self.exact_search_direction_calculator.run(
+                    v, problem, right_hand_side, tol
+                )
+            )
         else:
-            x_ddot, y_ddot, s_ddot, norm_residual = self.search_direction_calculator.run(v, problem, right_hand_side, tol)
+            x_ddot, y_ddot, s_ddot, norm_residual = (
+                self.search_direction_calculator.run(v, problem, right_hand_side, tol)
+            )
         logger.debug(f"tolerance: {tol}, ||M_2 z - sigma_2||: {norm_residual}")
         if norm_residual > tol:
-            logger.warning(f"Second derivative residual over tolerance! tolerance: {tol}, ||M_2 z - sigma_2||: {norm_residual}")
+            logger.warning(
+                f"Second derivative residual over tolerance! tolerance: {tol}, ||M_2 z - sigma_2||: {norm_residual}"
+            )
 
         # 誤差が0ベクトルの場合よりも大きい場合, 解を 0ベクトルに修正
         x_ddot_with_zero_y_ddot = rhs_elements_nonzero / v.s
         residual_with_zero_y_ddot = np.linalg.norm(problem.A @ x_ddot_with_zero_y_ddot)
-        logger.debug(f"{indent}Norm of second derivative residual = {norm_residual}, ||RHS|| = {residual_with_zero_y_ddot}")
+        logger.debug(
+            f"{indent}Norm of second derivative residual = {norm_residual}, ||RHS|| = {residual_with_zero_y_ddot}"
+        )
         if norm_residual > residual_with_zero_y_ddot:
-            logger.warning(f"{indent}Second derivative residual is too large. Second derivative is changed to zero vector.")
-            return x_ddot_with_zero_y_ddot, y_ddot_zero, xs_ddot_zero, residual_with_zero_y_ddot
+            logger.warning(
+                f"{indent}Second derivative residual is too large. Second derivative is changed to zero vector."
+            )
+            return (
+                x_ddot_with_zero_y_ddot,
+                y_ddot_zero,
+                xs_ddot_zero,
+                residual_with_zero_y_ddot,
+            )
 
         return x_ddot, y_ddot, s_ddot, norm_residual
 
@@ -582,7 +724,9 @@ class InexactArcSearchIPM(InexactInteriorPointMethod):
         # 実行時間記録開始
         start_time = time.time()
 
-        problem, v, remove_constraint_rows = self.initial_problem_and_point(problem_0, v_0)
+        problem, v, remove_constraint_rows = self.initial_problem_and_point(
+            problem_0, v_0
+        )
 
         # 初期点や問題が変わることで状況が変わるのでログ
         # logger.info("Logging problem information.")
@@ -600,7 +744,9 @@ class InexactArcSearchIPM(InexactInteriorPointMethod):
 
         iter_num = 0
         is_solved = self.solved_checker.run(v_0, problem_0)
-        is_terminated = self.is_terminate(is_solved, iter_num, problem_0, time.time() - start_time)
+        is_terminated = self.is_terminate(
+            is_solved, iter_num, problem_0, time.time() - start_time
+        )
 
         # SolvedDetail の出力
         lst_variables = [v]
@@ -623,57 +769,57 @@ class InexactArcSearchIPM(InexactInteriorPointMethod):
         while not is_terminated:
             iter_num += 1
             logger.info(f"Iteration number: {iter_num}, mu: {mu}")
-            logger.info(f"{indent}max_r_b: {np.linalg.norm(r_b, ord=np.inf)}, max_r_c: {np.linalg.norm(r_c, ord=np.inf)}")
+            logger.info(
+                f"{indent}max_r_b: {np.linalg.norm(r_b, ord=np.inf)}, max_r_c: {np.linalg.norm(r_c, ord=np.inf)}"
+            )
 
             # 探索方向の決定
-            lst_tolerance_inexact_vdot.append(self.calc_tolerance_for_inexact_first_derivative(v, problem))
-            x_dot, y_dot, s_dot, residual_first_derivative = self.calc_first_derivatives(v, problem)
+            lst_tolerance_inexact_vdot.append(
+                self.calc_tolerance_for_inexact_first_derivative(v, problem)
+            )
+            x_dot, y_dot, s_dot, residual_first_derivative = (
+                self.calc_first_derivatives(v, problem)
+            )
             lst_norm_vdot.append(np.linalg.norm(np.concatenate([x_dot, y_dot, s_dot])))
             lst_residual_inexact_vdot.append(residual_first_derivative)
 
-            lst_tolerance_inexact_vddot.append(self.calc_tolerance_for_inexact_second_derivative(v, problem))
+            lst_tolerance_inexact_vddot.append(
+                self.calc_tolerance_for_inexact_second_derivative(v, problem)
+            )
 
-            # alpha_x_max_line = self.variable_updater.max_step_size_guarantee_positive(v.x, x_dot, xs_ddot_zero)
-            # alpha_s_max_line = self.variable_updater.max_step_size_guarantee_positive(v.s, s_dot, xs_ddot_zero)
-            # alpha_line = min(alpha_x_max_line, alpha_s_max_line)
-            # v_alpha_line = LPVariables(
-            #     self.variable_updater.run(v.x, x_dot, xs_ddot_zero, alpha_line),
-            #     self.variable_updater.run(v.y, y_dot, y_ddot_zero, alpha_line),
-            #     self.variable_updater.run(v.s, s_dot, xs_ddot_zero, alpha_line)
-            # )
-            # is_max_step_size = self.variable_updater.is_max_step_size(alpha_line)
-            # is_in_neighborhood = self.is_in_center_path_neighborhood(v_alpha_line, problem, gamma_2) and self.is_G_and_g_no_less_than_0(v_alpha_line, v, alpha_line)
-            # if is_max_step_size and is_in_neighborhood and self.is_h_no_less_than_0(v_alpha_line, v, alpha_line):
-            #     logger.info("full step size can satisfy the conditions.")
-            #     x_ddot = xs_ddot_zero
-            #     y_ddot = y_ddot_zero
-            #     s_ddot = xs_ddot_zero
-            #     # 本当は zero vector に応じた residual を計算しないといけないが, 面倒なので 0 に統一
-            #     residual_second_derivative = 0
-            # else:
-            x_ddot, y_ddot, s_ddot, residual_second_derivative = self.calc_second_derivative(v, x_dot, y_dot, s_dot, problem)
-            lst_norm_vddot.append(np.linalg.norm(np.concatenate([x_ddot, y_ddot, s_ddot])))
+            x_ddot, y_ddot, s_ddot, residual_second_derivative = (
+                self.calc_second_derivative(v, x_dot, y_dot, s_dot, problem)
+            )
+            lst_norm_vddot.append(
+                np.linalg.norm(np.concatenate([x_ddot, y_ddot, s_ddot]))
+            )
             lst_residual_inexact_vddot.append(residual_second_derivative)
 
             # 近傍に入る step size になるまで Armijo のルールに従う
-            alpha_x_max = self.variable_updater.max_step_size_guarantee_positive(v.x, x_dot, x_ddot)
-            alpha_s_max = self.variable_updater.max_step_size_guarantee_positive(v.s, s_dot, s_ddot)
+            alpha_x_max = self.variable_updater.max_step_size_guarantee_positive(
+                v.x, x_dot, x_ddot
+            )
+            alpha_s_max = self.variable_updater.max_step_size_guarantee_positive(
+                v.s, s_dot, s_ddot
+            )
             alpha = min(alpha_x_max, alpha_s_max)
             logger.debug(f"{indent}Max step size: {alpha}")
             while alpha > self.min_step_size:
                 v_alpha = LPVariables(
                     self.variable_updater.run(v.x, x_dot, x_ddot, alpha),
                     self.variable_updater.run(v.y, y_dot, y_ddot, alpha),
-                    self.variable_updater.run(v.s, s_dot, s_ddot, alpha)
+                    self.variable_updater.run(v.s, s_dot, s_ddot, alpha),
                 )
-                is_in_neighborhood = self.is_in_center_path_neighborhood(v_alpha, problem, gamma_2) and self.is_G_and_g_no_less_than_0(v_alpha, v, alpha)
+                is_in_neighborhood = self.is_in_center_path_neighborhood(
+                    v_alpha, problem, gamma_2
+                ) and self.is_G_and_g_no_less_than_0(v_alpha, v, alpha)
                 if is_in_neighborhood and self.is_h_no_less_than_0(v_alpha, v, alpha):
                     break
                 alpha /= 2
             v = LPVariables(
                 self.variable_updater.run(v.x, x_dot, x_ddot, alpha),
                 self.variable_updater.run(v.y, y_dot, y_ddot, alpha),
-                self.variable_updater.run(v.s, s_dot, s_ddot, alpha)
+                self.variable_updater.run(v.s, s_dot, s_ddot, alpha),
             )
             logger.info(f"{indent}Step size: {alpha}")
 
@@ -699,23 +845,36 @@ class InexactArcSearchIPM(InexactInteriorPointMethod):
             # 停止条件更新
             is_solved = self.solved_checker.run(v, problem)
             is_terminated = self.is_terminate(
-                is_solved, iter_num, problem, time.time() - start_time,
-                alpha_x=alpha, alpha_s=alpha,
-                pre_r_b=pre_r_b, pre_r_c=pre_r_c,
-                r_b=r_b, r_c=r_c,
+                is_solved,
+                iter_num,
+                problem,
+                time.time() - start_time,
+                alpha_x=alpha,
+                alpha_s=alpha,
+                pre_r_b=pre_r_b,
+                pre_r_c=pre_r_c,
+                r_b=r_b,
+                r_c=r_c,
             )
 
         # 時間計測終了
         elapsed_time = time.time() - start_time
 
         aSolvedSummary = self.make_SolvedSummary(
-            v, problem, is_solved,
-            iter_num, self.is_iteration_number_reached_upper(iter_num, problem),
-            elapsed_time
+            v,
+            problem,
+            is_solved,
+            iter_num,
+            self.is_iteration_number_reached_upper(iter_num, problem),
+            elapsed_time,
         )
         # problem_0 と比較する際に変数の次元が合わないと困るため復帰させる
         output = SolvedDetail(
-            aSolvedSummary, v, problem, v_0, problem_0,
+            aSolvedSummary,
+            v,
+            problem,
+            v_0,
+            problem_0,
             lst_variables_by_iter=lst_variables,
             lst_main_step_size_by_iter=lst_alpha,
             lst_dual_step_size_by_iter=lst_alpha,

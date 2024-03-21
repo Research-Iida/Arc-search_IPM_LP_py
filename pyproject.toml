@@ -12,7 +12,6 @@ tqdm = "^4.64.0"
 dataclass-csv = "^1.4.0"
 matplotlib = "^3.5.2"
 scipy = "^1.8.1"
-pandas = "^1.4.2"
 pydantic = "^1.10.2"
 slack-sdk = "^3.21.3"
 qiskit = "0.38.0"
@@ -23,12 +22,12 @@ pytest = "^7.1.2"
 Sphinx = "^5.0.1"
 sphinx-rtd-theme = "^1.0.0"
 flake8 = "^4.0.1"
-autopep8 = "^1.6.0"
 rope = "^1.1.1"
 pytest-cov = "^3.0.0"
 mypy = "^0.961"
-pylint = "^2.14.1"
 cprofilev = "^1.0.7"
+black = "^24.3.0"
+
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
