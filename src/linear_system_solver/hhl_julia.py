@@ -1,11 +1,10 @@
 import numpy as np
-
-# サーバー環境で実行するためのおまじない
 from julia import Julia
 
 from ..logger import get_main_logger
 from .inexact_linear_system_solver import AbstractInexactLinearSystemSolver
 
+# サーバー環境で実行するためのおまじない
 jl = Julia(compiled_modules=False)
 from julia import Main, Pkg  # noqa: E402
 

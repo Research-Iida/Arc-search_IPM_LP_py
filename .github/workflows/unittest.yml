@@ -41,7 +41,7 @@ jobs:
         python -c "import julia; julia.install()"
 
     - name: Unitest with coverage
-      run: pytest -v --cov=src/ -m 'slow or not slow'
+      run: pytest -v --cov=src/ -m 'not julia'
 
     - name: Lint with ruff
       run: ruff check .
