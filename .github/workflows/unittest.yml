@@ -19,7 +19,7 @@ jobs:
 
     steps:
     - name: Checkout branch
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
@@ -30,6 +30,8 @@ jobs:
       uses: julia-actions/setup-julia@latest
       with:
         version: '1.7'
+
+    - uses: julia-actions/cache@v2
 
     - name: Julia build
       uses: julia-actions/julia-buildpkg@v1

@@ -6,6 +6,7 @@ from .inexact_linear_system_solver import AbstractInexactLinearSystemSolver
 
 # サーバー環境で実行するためのおまじない
 jl = Julia(compiled_modules=False)
+
 from julia import Main, Pkg  # noqa: E402
 
 Pkg.activate(".")
