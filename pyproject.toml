@@ -42,6 +42,8 @@ line-length = 119
 fixable = ["ALL"]
 unfixable = []
 
+ignore = []
+
 [tool.ruff.format]
 # Like Black, use double quotes for strings.
 quote-style = "double"
