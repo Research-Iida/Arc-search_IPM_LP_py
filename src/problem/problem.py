@@ -1,6 +1,8 @@
 """最適化問題に関する module"""
+
 # 親クラスから子クラスへの参照があるモジュールなので, annotations は必要
 from __future__ import annotations
+
 import dataclasses
 
 import numpy as np
@@ -9,6 +11,7 @@ import scipy
 
 class SettingProblemError(Exception):
     """問題を設定する際に例外が起こったら起こすエラー"""
+
     pass
 
 
@@ -25,6 +28,7 @@ class LinearProgrammingProblemStandard:
     Args:
         name: 問題名. デフォルトは空白
     """
+
     A: np.ndarray
     b: np.ndarray
     c: np.ndarray
@@ -65,8 +69,7 @@ class LinearProgrammingProblemStandard:
 
     @property
     def min_abs_A_nonzero(self) -> float:
-        """A の係数のうち最小の絶対値(0は除く)を出力
-        """
+        """A の係数のうち最小の絶対値(0は除く)を出力"""
         return np.abs(self.A[self.A != 0]).min()
 
     @property
@@ -103,9 +106,7 @@ class LinearProgrammingProblemStandard:
         """主問題の制約に対する残渣ベクトルの出力"""
         return self.A @ x - self.b
 
-    def residual_dual_constraint(
-        self, y: np.ndarray, s: np.ndarray
-    ) -> np.ndarray:
+    def residual_dual_constraint(self, y: np.ndarray, s: np.ndarray) -> np.ndarray:
         """双対問題の制約に対する残渣ベクトルの出力"""
         return self.A.T @ y + s - self.c
 
@@ -137,7 +138,9 @@ class LinearProgrammingProblemStandard:
         for i in range(self.m):
             if np.all(np.isclose(U[i, :], 0)):
                 if not np.isclose(b_factorized[i], 0):
-                    raise SettingProblemError(f"{i}行目において数値誤差を凌駕するほど実行不可能. U_i: {U[i, :]}, b_i: {b_factorized[i]}")
+                    raise SettingProblemError(
+                        f"{i}行目において数値誤差を凌駕するほど実行不可能. U_i: {U[i, :]}, b_i: {b_factorized[i]}"
+                    )
                 idx_zero_diag_element.append(i)
 
         # 指定された行を省いて出力
@@ -171,6 +174,7 @@ class LinearProgrammingProblem:
         UB: 変数の上限. UP_index 通りにソートされている
         name: 問題名. デフォルトは空白
     """
+
     A_E: np.ndarray
     b_E: np.ndarray
     A_G: np.ndarray
@@ -213,8 +217,7 @@ class LinearProgrammingProblem:
     # データが入っていなくても実行可能なため classmethod
     @classmethod
     def reverse_non_lower_bound(
-        cls, lb: np.ndarray, ub: np.ndarray,
-        A: np.ndarray, c: np.ndarray
+        cls, lb: np.ndarray, ub: np.ndarray, A: np.ndarray, c: np.ndarray
     ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """変数の下限が存在せず, 上限が存在する場合, 対応する変数の添え字の符号を反転させる
 
@@ -291,9 +294,7 @@ class LinearProgrammingProblem:
         return lb_out, ub_out, A_out, c_out
 
     @classmethod
-    def make_standard_A(
-        cls, A_E: np.ndarray, A_G: np.ndarray, A_L: np.ndarray, ub: np.ndarray
-    ) -> np.ndarray:
+    def make_standard_A(cls, A_E: np.ndarray, A_G: np.ndarray, A_L: np.ndarray, ub: np.ndarray) -> np.ndarray:
         """等式制約, 不等式制約から標準形式の係数行列を作成する
 
         Args:
@@ -317,21 +318,18 @@ class LinearProgrammingProblem:
             A_B[i, index_up] = 1
 
         # 組み合わせて一つの行列に
-        output = np.concatenate([
-            np.concatenate([A_E, np.zeros([m_e, m_g + m_l + m_b])], 1),
-            np.concatenate([A_G, -np.eye(m_g), np.zeros([m_g, m_l + m_b])], 1),
-            np.concatenate(
-                [A_L, np.zeros([m_l, m_g]), np.eye(m_l), np.zeros([m_l, m_b])],
-                1
-            ),
-            np.concatenate([A_B, np.zeros([m_b, m_g + m_l]), np.eye(m_b)], 1)
-        ])
+        output = np.concatenate(
+            [
+                np.concatenate([A_E, np.zeros([m_e, m_g + m_l + m_b])], 1),
+                np.concatenate([A_G, -np.eye(m_g), np.zeros([m_g, m_l + m_b])], 1),
+                np.concatenate([A_L, np.zeros([m_l, m_g]), np.eye(m_l), np.zeros([m_l, m_b])], 1),
+                np.concatenate([A_B, np.zeros([m_b, m_g + m_l]), np.eye(m_b)], 1),
+            ]
+        )
         return output
 
     @classmethod
-    def make_standard_b(
-        cls, A_E, A_G, A_L, b_E, b_G, b_L, lb, ub
-    ) -> np.ndarray:
+    def make_standard_b(cls, A_E, A_G, A_L, b_E, b_G, b_L, lb, ub) -> np.ndarray:
         """等式制約, 不等式制約から標準形式の right hand side を作成する
 
         Args:
@@ -346,18 +344,11 @@ class LinearProgrammingProblem:
         """
         lst_index_up = np.where(ub != np.inf)[0]
 
-        b = np.concatenate([
-            b_E - A_E @ lb,
-            b_G - A_G @ lb,
-            b_L - A_L @ lb,
-            ub[lst_index_up] - lb[lst_index_up]
-        ])
+        b = np.concatenate([b_E - A_E @ lb, b_G - A_G @ lb, b_L - A_L @ lb, ub[lst_index_up] - lb[lst_index_up]])
         return b
 
     @classmethod
-    def make_standard_c(
-        cls, c: np.ndarray, m_GL: int, ub: np.ndarray
-    ) -> np.ndarray:
+    def make_standard_c(cls, c: np.ndarray, m_GL: int, ub: np.ndarray) -> np.ndarray:
         """不等式制約から標準形式の目的関数係数を作成する
 
         Args:
@@ -380,9 +371,7 @@ class LinearProgrammingProblem:
         ub[self.UB_index] = self.UB
 
         # 変数すべてに下限を設定
-        lb_tmp, ub_tmp, A_tmp, c_tmp = self.separate_free_variable(
-            *self.reverse_non_lower_bound(lb, ub, A, self.c)
-        )
+        lb_tmp, ub_tmp, A_tmp, c_tmp = self.separate_free_variable(*self.reverse_non_lower_bound(lb, ub, A, self.c))
         # 等式制約に統一するため不等式制約を別々にする
         m_e = self.A_E.shape[0]
         m_g = self.A_G.shape[0]
@@ -394,9 +383,7 @@ class LinearProgrammingProblem:
 
         # 変形して標準形式の A, b, c 作成
         A_out = self.make_standard_A(A_E, A_G, A_L, ub_tmp)
-        b_out = self.make_standard_b(
-            A_E, A_G, A_L, self.b_E, self.b_G, self.b_L, lb_tmp, ub_tmp
-        )
+        b_out = self.make_standard_b(A_E, A_G, A_L, self.b_E, self.b_G, self.b_L, lb_tmp, ub_tmp)
         c_out = self.make_standard_c(c_tmp, m_gl, ub_tmp)
 
         return LinearProgrammingProblemStandard(A_out, b_out, c_out, self.name)
