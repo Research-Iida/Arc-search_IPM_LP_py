@@ -1,17 +1,17 @@
-
-import sys
 import argparse
+import sys
 from datetime import date
 
-from .utils import config_utils, str_util
-from .data_access import CsvHandler, MpsLoader
-from .logger import setup_logger, get_main_logger
-from .slack.slack import get_slack_api
+from .data_access import CsvHandler
+from .logger import get_main_logger, setup_logger
+from .problem.repository import LPRepository
 from .profiler.profiler import profile_decorator
-from .run_utils.get_solvers import get_solver, get_solvers
 from .run_utils.define_paths import path_solved_result_by_date
+from .run_utils.get_solvers import get_solver, get_solvers
 from .run_utils.solve_problem import solve, solve_and_write
 from .run_utils.write_files import copy_optimization_parameters, write_result_by_problem_solver_config
+from .slack.slack import get_slack_api
+from .utils import config_utils, str_util
 
 logger = get_main_logger()
 setup_logger(__name__)
@@ -20,18 +20,25 @@ aSlack = get_slack_api()
 # スキップする問題群. 基本的にサイズがでかすぎて解けなかったもの
 skip_problems = {
     "BLEND",  # SIFファイルに問題があり読み込みできなかった
-    "CRE-B", "CRE-D",
+    "CRE-B",
+    "CRE-D",
     "DEGEN2",  # 山下研のサーバーだと実行できなかった
     "DFL001",  # SIF ファイルに問題があり読み込みできなかった
-    "E226",   # SIF ファイルに問題があり読み込みできなかった
+    "E226",  # SIF ファイルに問題があり読み込みできなかった
     "FORPLAN",  # SIFファイルに問題があり読み込みできなかった
-    "GFRD-PNC", "GROW7", "GROW15",
+    "GFRD-PNC",
+    "GROW7",
+    "GROW15",
     "GROW22",  # SIFファイルに問題があり読み込みできなかった
     "KEN-11",  # 前処理の途中で落ちた
-    "KEN-13", "KEN-18",
+    "KEN-13",
+    "KEN-18",
     "NESM",  # 前処理で実行不可能と判断
-    "OSA-30", "OSA-60",
-    "PDS-06", "PDS-10", "PDS-20",
+    "OSA-30",
+    "OSA-60",
+    "PDS-06",
+    "PDS-10",
+    "PDS-20",
     "SCORPION",  # 初期点の計算時に特異行列が出てしまう
     "SIERRA",  # 文字列が数値の所に入っているらしい
     "STOCFOR3",  # 詳細は netlib の README 参照
@@ -58,7 +65,7 @@ class TargetProblemError(Exception):
 
 
 def decide_solved_problems(
-    aMpsLoader: MpsLoader,
+    aLPRepository: LPRepository,
     num_problem: int | None = None,
     start_problem_number: int | None = None,
 ) -> list[str]:
@@ -71,7 +78,7 @@ def decide_solved_problems(
         list[str]: 解く対象となった問題名のリスト
     """
     # すべての問題の読み込み
-    all_problem_files = set(aMpsLoader.get_problem_names())
+    all_problem_files = set(aLPRepository.get_problem_names())
     if not all_problem_files:
         msg = "There are no problem files! Did you open .tar file?"
         logger.exception(msg)
@@ -98,7 +105,9 @@ def decide_solved_problems(
 
 
 def main(
-    num_problem: int | None, name_solver: str | None, config_section: str | None,
+    num_problem: int | None,
+    name_solver: str | None,
+    config_section: str | None,
     start_problem_number: int | None = None,
 ):
     """main関数
@@ -123,11 +132,11 @@ def main(
 
     # 各種インスタンスの用意
     config = config_utils.read_config(section=config_section)
-    aMpsLoader = MpsLoader(config.get("PATH_NETLIB"))
+    aLPRepository = LPRepository(config_section)
     aCsvHandler = CsvHandler(config_section)
 
     # 対象の問題の決定
-    problem_files = decide_solved_problems(aMpsLoader, num_problem, start_problem_number)
+    problem_files = decide_solved_problems(aLPRepository, num_problem, start_problem_number)
     target_problem_number = len(problem_files)
     logger.info(f"Target problems number: {target_problem_number}")
 
@@ -151,11 +160,11 @@ def main(
         aSlack.notify(msg)
 
         # 最初にline search で解いてキャッシュに入れる
-        _ = solve(filename, get_solver("line", config_utils.test_section), aMpsLoader, aCsvHandler)
+        _ = solve(filename, get_solver("line", config_utils.test_section), aLPRepository)
 
         # ソルバーごとに解く. 毎回初期化した方が都合がいいので for 構文の中で取り出す
         for solver in get_solvers(name_solver, config_section):
-            aSolvedDetail = solve_and_write(filename, solver, aMpsLoader, aCsvHandler, name_result, path_result)
+            aSolvedDetail = solve_and_write(filename, solver, aLPRepository, aCsvHandler, name_result, path_result)
             write_result_by_problem_solver_config(aSolvedDetail, path_result)
 
         # 並列処理: メモリが爆発して逆に遅くなるためやらないほうがいい
@@ -163,7 +172,7 @@ def main(
         # process_list = []
         # for solver in lst_solver:
         #     kwargs = {
-        #         "filename": filename, "solver": solver, "aMpsLoader": aMpsLoader, "aCsvHandler": aCsvHandler,
+        #         "filename": filename, "solver": solver, "aLPRepository": aLPRepository, "aCsvHandler": aCsvHandler,
         #         "name_result": name_result, "path_result": path_result
         #     }
         #     process = Process(target=solve_and_write, kwargs=kwargs)
@@ -191,8 +200,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     try:
-        profile_decorator(main, "solve_all_problems", args.num_problem, args.solver, args.config_section, args.start_problem_number)
+        profile_decorator(
+            main, "solve_all_problems", args.num_problem, args.solver, args.config_section, args.start_problem_number
+        )
         aSlack.notify_mentioned(f"{msg_for_logging_today}End calculation.")
-    except: # NOQA
+    except:  # NOQA
         aSlack.notify_error()
         logger.exception(sys.exc_info())

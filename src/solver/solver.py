@@ -3,23 +3,25 @@
 今後ソルバーの設定を変えることで実験することが頻繁に起こるため,
 インターフェイスを使用して変更に対して柔軟な設計をできるようにしておく
 """
+
 from abc import ABCMeta, abstractmethod
 
 import numpy as np
+from scipy.sparse.linalg import inv
 
 from ..logger import get_main_logger, indent
 from ..problem import LinearProgrammingProblemStandard as LPS
-from .variables import LPVariables
-from .solved_checker import SolvedChecker, RelativeSolvedChecker, AbsoluteSolvedChecker
 from .optimization_parameters import OptimizationParameters
-from .solved_data import SolvedSummary, SolvedDetail
+from .solved_checker import AbsoluteSolvedChecker, RelativeSolvedChecker, SolvedChecker
+from .solved_data import SolvedDetail, SolvedSummary
+from .variables import LPVariables
 
 logger = get_main_logger()
 
 
 class LPSolver(metaclass=ABCMeta):
-    """LPを解くためのソルバーに関する抽象クラス
-    """
+    """LPを解くためのソルバーに関する抽象クラス"""
+
     solved_checker: SolvedChecker
 
     def _set_config_and_parameters(self, config_section: str):
@@ -28,8 +30,7 @@ class LPSolver(metaclass=ABCMeta):
 
     @property
     def is_stopping_criteria_relative(self) -> bool:
-        """停止条件を relative なもの（数値実験上は効率がよいとされている）に設定するか
-        """
+        """停止条件を relative なもの（数値実験上は効率がよいとされている）に設定するか"""
         return self.parameters.IS_STOPPING_CRITERIA_RELATIVE
 
     def __init__(
@@ -103,13 +104,7 @@ class LPSolver(metaclass=ABCMeta):
         except Exception as e:
             logger.exception("Error occured - ", exc_info=e)
             aSolvedSummary = SolvedSummary(
-                problem.name,
-                solver_name,
-                self.config_section,
-                True,
-                problem.n,
-                problem.m,
-                False
+                problem.name, solver_name, self.config_section, True, problem.n, problem.m, False
             )
             aSolvedDetail = SolvedDetail(aSolvedSummary, v_0, problem, v_0, problem)
 
@@ -152,10 +147,10 @@ class LPSolver(metaclass=ABCMeta):
         A = problem.A
         c = problem.c
 
-        AA_T_inv = np.linalg.inv(A.dot(A.T))
-        yhat = AA_T_inv.dot(A).dot(c)
-        s_hat = c - A.T.dot(yhat)
-        x_hat = A.T.dot(AA_T_inv).dot(problem.b)
+        AA_T_inv = inv(A @ A.T)
+        yhat = AA_T_inv @ A @ c
+        s_hat = c - A.T @ yhat
+        x_hat = A.T @ AA_T_inv @ problem.b
 
         delta_x = max([-1.1 * min(x_hat), 0])
         delta_s = max([-1.1 * min(s_hat), 0])
@@ -169,9 +164,7 @@ class LPSolver(metaclass=ABCMeta):
         if sum(x_delta) != 0:
             delta_hat_s += 0.5 * (x_delta).T.dot(s_delta) / sum(x_delta)
 
-        output = LPVariables(
-            x_hat + delta_hat_x, yhat, s_hat + delta_hat_s
-        )
+        output = LPVariables(x_hat + delta_hat_x, yhat, s_hat + delta_hat_s)
         return output
 
     def _initial_variables_by_Lustig(self, problem: LPS) -> LPVariables:
@@ -183,8 +176,8 @@ class LPSolver(metaclass=ABCMeta):
         b = problem.b
         c = problem.c
 
-        AA_T_inv = np.linalg.inv(A.dot(A.T))
-        x_hat = A.T.dot(AA_T_inv).dot(b)
+        AA_T_inv = inv(A @ A.T)
+        x_hat = A.T @ AA_T_inv @ b
         xi_1 = max(-100 * x_hat.min(), 100, np.linalg.norm(b, ord=1) / 100)
         xi_2 = 1 + np.linalg.norm(c, ord=1)
         x_0 = x_hat.copy()
@@ -205,14 +198,19 @@ class LPSolver(metaclass=ABCMeta):
         Returns:
             LPVariables: 初期点 x, λ, s
         """
-        return LPVariables(np.ones(problem.n) * self.initial_point_scale, np.zeros(problem.m), np.ones(problem.n) * self.initial_point_scale)
+        return LPVariables(
+            np.ones(problem.n) * self.initial_point_scale,
+            np.zeros(problem.m),
+            np.ones(problem.n) * self.initial_point_scale,
+        )
 
     def log_initial_problem_information(self, problem_0: LPS):
         """最初の段階での問題に関するロギングの実行"""
         logger.info(f"{indent}Dimension of problem n: {problem_0.n}, m: {problem_0.m}")
 
         logger.info(f"{indent}Eigen values:")
-        logger.info(f"{indent*2}Max: {problem_0.max_sqrt_eigen_value_AAT}, Min: {problem_0.min_sqrt_eigen_value_AAT}")
+        # logger.info(f"{indent*2}Max: {problem_0.max_sqrt_eigen_value_AAT}, Min: {problem_0.min_sqrt_eigen_value_AAT}")
+        logger.info(f"{indent*2}Max: {problem_0.max_sqrt_eigen_value_AAT}")
 
         logger.info(f"{indent}Abs ratio scaling:")
         logger.info(f"{indent*2}Max: {problem_0.max_abs_A}, Min: {problem_0.min_abs_A_nonzero}")
@@ -274,23 +272,30 @@ class LPSolver(metaclass=ABCMeta):
         return elapsed_time > upper_bound
 
     def make_SolvedSummary(
-        self, v: LPVariables, problem: LPS,
+        self,
+        v: LPVariables,
+        problem: LPS,
         is_solved: bool,
-        iter_num: int, is_iteration_number_reached_upper: bool,
+        iter_num: int,
+        is_iteration_number_reached_upper: bool,
         elapsed_time: float,
     ) -> SolvedSummary:
         """最適化の結果の概要を出力する"""
         output = SolvedSummary(
-            problem.name, self.__class__.__name__, self.config_section,
+            problem.name,
+            self.__class__.__name__,
+            self.config_section,
             False,
-            problem.n, problem.m,
+            problem.n,
+            problem.m,
             is_solved,
             iter_num,
             # 反復回数上限に達し, それでもまだ解けてない場合に反復を追加しようとするので over upper
             is_iteration_number_reached_upper and not is_solved,
             round(elapsed_time, 2),
             self.is_calculation_time_reached_upper(elapsed_time) and not is_solved,
-            problem.objective_main(v.x), v.mu,
+            problem.objective_main(v.x),
+            v.mu,
             np.linalg.norm(problem.residual_main_constraint(v.x), np.inf),
             np.linalg.norm(problem.residual_dual_constraint(v.y, v.s), np.inf),
         )

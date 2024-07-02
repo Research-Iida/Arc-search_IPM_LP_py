@@ -51,13 +51,13 @@ hljs.highlightAll();
 <p>求解した結果</p></div>
 </dd>
 <dt id="src.run_utils.solve_problem.preprocess"><code class="name flex">
-<span>def <span class="ident">preprocess</span></span>(<span>problem_name: str, aMpsLoader: <a title="src.data_access.mps_handler.MpsLoader" href="../data_access/mps_handler.html#src.data_access.mps_handler.MpsLoader">MpsLoader</a>, aCsvHandler: <a title="src.data_access.csv_handler.CsvHandler" href="../data_access/csv_handler.html#src.data_access.csv_handler.CsvHandler">CsvHandler</a>) ‑> <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a></span>
+<span>def <span class="ident">preprocess</span></span>(<span>problem_name: str, aLPRepository: <a title="src.problem.repository.LPRepository" href="../problem/repository.html#src.problem.repository.LPRepository">LPRepository</a>) ‑> <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a></span>
 </code></dt>
 <dd>
 <div class="desc"><p>前処理を施し, 標準形となった Netlib LP を csv で書き込む</p></div>
 </dd>
 <dt id="src.run_utils.solve_problem.solve"><code class="name flex">
-<span>def <span class="ident">solve</span></span>(<span>problem_name: str, aLPSolver: <a title="src.solver.solver.LPSolver" href="../solver/solver.html#src.solver.solver.LPSolver">LPSolver</a>, aMpsLoader: <a title="src.data_access.mps_handler.MpsLoader" href="../data_access/mps_handler.html#src.data_access.mps_handler.MpsLoader">MpsLoader</a>, aCsvHandler: <a title="src.data_access.csv_handler.CsvHandler" href="../data_access/csv_handler.html#src.data_access.csv_handler.CsvHandler">CsvHandler</a>) ‑> <a title="src.solver.solved_data.SolvedDetail" href="../solver/solved_data.html#src.solver.solved_data.SolvedDetail">SolvedDetail</a></span>
+<span>def <span class="ident">solve</span></span>(<span>problem_name: str, aLPSolver: <a title="src.solver.solver.LPSolver" href="../solver/solver.html#src.solver.solver.LPSolver">LPSolver</a>, aLPRepository: <a title="src.problem.repository.LPRepository" href="../problem/repository.html#src.problem.repository.LPRepository">LPRepository</a>) ‑> <a title="src.solver.solved_data.SolvedDetail" href="../solver/solved_data.html#src.solver.solved_data.SolvedDetail">SolvedDetail</a></span>
 </code></dt>
 <dd>
 <div class="desc"><p>ベンチマークの問題を読み取り, 解く</p>
@@ -77,7 +77,7 @@ hljs.highlightAll();
 </dl></div>
 </dd>
 <dt id="src.run_utils.solve_problem.solve_and_write"><code class="name flex">
-<span>def <span class="ident">solve_and_write</span></span>(<span>filename: str, solver: <a title="src.solver.solver.LPSolver" href="../solver/solver.html#src.solver.solver.LPSolver">LPSolver</a>, aMpsLoader: <a title="src.data_access.mps_handler.MpsLoader" href="../data_access/mps_handler.html#src.data_access.mps_handler.MpsLoader">MpsLoader</a>, aCsvHandler: <a title="src.data_access.csv_handler.CsvHandler" href="../data_access/csv_handler.html#src.data_access.csv_handler.CsvHandler">CsvHandler</a>, name_result: str, path_result: str) ‑> <a title="src.solver.solved_data.SolvedDetail" href="../solver/solved_data.html#src.solver.solved_data.SolvedDetail">SolvedDetail</a></span>
+<span>def <span class="ident">solve_and_write</span></span>(<span>filename: str, solver: <a title="src.solver.solver.LPSolver" href="../solver/solver.html#src.solver.solver.LPSolver">LPSolver</a>, aLPRepository: <a title="src.problem.repository.LPRepository" href="../problem/repository.html#src.problem.repository.LPRepository">LPRepository</a>, aCsvHandler: <a title="src.data_access.csv_handler.CsvHandler" href="../data_access/csv_handler.html#src.data_access.csv_handler.CsvHandler">CsvHandler</a>, name_result: str, path_result: str) ‑> <a title="src.solver.solved_data.SolvedDetail" href="../solver/solved_data.html#src.solver.solved_data.SolvedDetail">SolvedDetail</a></span>
 </code></dt>
 <dd>
 <div class="desc"><p>問題を解き, 結果を格納する. <code>__main__.py</code> で使用するので書き出しておく</p></div>

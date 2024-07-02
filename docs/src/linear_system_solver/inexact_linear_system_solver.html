@@ -49,8 +49,8 @@ Strategy パターン採用.</p>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class AbstractInexactLinearSystemSolver(AbstractLinearSystemSolver, metaclass=ABCMeta):
-    &#34;&#34;&#34;線形方程式を inexact に解くクラスの super class
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;線形方程式を inexact に解くクラスの super class&#34;&#34;&#34;
+
     pass</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -97,13 +97,11 @@ Strategy パターン採用.</p>
     Attributes:
         prev_coef_matrix_preprocessed: `prev_A` に前処理を施した後の係数行列
     &#34;&#34;&#34;
-    prev_coef_matrix_preprocessed: csc_matrix = None
+
+    prev_coef_matrix_preprocessed: Csr = None
     method_name: str = &#34;BiCG&#34;
 
-    def solve(
-        self, A: np.ndarray, b: np.ndarray,
-        tolerance: float = 10**-7, *args
-    ) -&gt; np.ndarray:
+    def solve(self, A: np.ndarray, b: np.ndarray, tolerance: float = 10**-7, *args) -&gt; np.ndarray:
         &#34;&#34;&#34;線形方程式 Ax=b を共役勾配法によって解く
 
         Args:
@@ -122,10 +120,12 @@ Strategy パターン採用.</p>
 
         logger.info(f&#34;{self.method_name} start.&#34;)
         result, info = spla.bicg(
-            coef_matrix, right_hand_side,
-            rtol=0, atol=tolerance,
+            coef_matrix,
+            right_hand_side,
+            rtol=0,
+            atol=tolerance,
             M=np.diag(1 / np.diag(coef_matrix)),
-            maxiter=100 * coef_matrix.shape[0]
+            maxiter=100 * coef_matrix.shape[0],
         )
         logger.info(f&#34;{self.method_name} end.&#34;)
 
@@ -136,7 +136,7 @@ Strategy パターン採用.</p>
 
         self.prev_A = A.copy()
         # 疎行列にして保管しておく
-        self.prev_coef_matrix_preprocessed = csc_matrix(coef_matrix)
+        self.prev_coef_matrix_preprocessed = Csr(coef_matrix)
         return result</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -150,7 +150,7 @@ Strategy パターン採用.</p>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="src.linear_system_solver.inexact_linear_system_solver.BiCGLinearSystemSolver.prev_coef_matrix_preprocessed"><code class="name">var <span class="ident">prev_coef_matrix_preprocessed</span> : scipy.sparse._csc.csc_matrix</code></dt>
+<dt id="src.linear_system_solver.inexact_linear_system_solver.BiCGLinearSystemSolver.prev_coef_matrix_preprocessed"><code class="name">var <span class="ident">prev_coef_matrix_preprocessed</span> : scipy.sparse._csr.csr_matrix</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -194,13 +194,11 @@ Strategy パターン採用.</p>
     Attributes:
         prev_coef_matrix_preprocessed: `prev_A` に前処理を施した後の係数行列
     &#34;&#34;&#34;
-    prev_coef_matrix_preprocessed: csc_matrix = None
+
+    prev_coef_matrix_preprocessed: Csr = None
     method_name: str = &#34;BiCGStab&#34;
 
-    def solve(
-        self, A: np.ndarray, b: np.ndarray,
-        tolerance: float = 10**-7, *args
-    ) -&gt; np.ndarray:
+    def solve(self, A: np.ndarray, b: np.ndarray, tolerance: float = 10**-7, *args) -&gt; np.ndarray:
         &#34;&#34;&#34;線形方程式 Ax=b を共役勾配法によって解く
 
         Args:
@@ -218,10 +216,12 @@ Strategy パターン採用.</p>
 
         logger.info(f&#34;{self.method_name} start.&#34;)
         result, info = spla.bicgstab(
-            coef_matrix, right_hand_side,
-            rtol=0, atol=tolerance,
+            coef_matrix,
+            right_hand_side,
+            rtol=0,
+            atol=tolerance,
             M=np.diag(1 / np.diag(coef_matrix)),
-            maxiter=100 * coef_matrix.shape[0]
+            maxiter=100 * coef_matrix.shape[0],
         )
         logger.info(f&#34;{self.method_name} end.&#34;)
 
@@ -231,7 +231,7 @@ Strategy パターン採用.</p>
             logger.warning(&#34;Illegal input or breakdown in Linear System.&#34;)
 
         self.prev_A = A.copy()
-        self.prev_coef_matrix_preprocessed = csc_matrix(coef_matrix)
+        self.prev_coef_matrix_preprocessed = Csr(coef_matrix)
         return result</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -245,7 +245,7 @@ Strategy パターン採用.</p>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="src.linear_system_solver.inexact_linear_system_solver.BiCGStabLinearSystemSolver.prev_coef_matrix_preprocessed"><code class="name">var <span class="ident">prev_coef_matrix_preprocessed</span> : scipy.sparse._csc.csc_matrix</code></dt>
+<dt id="src.linear_system_solver.inexact_linear_system_solver.BiCGStabLinearSystemSolver.prev_coef_matrix_preprocessed"><code class="name">var <span class="ident">prev_coef_matrix_preprocessed</span> : scipy.sparse._csr.csr_matrix</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -289,13 +289,11 @@ Strategy パターン採用.</p>
     Attributes:
         prev_coef_matrix_preprocessed: `prev_A` に前処理を施した後の係数行列
     &#34;&#34;&#34;
-    prev_coef_matrix_preprocessed: csc_matrix = None
+
+    prev_coef_matrix_preprocessed: Csr = None
     method_name: str = &#34;Conjugate Gradient method&#34;
 
-    def solve(
-        self, A: np.ndarray, b: np.ndarray,
-        tolerance: float = 10**-7, *args
-    ) -&gt; np.ndarray:
+    def solve(self, A: np.ndarray, b: np.ndarray, tolerance: float = 10**-7, *args) -&gt; np.ndarray:
         &#34;&#34;&#34;線形方程式 Ax=b を共役勾配法によって解く
 
         Args:
@@ -315,10 +313,12 @@ Strategy パターン採用.</p>
 
         logger.info(f&#34;{self.method_name} start.&#34;)
         result, info = spla.cg(
-            coef_matrix, right_hand_side,
-            rtol=0, atol=tolerance,
+            coef_matrix,
+            right_hand_side,
+            rtol=0,
+            atol=tolerance,
             M=np.diag(1 / np.diag(coef_matrix)),
-            maxiter=100 * coef_matrix.shape[0]
+            maxiter=100 * coef_matrix.shape[0],
         )
         logger.info(f&#34;{self.method_name} end.&#34;)
 
@@ -330,15 +330,17 @@ Strategy パターン採用.</p>
             if not np.all(eigen_value &gt; 0):
                 min_eig = min(eigen_value)
                 logger.warning(f&#34;Coefficient matrix of the LSS is not positive definite! min eigen value: {min_eig}&#34;)
-                coef_perturbation = np.abs(min_eig) + 10**(-3)
+                coef_perturbation = np.abs(min_eig) + 10 ** (-3)
                 logger.info(f&#34;Perturbation coefficient matrix by {coef_perturbation}.&#34;)
                 coef_matrix += coef_perturbation * np.eye(coef_matrix.shape[0])
 
                 result, info = spla.cg(
-                    coef_matrix, right_hand_side,
-                    tol=0, atol=tolerance,
+                    coef_matrix,
+                    right_hand_side,
+                    tol=0,
+                    atol=tolerance,
                     M=np.diag(1 / np.diag(coef_matrix)),
-                    maxiter=100 * coef_matrix.shape[0]
+                    maxiter=100 * coef_matrix.shape[0],
                 )
 
         # cg法が解けなかった場合の warning
@@ -349,7 +351,7 @@ Strategy パターン採用.</p>
 
         self.prev_A = A.copy()
         # 疎行列にして保管しておく
-        self.prev_coef_matrix_preprocessed = csc_matrix(coef_matrix)
+        self.prev_coef_matrix_preprocessed = Csr(coef_matrix)
         return result</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -363,7 +365,7 @@ Strategy パターン採用.</p>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="src.linear_system_solver.inexact_linear_system_solver.CGLinearSystemSolver.prev_coef_matrix_preprocessed"><code class="name">var <span class="ident">prev_coef_matrix_preprocessed</span> : scipy.sparse._csc.csc_matrix</code></dt>
+<dt id="src.linear_system_solver.inexact_linear_system_solver.CGLinearSystemSolver.prev_coef_matrix_preprocessed"><code class="name">var <span class="ident">prev_coef_matrix_preprocessed</span> : scipy.sparse._csr.csr_matrix</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -407,13 +409,11 @@ Strategy パターン採用.</p>
     Attributes:
         prev_coef_matrix_preprocessed: `prev_A` に前処理を施した後の係数行列
     &#34;&#34;&#34;
-    prev_coef_matrix_preprocessed: csc_matrix = None
+
+    prev_coef_matrix_preprocessed: Csr = None
     method_name: str = &#34;CGS&#34;
 
-    def solve(
-        self, A: np.ndarray, b: np.ndarray,
-        tolerance: float = 10**-7, *args
-    ) -&gt; np.ndarray:
+    def solve(self, A: np.ndarray, b: np.ndarray, tolerance: float = 10**-7, *args) -&gt; np.ndarray:
         &#34;&#34;&#34;線形方程式 Ax=b を共役勾配法によって解く
 
         Args:
@@ -431,10 +431,12 @@ Strategy パターン採用.</p>
 
         logger.info(f&#34;{self.method_name} start.&#34;)
         result, info = spla.cgs(
-            coef_matrix, right_hand_side,
-            rtol=0, atol=tolerance,
+            coef_matrix,
+            right_hand_side,
+            rtol=0,
+            atol=tolerance,
             M=np.diag(1 / np.diag(coef_matrix)),
-            maxiter=100 * coef_matrix.shape[0]
+            maxiter=100 * coef_matrix.shape[0],
         )
         logger.info(f&#34;{self.method_name} end.&#34;)
 
@@ -444,7 +446,7 @@ Strategy パターン採用.</p>
             logger.warning(&#34;Illegal input or breakdown in Linear System.&#34;)
 
         self.prev_A = A.copy()
-        self.prev_coef_matrix_preprocessed = csc_matrix(coef_matrix)
+        self.prev_coef_matrix_preprocessed = Csr(coef_matrix)
         return result</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -458,7 +460,7 @@ Strategy パターン採用.</p>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="src.linear_system_solver.inexact_linear_system_solver.CGSLinearSystemSolver.prev_coef_matrix_preprocessed"><code class="name">var <span class="ident">prev_coef_matrix_preprocessed</span> : scipy.sparse._csc.csc_matrix</code></dt>
+<dt id="src.linear_system_solver.inexact_linear_system_solver.CGSLinearSystemSolver.prev_coef_matrix_preprocessed"><code class="name">var <span class="ident">prev_coef_matrix_preprocessed</span> : scipy.sparse._csr.csr_matrix</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -502,13 +504,11 @@ Strategy パターン採用.</p>
     Attributes:
         prev_coef_matrix_preprocessed: `prev_A` に前処理を施した後の係数行列
     &#34;&#34;&#34;
-    prev_coef_matrix_preprocessed: csc_matrix = None
+
+    prev_coef_matrix_preprocessed: Csr = None
     method_name: str = &#34;Quasi-Minimal Residual method&#34;
 
-    def solve(
-        self, A: np.ndarray, b: np.ndarray,
-        tolerance: float = 10**-7, *args
-    ) -&gt; np.ndarray:
+    def solve(self, A: np.ndarray, b: np.ndarray, tolerance: float = 10**-7, *args) -&gt; np.ndarray:
         &#34;&#34;&#34;線形方程式 Ax=b を共役勾配法によって解く
 
         Args:
@@ -526,10 +526,12 @@ Strategy パターン採用.</p>
 
         logger.info(f&#34;{self.method_name} start.&#34;)
         result, info = spla.qmr(
-            coef_matrix, right_hand_side,
-            rtol=0, atol=tolerance,
+            coef_matrix,
+            right_hand_side,
+            rtol=0,
+            atol=tolerance,
             # M1=np.diag(1 / np.diag(coef_matrix)),
-            maxiter=100 * coef_matrix.shape[0]
+            maxiter=100 * coef_matrix.shape[0],
         )
         logger.info(f&#34;{self.method_name} end.&#34;)
 
@@ -539,7 +541,7 @@ Strategy パターン採用.</p>
             logger.warning(&#34;Illegal input or breakdown in Linear System.&#34;)
 
         self.prev_A = A.copy()
-        self.prev_coef_matrix_preprocessed = csc_matrix(coef_matrix)
+        self.prev_coef_matrix_preprocessed = Csr(coef_matrix)
         return result</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -553,7 +555,7 @@ Strategy パターン採用.</p>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="src.linear_system_solver.inexact_linear_system_solver.QMRLinearSystemSolver.prev_coef_matrix_preprocessed"><code class="name">var <span class="ident">prev_coef_matrix_preprocessed</span> : scipy.sparse._csc.csc_matrix</code></dt>
+<dt id="src.linear_system_solver.inexact_linear_system_solver.QMRLinearSystemSolver.prev_coef_matrix_preprocessed"><code class="name">var <span class="ident">prev_coef_matrix_preprocessed</span> : scipy.sparse._csr.csr_matrix</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -597,13 +599,11 @@ Strategy パターン採用.</p>
     Attributes:
         prev_coef_matrix_preprocessed: `prev_A` に前処理を施した後の係数行列
     &#34;&#34;&#34;
-    prev_coef_matrix_preprocessed: csc_matrix = None
+
+    prev_coef_matrix_preprocessed: Csr = None
     method_name: str = &#34;TFQMR&#34;
 
-    def solve(
-        self, A: np.ndarray, b: np.ndarray,
-        tolerance: float = 10**-7, *args
-    ) -&gt; np.ndarray:
+    def solve(self, A: np.ndarray, b: np.ndarray, tolerance: float = 10**-7, *args) -&gt; np.ndarray:
         &#34;&#34;&#34;線形方程式 Ax=b を共役勾配法によって解く
 
         Args:
@@ -621,10 +621,12 @@ Strategy パターン採用.</p>
 
         logger.info(f&#34;{self.method_name} start.&#34;)
         result, info = spla.tfqmr(
-            coef_matrix, right_hand_side,
-            rtol=0, atol=tolerance,
+            coef_matrix,
+            right_hand_side,
+            rtol=0,
+            atol=tolerance,
             # M=np.diag(1 / np.diag(coef_matrix)),
-            maxiter=100 * coef_matrix.shape[0]
+            maxiter=100 * coef_matrix.shape[0],
         )
         logger.info(f&#34;{self.method_name} end.&#34;)
 
@@ -634,7 +636,7 @@ Strategy パターン採用.</p>
             logger.warning(&#34;Illegal input or breakdown in Linear System.&#34;)
 
         self.prev_A = A.copy()
-        self.prev_coef_matrix_preprocessed = csc_matrix(coef_matrix)
+        self.prev_coef_matrix_preprocessed = Csr(coef_matrix)
         return result</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -648,7 +650,7 @@ Strategy パターン採用.</p>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="src.linear_system_solver.inexact_linear_system_solver.TFQMRLinearSystemSolver.prev_coef_matrix_preprocessed"><code class="name">var <span class="ident">prev_coef_matrix_preprocessed</span> : scipy.sparse._csc.csc_matrix</code></dt>
+<dt id="src.linear_system_solver.inexact_linear_system_solver.TFQMRLinearSystemSolver.prev_coef_matrix_preprocessed"><code class="name">var <span class="ident">prev_coef_matrix_preprocessed</span> : scipy.sparse._csr.csr_matrix</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>

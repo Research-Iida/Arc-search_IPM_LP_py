@@ -9,6 +9,7 @@ from abc import ABCMeta, abstractmethod
 
 import numpy as np
 from scipy.linalg import lu_factor, lu_solve
+from scipy.sparse import csr_matrix as Csr
 
 from ..logger import get_main_logger
 
@@ -22,16 +23,15 @@ class AbstractLinearSystemSolver(metaclass=ABCMeta):
         prev_A: 前回使用した係数行列. `solve` する際に同じものが入力された場合,
             再び同じ前処理をしなくて済むように持っておく
     """
-    prev_A: np.ndarray = None
+
+    prev_A: Csr = None
 
     @abstractmethod
-    def solve(
-        self, A: np.ndarray, b: np.ndarray, tolerance: float | None, *args
-    ) -> np.ndarray:
+    def solve(self, A: Csr, b: np.ndarray, tolerance: float | None, *args) -> np.ndarray:
         """線形方程式 Ax=b を解き, x を求める
 
         Args:
-            A (np.ndarray): 係数行列
+            A (Csr): 係数行列
             b (np.ndarray): 右辺のベクトル
             tolerance (float): 出した解が厳密解とどれだけ離れるかの許容度
 
@@ -48,12 +48,13 @@ class ExactLinearSystemSolver(AbstractLinearSystemSolver):
     Attributes:
         prev_lu_factor: `prev_A` を `scipy.linalg.lu_factor` にかけて求めたLU分解.
     """
+
     prev_lu_factor = None
 
-    def solve(self, A: np.ndarray, b: np.ndarray, tolerance: float | None = None) -> np.ndarray:
+    def solve(self, A: Csr, b: np.ndarray, tolerance: float | None = None) -> np.ndarray:
         """線形方程式 Ax=b を numpy によるLU分解によって解く"""
         if self.prev_lu_factor is not None:
-            if self.prev_A.shape == A.shape and np.all(self.prev_A == A):
+            if self.prev_A.shape == A.shape and len((self.prev_A != A).data) == 0:
                 logger.info("Use prev_A information.")
                 return lu_solve(self.prev_lu_factor, b)
 

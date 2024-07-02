@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.1">
-<title>src.solver API documentation</title>
+<title>src.solver.repository API documentation</title>
 <meta name="description" content="">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
@@ -22,69 +22,71 @@ hljs.highlightAll();
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>src.solver</code></h1>
+<h1 class="title">Module <code>src.solver.repository</code></h1>
 </header>
 <section id="section-intro">
 </section>
 <section>
-<h2 class="section-title" id="header-submodules">Sub-modules</h2>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt><code class="name"><a title="src.solver.inexact_interior_point_method" href="inexact_interior_point_method.html">src.solver.inexact_interior_point_method</a></code></dt>
+<dt id="src.solver.repository.SolvedDataRepository"><code class="flex name class">
+<span>class <span class="ident">SolvedDataRepository</span></span>
+</code></dt>
 <dd>
 <div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="src.solver.interior_point_method" href="interior_point_method.html">src.solver.interior_point_method</a></code></dt>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class SolvedDataRepository:
+    def write_SolvedSummary(
+        self, lst_solved_summary: list[SolvedSummary], name: str, path: str, is_append: bool = False
+    ):
+        &#34;&#34;&#34;最適化の実行によって得られた諸データを書き込む
+
+        DataclassWriter を使用するため, self.write メソッドは使用しない
+
+        Args:
+            path: 書き込み先のディレクトリ
+            is_append: 追記するか否か. 追記する場合は headerを抜く
+        &#34;&#34;&#34;
+        file_util.create_dir_if_not_exists(path)
+        filename = str_util.add_suffix_csv(f&#34;{path}{name}&#34;)
+
+        if is_append:
+            mode = &#34;a+&#34;
+        else:
+            mode = &#34;w&#34;
+
+        with open(filename, mode, newline=&#34;&#34;) as f:
+            w = DataclassWriter(f, lst_solved_summary, SolvedSummary)
+            w.write(skip_header=is_append)</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="src.solver.repository.SolvedDataRepository.write_SolvedSummary"><code class="name flex">
+<span>def <span class="ident">write_SolvedSummary</span></span>(<span>self, lst_solved_summary: list[<a title="src.solver.solved_data.SolvedSummary" href="solved_data.html#src.solver.solved_data.SolvedSummary">SolvedSummary</a>], name: str, path: str, is_append: bool = False)</span>
+</code></dt>
 <dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="src.solver.interior_point_method_with_restarting_strategy" href="interior_point_method_with_restarting_strategy.html">src.solver.interior_point_method_with_restarting_strategy</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="src.solver.iterative_refinement" href="iterative_refinement.html">src.solver.iterative_refinement</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="src.solver.optimization_parameters" href="optimization_parameters.html">src.solver.optimization_parameters</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="src.solver.repository" href="repository.html">src.solver.repository</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="src.solver.search_direction_calculator" href="search_direction_calculator.html">src.solver.search_direction_calculator</a></code></dt>
-<dd>
-<div class="desc"><p>探索方向の計算方法についてまとめたモジュール</p></div>
-</dd>
-<dt><code class="name"><a title="src.solver.solved_checker" href="solved_checker.html">src.solver.solved_checker</a></code></dt>
-<dd>
-<div class="desc"><p>ソルバーが問題を解くことができたかを確認するクラス</p></div>
-</dd>
-<dt><code class="name"><a title="src.solver.solved_data" href="solved_data.html">src.solver.solved_data</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="src.solver.solver" href="solver.html">src.solver.solver</a></code></dt>
-<dd>
-<div class="desc"><p>solver に関する module …</p></div>
-</dd>
-<dt><code class="name"><a title="src.solver.variable_updater" href="variable_updater.html">src.solver.variable_updater</a></code></dt>
-<dd>
-<div class="desc"><p>変数の更新方法について管理するモジュール
-arc-search, line-search の2通り</p></div>
-</dd>
-<dt><code class="name"><a title="src.solver.variables" href="variables.html">src.solver.variables</a></code></dt>
-<dd>
-<div class="desc"></div>
+<div class="desc"><p>最適化の実行によって得られた諸データを書き込む</p>
+<p>DataclassWriter を使用するため, self.write メソッドは使用しない</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>path</code></strong></dt>
+<dd>書き込み先のディレクトリ</dd>
+<dt><strong><code>is_append</code></strong></dt>
+<dd>追記するか否か. 追記する場合は headerを抜く</dd>
+</dl></div>
 </dd>
 </dl>
-</section>
-<section>
-</section>
-<section>
-</section>
-<section>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -94,23 +96,17 @@ arc-search, line-search の2通り</p></div>
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="src" href="../index.html">src</a></code></li>
+<li><code><a title="src.solver" href="index.html">src.solver</a></code></li>
 </ul>
 </li>
-<li><h3><a href="#header-submodules">Sub-modules</a></h3>
+<li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
-<li><code><a title="src.solver.inexact_interior_point_method" href="inexact_interior_point_method.html">src.solver.inexact_interior_point_method</a></code></li>
-<li><code><a title="src.solver.interior_point_method" href="interior_point_method.html">src.solver.interior_point_method</a></code></li>
-<li><code><a title="src.solver.interior_point_method_with_restarting_strategy" href="interior_point_method_with_restarting_strategy.html">src.solver.interior_point_method_with_restarting_strategy</a></code></li>
-<li><code><a title="src.solver.iterative_refinement" href="iterative_refinement.html">src.solver.iterative_refinement</a></code></li>
-<li><code><a title="src.solver.optimization_parameters" href="optimization_parameters.html">src.solver.optimization_parameters</a></code></li>
-<li><code><a title="src.solver.repository" href="repository.html">src.solver.repository</a></code></li>
-<li><code><a title="src.solver.search_direction_calculator" href="search_direction_calculator.html">src.solver.search_direction_calculator</a></code></li>
-<li><code><a title="src.solver.solved_checker" href="solved_checker.html">src.solver.solved_checker</a></code></li>
-<li><code><a title="src.solver.solved_data" href="solved_data.html">src.solver.solved_data</a></code></li>
-<li><code><a title="src.solver.solver" href="solver.html">src.solver.solver</a></code></li>
-<li><code><a title="src.solver.variable_updater" href="variable_updater.html">src.solver.variable_updater</a></code></li>
-<li><code><a title="src.solver.variables" href="variables.html">src.solver.variables</a></code></li>
+<li>
+<h4><code><a title="src.solver.repository.SolvedDataRepository" href="#src.solver.repository.SolvedDataRepository">SolvedDataRepository</a></code></h4>
+<ul class="">
+<li><code><a title="src.solver.repository.SolvedDataRepository.write_SolvedSummary" href="#src.solver.repository.SolvedDataRepository.write_SolvedSummary">write_SolvedSummary</a></code></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

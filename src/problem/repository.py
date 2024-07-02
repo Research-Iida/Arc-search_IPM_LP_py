@@ -1,0 +1,180 @@
+"""LP の読み込み・書き込みに関する module
+"""
+
+import os
+from pathlib import Path
+from typing import Optional
+
+import numpy as np
+from pysmps import smps_loader as smps
+from scipy.sparse import coo_matrix, lil_matrix, load_npz, save_npz
+
+from ..logger import get_main_logger
+from ..problem import LinearProgrammingProblem as LP
+from ..problem import LinearProgrammingProblemStandard as LPS
+from ..utils import config_utils, str_util
+
+logger = get_main_logger()
+
+
+class CannotReadError(Exception):
+    """この module で読み込みができない場合に発生するエラー"""
+
+    pass
+
+
+class LPRepository:
+    """LPを読み込む際に必要になる処理についてまとめたクラス
+
+    SIF file は制約ごとに上限, 下限が設定されていたり, box constraint が存在したりする
+    標準形式に起こす必要がある
+    """
+
+    def __init__(self, config_section: str = config_utils.default_section):
+        """初期化. `data` ディレクトリへのパスを設定する"""
+        config_ini = config_utils.read_config(section=config_section)
+
+        self._path_netlib = config_ini.get("PATH_NETLIB")
+        self._path_data = config_ini.get("PATH_DATA")
+        self._path_processed = config_ini.get("PATH_PROCESSED")
+        self._path_result = config_ini.get("PATH_RESULT")
+
+    def get_problem_names(self) -> list[str]:
+        """参照しているディレクトリに存在する `SIF` ファイルの一覧を取得
+
+        問題名のみ取り出したいので, `.SIF` を削除して出力する
+        """
+        path = Path(self._path_netlib)
+        return [fullpath.name[:-4] for fullpath in path.glob("*.SIF")]
+
+    def separate_by_constraint_type(self, types_constraint: list[str], A: lil_matrix, b_origin: np.ndarray):
+        """制約の種類（等式, 上限, 下限）によって A,b のインスタンスを分ける
+
+        Args:
+            types_constraint: A, b の制約の種類. E or G or L
+        """
+        lst_index_eq = [idx for idx, val in enumerate(types_constraint) if val == "E"]
+        A_E = A[lst_index_eq, :]
+        b_E = b_origin[lst_index_eq]
+        lst_index_ge = [idx for idx, val in enumerate(types_constraint) if val == "G"]
+        A_G = A[lst_index_ge, :]
+        b_G = b_origin[lst_index_ge]
+        lst_index_le = [idx for idx, val in enumerate(types_constraint) if val == "L"]
+        A_L = A[lst_index_le, :]
+        b_L = b_origin[lst_index_le]
+        return A_E, A_G, A_L, b_E, b_G, b_L
+
+    def read_raw_LP(self, problem_name: str) -> LP:
+        """MPS ファイルを読み込んで線形計画問題インスタンスを出力する
+
+        Args:
+            problem_name: 問題名. パスは含まない. `.SIF` はついていてもいなくてもよい
+
+        Returns:
+            LP: 線形計画問題のインスタンス
+        """
+        mps_obj = smps.load_mps(str_util.add_suffix(f"{self._path_netlib}{problem_name}", ".SIF"))
+
+        # 制約数
+        m_origin = len(mps_obj[2])
+        A_origin = coo_matrix(mps_obj[7]).tolil()
+
+        # 変数次元数
+        n_origin = len(mps_obj[3])
+        c_origin = mps_obj[6]
+
+        # すべて0であれば SIF file への記載が省略されるため, 明示的に設定
+        if not len(c_origin):
+            c_origin = np.zeros(n_origin)
+
+        # 制約
+        name_constraints = mps_obj[8]
+        # 制約の右辺がすべて0の場合省略されるため, 明示的に設定
+        if name_constraints:
+            b_origin = mps_obj[9][name_constraints[0]]
+        else:
+            b_origin = np.zeros(m_origin)
+        # 変数の上下限制約
+        name_bounds = mps_obj[10]
+        # 上下限制約がない場合記載が省略されるため, 明示的に設定
+        if name_bounds:
+            dct_bound = mps_obj[11][name_bounds[0]]
+            lb_origin = dct_bound["LO"]
+            ub_origin = dct_bound["UP"]
+        else:
+            lb_origin = np.zeros(n_origin)
+            ub_origin = np.full(n_origin, np.inf)
+
+        # 変数上限は制約に追加されるので, 上限があるものを取得しておく
+        lst_index_lb = np.where(lb_origin != -np.inf)[0]
+        lst_index_ub = np.where(ub_origin != np.inf)[0]
+        lb = lb_origin[lst_index_lb]
+        ub = ub_origin[lst_index_ub]
+
+        # 等式制約, 上限 or 下限不等式制約に分ける
+        types_constraint = mps_obj[5]
+        A_E, A_G, A_L, b_E, b_G, b_L = self.separate_by_constraint_type(types_constraint, A_origin, b_origin)
+
+        output = LP(A_E, b_E, A_G, b_G, A_L, b_L, lst_index_lb, lb, lst_index_ub, ub, c_origin, problem_name)
+        return output
+
+    def write_numpy(self, filename: str, data: np.ndarray, path: Optional[str] = None):
+        """numpy のデータをcsvファイルに書き出す
+
+        Args:
+            filename: ファイル名. `.csv` がなくともメソッドの中でつけるので問題ない
+            data: 書き込み対象の numpy データ
+            path: 書き込み先のpath. 指定がなければ `self._path_data` 直下に置く
+        """
+        # 書き込み先の決定
+        if path is None:
+            path = self._path_data
+
+        fullpath_filename = str_util.add_suffix_csv(f"{path}{filename}")
+        np.savetxt(fullpath_filename, data, delimiter=",")
+        logger.info(f"{fullpath_filename} is written.")
+
+    def write_LP(self, aLP: LPS, problem_name: str):
+        """線形計画問題を csvファイルに書き出す
+
+        前処理したものを書き出す前提のため, `processed` ディレクトリに書き出す
+
+        TODO:
+            * 0は書き下すとファイルサイズが大きくなるので, 欠損させるようにしたい
+        """
+        # Aの書き出し, scipy.sparce の型なので別で書き出しする
+        save_npz(f"{self._path_processed}{problem_name}_A.npz", aLP.A)
+        # self.write_numpy(problem_name + "_A", aLP.A, self._path_processed)
+
+        self.write_numpy(problem_name + "_b", aLP.b, self._path_processed)
+        self.write_numpy(problem_name + "_c", aLP.c, self._path_processed)
+
+    def can_read_processed_LP(self, problem_name: str) -> bool:
+        """指定した問題がディレクトリに存在し, 読み取ることが可能か"""
+        file_prefix = f"{self._path_processed}{problem_name}"
+
+        can_read_A = os.path.exists(str_util.add_suffix(file_prefix + "_A", ".npz"))
+        can_read_b = os.path.exists(str_util.add_suffix_csv(file_prefix + "_b"))
+        can_read_c = os.path.exists(str_util.add_suffix_csv(file_prefix + "_c"))
+        return can_read_A and can_read_b and can_read_c
+
+    def read_processed_LP(self, problem_name: str) -> LPS:
+        """線形計画問題に関するcsvファイルを読み込み, 問題のクラスインスタンスを出力
+
+        csv上で欠損している箇所は0を代入する
+        """
+        # 読み込めない場合, エラーを返す
+        if not self.can_read_processed_LP(problem_name):
+            raise CannotReadError(f"{self._path_processed} 以下に {problem_name} が存在しません.")
+
+        file_prefix = f"{self._path_processed}{problem_name}"
+
+        A = load_npz(str_util.add_suffix(file_prefix + "_A", ".npz"))
+
+        def read(filename: str) -> np.ndarray:
+            """各定数を読み込む処理"""
+            return np.genfromtxt(filename, delimiter=",", filling_values=0)
+
+        b = read(str_util.add_suffix_csv(file_prefix + "_b"))
+        c = read(str_util.add_suffix_csv(file_prefix + "_c"))
+        return LPS(A, b, c, problem_name)

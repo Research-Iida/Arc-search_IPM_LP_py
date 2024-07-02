@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.1">
-<title>src.data_access.mps_handler API documentation</title>
-<meta name="description" content="データの読み込み・書き込みに関する module">
+<title>src.problem.repository API documentation</title>
+<meta name="description" content="LP の読み込み・書き込みに関する module">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
@@ -22,10 +22,10 @@ hljs.highlightAll();
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>src.data_access.mps_handler</code></h1>
+<h1 class="title">Module <code>src.problem.repository</code></h1>
 </header>
 <section id="section-intro">
-<p>データの読み込み・書き込みに関する module</p>
+<p>LP の読み込み・書き込みに関する module</p>
 </section>
 <section>
 </section>
@@ -36,7 +36,7 @@ hljs.highlightAll();
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="src.data_access.mps_handler.CannotReadError"><code class="flex name class">
+<dt id="src.problem.repository.CannotReadError"><code class="flex name class">
 <span>class <span class="ident">CannotReadError</span></span>
 <span>(</span><span>*args, **kwargs)</span>
 </code></dt>
@@ -57,45 +57,41 @@ hljs.highlightAll();
 <li>builtins.BaseException</li>
 </ul>
 </dd>
-<dt id="src.data_access.mps_handler.MpsLoader"><code class="flex name class">
-<span>class <span class="ident">MpsLoader</span></span>
-<span>(</span><span>path_netlib: str = 'data/raw/netlib/')</span>
+<dt id="src.problem.repository.LPRepository"><code class="flex name class">
+<span>class <span class="ident">LPRepository</span></span>
+<span>(</span><span>config_section: str = 'DEFAULT')</span>
 </code></dt>
 <dd>
-<div class="desc"><p>SIF file からLPを読み込む際に必要になる処理についてまとめたクラス</p>
+<div class="desc"><p>LPを読み込む際に必要になる処理についてまとめたクラス</p>
 <p>SIF file は制約ごとに上限, 下限が設定されていたり, box constraint が存在したりする
 標準形式に起こす必要がある</p>
-<p>初期化</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>path_netlib</code></strong></dt>
-<dd>NETLIB のベンチマークSIF file が格納されているディレクトリまでのパス</dd>
-</dl></div>
+<p>初期化. <code>data</code> ディレクトリへのパスを設定する</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class MpsLoader:
-    &#34;&#34;&#34;SIF file からLPを読み込む際に必要になる処理についてまとめたクラス
+<pre><code class="python">class LPRepository:
+    &#34;&#34;&#34;LPを読み込む際に必要になる処理についてまとめたクラス
 
     SIF file は制約ごとに上限, 下限が設定されていたり, box constraint が存在したりする
     標準形式に起こす必要がある
     &#34;&#34;&#34;
 
-    def __init__(self, path_netlib: str = path_netlib):
-        &#34;&#34;&#34;初期化
+    def __init__(self, config_section: str = config_utils.default_section):
+        &#34;&#34;&#34;初期化. `data` ディレクトリへのパスを設定する&#34;&#34;&#34;
+        config_ini = config_utils.read_config(section=config_section)
 
-        Args:
-            path_netlib: NETLIB のベンチマークSIF file が格納されているディレクトリまでのパス
-        &#34;&#34;&#34;
-        self._path = path_netlib
+        self._path_netlib = config_ini.get(&#34;PATH_NETLIB&#34;)
+        self._path_data = config_ini.get(&#34;PATH_DATA&#34;)
+        self._path_processed = config_ini.get(&#34;PATH_PROCESSED&#34;)
+        self._path_result = config_ini.get(&#34;PATH_RESULT&#34;)
 
     def get_problem_names(self) -&gt; list[str]:
         &#34;&#34;&#34;参照しているディレクトリに存在する `SIF` ファイルの一覧を取得
 
         問題名のみ取り出したいので, `.SIF` を削除して出力する
         &#34;&#34;&#34;
-        path = pathlib.Path(self._path)
+        path = Path(self._path_netlib)
         return [fullpath.name[:-4] for fullpath in path.glob(&#34;*.SIF&#34;)]
 
     def separate_by_constraint_type(self, types_constraint: list[str], A: lil_matrix, b_origin: np.ndarray):
@@ -115,12 +111,7 @@ hljs.highlightAll();
         b_L = b_origin[lst_index_le]
         return A_E, A_G, A_L, b_E, b_G, b_L
 
-    def add_suffix(self, problem_name: str) -&gt; str:
-        &#34;&#34;&#34;パスを Attributes から取得し, `.SIF` が頭についていなければ追加&#34;&#34;&#34;
-        suffix = &#34;.SIF&#34;
-        return str_util.add_suffix(f&#34;{self._path}{problem_name}&#34;, suffix)
-
-    def run(self, problem_name: str) -&gt; LP:
+    def read_raw_LP(self, problem_name: str) -&gt; LP:
         &#34;&#34;&#34;MPS ファイルを読み込んで線形計画問題インスタンスを出力する
 
         Args:
@@ -129,7 +120,7 @@ hljs.highlightAll();
         Returns:
             LP: 線形計画問題のインスタンス
         &#34;&#34;&#34;
-        mps_obj = smps.load_mps(self.add_suffix(problem_name))
+        mps_obj = smps.load_mps(str_util.add_suffix(f&#34;{self._path_netlib}{problem_name}&#34;, &#34;.SIF&#34;))
 
         # 制約数
         m_origin = len(mps_obj[2])
@@ -172,25 +163,93 @@ hljs.highlightAll();
         A_E, A_G, A_L, b_E, b_G, b_L = self.separate_by_constraint_type(types_constraint, A_origin, b_origin)
 
         output = LP(A_E, b_E, A_G, b_G, A_L, b_L, lst_index_lb, lb, lst_index_ub, ub, c_origin, problem_name)
-        return output</code></pre>
+        return output
+
+    def write_numpy(self, filename: str, data: np.ndarray, path: Optional[str] = None):
+        &#34;&#34;&#34;numpy のデータをcsvファイルに書き出す
+
+        Args:
+            filename: ファイル名. `.csv` がなくともメソッドの中でつけるので問題ない
+            data: 書き込み対象の numpy データ
+            path: 書き込み先のpath. 指定がなければ `self._path_data` 直下に置く
+        &#34;&#34;&#34;
+        # 書き込み先の決定
+        if path is None:
+            path = self._path_data
+
+        fullpath_filename = str_util.add_suffix_csv(f&#34;{path}{filename}&#34;)
+        np.savetxt(fullpath_filename, data, delimiter=&#34;,&#34;)
+        logger.info(f&#34;{fullpath_filename} is written.&#34;)
+
+    def write_LP(self, aLP: LPS, problem_name: str):
+        &#34;&#34;&#34;線形計画問題を csvファイルに書き出す
+
+        前処理したものを書き出す前提のため, `processed` ディレクトリに書き出す
+
+        TODO:
+            * 0は書き下すとファイルサイズが大きくなるので, 欠損させるようにしたい
+        &#34;&#34;&#34;
+        # Aの書き出し, scipy.sparce の型なので別で書き出しする
+        save_npz(f&#34;{self._path_processed}{problem_name}_A.npz&#34;, aLP.A)
+        # self.write_numpy(problem_name + &#34;_A&#34;, aLP.A, self._path_processed)
+
+        self.write_numpy(problem_name + &#34;_b&#34;, aLP.b, self._path_processed)
+        self.write_numpy(problem_name + &#34;_c&#34;, aLP.c, self._path_processed)
+
+    def can_read_processed_LP(self, problem_name: str) -&gt; bool:
+        &#34;&#34;&#34;指定した問題がディレクトリに存在し, 読み取ることが可能か&#34;&#34;&#34;
+        file_prefix = f&#34;{self._path_processed}{problem_name}&#34;
+
+        can_read_A = os.path.exists(str_util.add_suffix(file_prefix + &#34;_A&#34;, &#34;.npz&#34;))
+        can_read_b = os.path.exists(str_util.add_suffix_csv(file_prefix + &#34;_b&#34;))
+        can_read_c = os.path.exists(str_util.add_suffix_csv(file_prefix + &#34;_c&#34;))
+        return can_read_A and can_read_b and can_read_c
+
+    def read_processed_LP(self, problem_name: str) -&gt; LPS:
+        &#34;&#34;&#34;線形計画問題に関するcsvファイルを読み込み, 問題のクラスインスタンスを出力
+
+        csv上で欠損している箇所は0を代入する
+        &#34;&#34;&#34;
+        # 読み込めない場合, エラーを返す
+        if not self.can_read_processed_LP(problem_name):
+            raise CannotReadError(f&#34;{self._path_processed} 以下に {problem_name} が存在しません.&#34;)
+
+        file_prefix = f&#34;{self._path_processed}{problem_name}&#34;
+
+        A = load_npz(str_util.add_suffix(file_prefix + &#34;_A&#34;, &#34;.npz&#34;))
+
+        def read(filename: str) -&gt; np.ndarray:
+            &#34;&#34;&#34;各定数を読み込む処理&#34;&#34;&#34;
+            return np.genfromtxt(filename, delimiter=&#34;,&#34;, filling_values=0)
+
+        b = read(str_util.add_suffix_csv(file_prefix + &#34;_b&#34;))
+        c = read(str_util.add_suffix_csv(file_prefix + &#34;_c&#34;))
+        return LPS(A, b, c, problem_name)</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
-<dt id="src.data_access.mps_handler.MpsLoader.add_suffix"><code class="name flex">
-<span>def <span class="ident">add_suffix</span></span>(<span>self, problem_name: str) ‑> str</span>
+<dt id="src.problem.repository.LPRepository.can_read_processed_LP"><code class="name flex">
+<span>def <span class="ident">can_read_processed_LP</span></span>(<span>self, problem_name: str) ‑> bool</span>
 </code></dt>
 <dd>
-<div class="desc"><p>パスを Attributes から取得し, <code>.SIF</code> が頭についていなければ追加</p></div>
+<div class="desc"><p>指定した問題がディレクトリに存在し, 読み取ることが可能か</p></div>
 </dd>
-<dt id="src.data_access.mps_handler.MpsLoader.get_problem_names"><code class="name flex">
+<dt id="src.problem.repository.LPRepository.get_problem_names"><code class="name flex">
 <span>def <span class="ident">get_problem_names</span></span>(<span>self) ‑> list[str]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>参照しているディレクトリに存在する <code>SIF</code> ファイルの一覧を取得</p>
 <p>問題名のみ取り出したいので, <code>.SIF</code> を削除して出力する</p></div>
 </dd>
-<dt id="src.data_access.mps_handler.MpsLoader.run"><code class="name flex">
-<span>def <span class="ident">run</span></span>(<span>self, problem_name: str) ‑> <a title="src.problem.problem.LinearProgrammingProblem" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblem">LinearProgrammingProblem</a></span>
+<dt id="src.problem.repository.LPRepository.read_processed_LP"><code class="name flex">
+<span>def <span class="ident">read_processed_LP</span></span>(<span>self, problem_name: str) ‑> <a title="src.problem.problem.LinearProgrammingProblemStandard" href="problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>線形計画問題に関するcsvファイルを読み込み, 問題のクラスインスタンスを出力</p>
+<p>csv上で欠損している箇所は0を代入する</p></div>
+</dd>
+<dt id="src.problem.repository.LPRepository.read_raw_LP"><code class="name flex">
+<span>def <span class="ident">read_raw_LP</span></span>(<span>self, problem_name: str) ‑> <a title="src.problem.problem.LinearProgrammingProblem" href="problem.html#src.problem.problem.LinearProgrammingProblem">LinearProgrammingProblem</a></span>
 </code></dt>
 <dd>
 <div class="desc"><p>MPS ファイルを読み込んで線形計画問題インスタンスを出力する</p>
@@ -205,7 +264,7 @@ hljs.highlightAll();
 <dd>線形計画問題のインスタンス</dd>
 </dl></div>
 </dd>
-<dt id="src.data_access.mps_handler.MpsLoader.separate_by_constraint_type"><code class="name flex">
+<dt id="src.problem.repository.LPRepository.separate_by_constraint_type"><code class="name flex">
 <span>def <span class="ident">separate_by_constraint_type</span></span>(<span>self, types_constraint: list[str], A: scipy.sparse._lil.lil_matrix, b_origin: numpy.ndarray)</span>
 </code></dt>
 <dd>
@@ -214,6 +273,32 @@ hljs.highlightAll();
 <dl>
 <dt><strong><code>types_constraint</code></strong></dt>
 <dd>A, b の制約の種類. E or G or L</dd>
+</dl></div>
+</dd>
+<dt id="src.problem.repository.LPRepository.write_LP"><code class="name flex">
+<span>def <span class="ident">write_LP</span></span>(<span>self, aLP: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>, problem_name: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>線形計画問題を csvファイルに書き出す</p>
+<p>前処理したものを書き出す前提のため, <code>processed</code> ディレクトリに書き出す</p>
+<h2 id="todo">Todo</h2>
+<ul>
+<li>0は書き下すとファイルサイズが大きくなるので, 欠損させるようにしたい</li>
+</ul></div>
+</dd>
+<dt id="src.problem.repository.LPRepository.write_numpy"><code class="name flex">
+<span>def <span class="ident">write_numpy</span></span>(<span>self, filename: str, data: numpy.ndarray, path: Optional[str] = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>numpy のデータをcsvファイルに書き出す</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>filename</code></strong></dt>
+<dd>ファイル名. <code>.csv</code> がなくともメソッドの中でつけるので問題ない</dd>
+<dt><strong><code>data</code></strong></dt>
+<dd>書き込み対象の numpy データ</dd>
+<dt><strong><code>path</code></strong></dt>
+<dd>書き込み先のpath. 指定がなければ <code>self._path_data</code> 直下に置く</dd>
 </dl></div>
 </dd>
 </dl>
@@ -228,21 +313,24 @@ hljs.highlightAll();
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="src.data_access" href="index.html">src.data_access</a></code></li>
+<li><code><a title="src.problem" href="index.html">src.problem</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="src.data_access.mps_handler.CannotReadError" href="#src.data_access.mps_handler.CannotReadError">CannotReadError</a></code></h4>
+<h4><code><a title="src.problem.repository.CannotReadError" href="#src.problem.repository.CannotReadError">CannotReadError</a></code></h4>
 </li>
 <li>
-<h4><code><a title="src.data_access.mps_handler.MpsLoader" href="#src.data_access.mps_handler.MpsLoader">MpsLoader</a></code></h4>
+<h4><code><a title="src.problem.repository.LPRepository" href="#src.problem.repository.LPRepository">LPRepository</a></code></h4>
 <ul class="">
-<li><code><a title="src.data_access.mps_handler.MpsLoader.add_suffix" href="#src.data_access.mps_handler.MpsLoader.add_suffix">add_suffix</a></code></li>
-<li><code><a title="src.data_access.mps_handler.MpsLoader.get_problem_names" href="#src.data_access.mps_handler.MpsLoader.get_problem_names">get_problem_names</a></code></li>
-<li><code><a title="src.data_access.mps_handler.MpsLoader.run" href="#src.data_access.mps_handler.MpsLoader.run">run</a></code></li>
-<li><code><a title="src.data_access.mps_handler.MpsLoader.separate_by_constraint_type" href="#src.data_access.mps_handler.MpsLoader.separate_by_constraint_type">separate_by_constraint_type</a></code></li>
+<li><code><a title="src.problem.repository.LPRepository.can_read_processed_LP" href="#src.problem.repository.LPRepository.can_read_processed_LP">can_read_processed_LP</a></code></li>
+<li><code><a title="src.problem.repository.LPRepository.get_problem_names" href="#src.problem.repository.LPRepository.get_problem_names">get_problem_names</a></code></li>
+<li><code><a title="src.problem.repository.LPRepository.read_processed_LP" href="#src.problem.repository.LPRepository.read_processed_LP">read_processed_LP</a></code></li>
+<li><code><a title="src.problem.repository.LPRepository.read_raw_LP" href="#src.problem.repository.LPRepository.read_raw_LP">read_raw_LP</a></code></li>
+<li><code><a title="src.problem.repository.LPRepository.separate_by_constraint_type" href="#src.problem.repository.LPRepository.separate_by_constraint_type">separate_by_constraint_type</a></code></li>
+<li><code><a title="src.problem.repository.LPRepository.write_LP" href="#src.problem.repository.LPRepository.write_LP">write_LP</a></code></li>
+<li><code><a title="src.problem.repository.LPRepository.write_numpy" href="#src.problem.repository.LPRepository.write_numpy">write_numpy</a></code></li>
 </ul>
 </li>
 </ul>

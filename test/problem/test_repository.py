@@ -1,16 +1,26 @@
+import glob
+import os
+
+import numpy as np
 import pytest
 from pysmps import smps_loader as smps
+from scipy.sparse import csr_matrix
 
-from src.data_access import MpsLoader
-from src.utils import config_utils
+from src.problem import LinearProgrammingProblemStandard as LPS
+from src.problem.repository import CannotReadError, LPRepository
+from src.utils.config_utils import read_config, test_section
 
-config_ini = config_utils.read_config(section="TEST")
+config_ini = read_config(section=test_section)
 path_netlib = config_ini.get("PATH_NETLIB")
+path_data = config_ini.get("PATH_DATA")
+
+# ファイル名の設定
+filename_written = "written"
 
 
 @pytest.fixture
-def aMpsLoader():
-    return MpsLoader(path_netlib)
+def aLPRepository() -> LPRepository:
+    return LPRepository(test_section)
 
 
 def test_load_mps_KB2():
@@ -52,16 +62,16 @@ def test_load_mps_KB2():
     assert dct_bound["UP"].shape[0] == n
 
 
-def test_get_problem_names(aMpsLoader):
+def test_get_problem_names(aLPRepository):
     """出力される SIF ファイル名はパスを含んでいないか, `.SIF` で終わっていないか"""
-    for file in aMpsLoader.get_problem_names():
+    for file in aLPRepository.get_problem_names():
         assert not file.startswith(f"{path_netlib}")
         assert not file.endswith(".SIF")
 
 
-def test_run_25FV47(aMpsLoader):
-    """MpsLoader.run によりLPのインスタンスが作成されるか"""
-    aLP = aMpsLoader.run("25FV47.SIF")
+def test_run_25FV47(aLPRepository):
+    """LPRepository によりLPのインスタンスが作成されるか"""
+    aLP = aLPRepository.read_raw_LP("25FV47.SIF")
     assert aLP.A_E.shape[0] == aLP.b_E.shape[0]
     assert aLP.A_G.shape[0] == aLP.b_G.shape[0]
     assert aLP.A_L.shape[0] == aLP.b_L.shape[0]
@@ -71,3 +81,31 @@ def test_run_25FV47(aMpsLoader):
     aLPS = aLP.convert_standard()
     assert aLPS.A.shape[0] == aLPS.b.shape[0]
     assert aLPS.A.shape[1] == aLPS.c.shape[0]
+
+
+def test_cannot_read_LP(aLPRepository):
+    """ファイルが存在しない場合にエラーを返すか"""
+    with pytest.raises(CannotReadError):
+        aLPRepository.read_processed_LP("not_exist_file")
+
+
+@pytest.fixture(scope="module")
+def remove_written_file():
+    """書き込みのテスト前にファイルが存在するとテストが通ったのかいなかわからないので,
+    書き込む前に存在するファイルは削除する"""
+    file_list = glob.glob(f"{path_data}*/{filename_written}*")
+    for filename in file_list:
+        os.remove(filename)
+
+    yield
+
+
+def test_write_LP(aLPRepository, remove_written_file):
+    """書き込んだファイルが全く同じオブジェクトを返すか"""
+    sol_LP = LPS(A=csr_matrix([[1, 1], [0, 1]]), b=np.array([0, 1]), c=np.array([2, 0]))
+    aLPRepository.write_LP(sol_LP, filename_written)
+    test_LP = aLPRepository.read_processed_LP(filename_written)
+    assert len((test_LP.A != sol_LP.A).data) == 0
+    np.testing.assert_array_equal(test_LP.b, sol_LP.b)
+    np.testing.assert_array_equal(test_LP.c, sol_LP.c)
+    assert test_LP.name == filename_written

@@ -1,14 +1,15 @@
 """`tests` ディレクトリ内のファイルを実行する際によく使用するものをまとめたファイル
 """
+
 import math
 
 import numpy as np
+from scipy.sparse import csr_matrix as Csr
 
 from src.problem import LinearProgrammingProblemStandard as LPS
+from src.solver.optimization_parameters import OptimizationParameters
 from src.solver.solver import LPSolver
 from src.solver.variables import LPVariables
-from src.solver.optimization_parameters import OptimizationParameters
-
 
 problem_name = "test"
 config_section = "TEST"
@@ -22,7 +23,7 @@ def make_test_LP_and_initial_point() -> tuple[LPS, LPVariables]:
     最適値は -6
     初期点は x=s=10, y=0
     """
-    A = np.array([[1, 2], [2, 1]])
+    A = Csr(np.array([[1.0, 2.0], [2.0, 1.0]]))
     b = np.array([8, 10])
     c = np.array([-1, -1])
 
