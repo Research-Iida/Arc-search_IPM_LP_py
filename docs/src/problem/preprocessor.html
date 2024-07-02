@@ -47,9 +47,14 @@ hljs.highlightAll();
 </summary>
 <pre><code class="python">class LPPreprocessor:
     &#34;&#34;&#34;LPに関する前処理クラス&#34;&#34;&#34;
+
     def _remove_rows_and_columns(
-        self, A: np.ndarray, b: np.ndarray = None, c: np.ndarray = None,
-        rows_remove: set[int] = set(), columns_remove: set[int] = set()
+        self,
+        A: np.ndarray,
+        b: np.ndarray = None,
+        c: np.ndarray = None,
+        rows_remove: set[int] = set(),
+        columns_remove: set[int] = set(),
     ) -&gt; tuple[np.ndarray, np.ndarray, np.ndarray]:
         &#34;&#34;&#34;削除する行, 列を指定して, A, b, c から削除する
 
@@ -76,9 +81,7 @@ hljs.highlightAll();
 
         return A_out, b_out, c_out
 
-    def remove_empty_row(
-        self, A: np.ndarray, b: np.ndarray
-    ) -&gt; tuple[np.ndarray, np.ndarray]:
+    def remove_empty_row(self, A: np.ndarray, b: np.ndarray) -&gt; tuple[np.ndarray, np.ndarray]:
         &#34;&#34;&#34;空行で制約が存在しないAの行は削除する
 
         もしAの係数がないのにbが0以外の場合, どうやってもその制約は満たせないのでエラー
@@ -91,14 +94,10 @@ hljs.highlightAll();
                 raise ProblemInfeasibleError
             rows_remove.add(i)
 
-        A_out, b_out, _ = self._remove_rows_and_columns(
-            A, b=b, rows_remove=rows_remove
-        )
+        A_out, b_out, _ = self._remove_rows_and_columns(A, b=b, rows_remove=rows_remove)
         return A_out, b_out
 
-    def remove_duplicated_row(
-        self, A: np.ndarray, b: np.ndarray
-    ) -&gt; tuple[np.ndarray, np.ndarray]:
+    def remove_duplicated_row(self, A: np.ndarray, b: np.ndarray) -&gt; tuple[np.ndarray, np.ndarray]:
         &#34;&#34;&#34;重複のある制約を削除
 
         A_i = k*A_j の時, b_i = k*b_j ならば, jの制約はなくても同じなので削除してよい
@@ -106,9 +105,7 @@ hljs.highlightAll();
         &#34;&#34;&#34;
         m = A.shape[0]
 
-        def scalar_times_vector(
-            vec_a: np.ndarray, vec_b: np.ndarray
-        ) -&gt; Optional[float]:
+        def scalar_times_vector(vec_a: np.ndarray, vec_b: np.ndarray) -&gt; Optional[float]:
             &#34;&#34;&#34;vec_b が vec_a の定数倍であるならばその値を, そうでなければ None を出力&#34;&#34;&#34;
             # 0の位置が正しくなければ定数倍ではない
             idx_not_zero_a = np.where(vec_a != 0)[0]
@@ -146,14 +143,10 @@ hljs.highlightAll();
                 rows_remove.add(j)
 
         # 削除対象の行を省いて出力
-        A_out, b_out, _ = self._remove_rows_and_columns(
-            A, b=b, rows_remove=rows_remove
-        )
+        A_out, b_out, _ = self._remove_rows_and_columns(A, b=b, rows_remove=rows_remove)
         return A_out, b_out
 
-    def remove_empty_column(
-        self, A: np.ndarray, c: np.ndarray
-    ) -&gt; tuple[np.ndarray, np.ndarray]:
+    def remove_empty_column(self, A: np.ndarray, c: np.ndarray) -&gt; tuple[np.ndarray, np.ndarray]:
         &#34;&#34;&#34;空列で制約が存在しない変数は自由な値を取れるので, 削除する
 
         自由な値がとれる場合, cが正ならば0が最適値
@@ -167,14 +160,10 @@ hljs.highlightAll();
                 raise ProblemUnboundedError
             columns_remove.add(i)
 
-        A_out, _, c_out = self._remove_rows_and_columns(
-            A, c=c, columns_remove=columns_remove
-        )
+        A_out, _, c_out = self._remove_rows_and_columns(A, c=c, columns_remove=columns_remove)
         return A_out, c_out
 
-    def remove_duplicated_column(
-        self, A: np.ndarray, c: np.ndarray
-    ) -&gt; tuple[np.ndarray, np.ndarray]:
+    def remove_duplicated_column(self, A: np.ndarray, c: np.ndarray) -&gt; tuple[np.ndarray, np.ndarray]:
         &#34;&#34;&#34;重複する列を削除する
 
         行の場合と異なり, 全く同じ列でなければ削除をしない
@@ -195,9 +184,7 @@ hljs.highlightAll();
                     columns_remove.add(j)
 
         # 削除対象の列を省いて出力
-        A_out, _, c_out = self._remove_rows_and_columns(
-            A, c=c, columns_remove=columns_remove
-        )
+        A_out, _, c_out = self._remove_rows_and_columns(A, c=c, columns_remove=columns_remove)
         return A_out, c_out
 
     def rows_only_one_nonzero(self, A: np.ndarray) -&gt; list[int]:
@@ -231,9 +218,7 @@ hljs.highlightAll();
             return A, b, c
 
         # 1つしか係数がない行の係数とその列を取得
-        elements, columns_remove = self.only_one_nonzero_elements_and_columns(
-            A, rows_remove
-        )
+        elements, columns_remove = self.only_one_nonzero_elements_and_columns(A, rows_remove)
 
         # 変数の確定. もし負の値になってしまったら実行不可能
         x = b[rows_remove] / elements
@@ -241,9 +226,7 @@ hljs.highlightAll();
             raise ProblemInfeasibleError
 
         # 行が削除された結果
-        A_new, _, c_new = self._remove_rows_and_columns(
-            A, c=c, rows_remove=rows_remove, columns_remove=columns_remove
-        )
+        A_new, _, c_new = self._remove_rows_and_columns(A, c=c, rows_remove=rows_remove, columns_remove=columns_remove)
         # bのみ値が変わるため, 別で計算する
         rows_output = [i for i in range(A.shape[0]) if i not in rows_remove]
         b_new = b[rows_output] - A[np.ix_(rows_output, columns_remove)].dot(x)
@@ -252,9 +235,7 @@ hljs.highlightAll();
         A_out, b_out, c_out = self.remove_row_singleton(A_new, b_new, c_new)
         return A_out, b_out, c_out
 
-    def find_zero_columns_in_A(
-        self, A: np.ndarray, column: int
-    ) -&gt; list[int]:
+    def find_zero_columns_in_A(self, A: np.ndarray, column: int) -&gt; list[int]:
         &#34;&#34;&#34;Aのj列に対して足して0になる列のリストを取得
 
         j-1列目までは確認していると考えて, j+1列目以降と比較する
@@ -263,7 +244,7 @@ hljs.highlightAll();
             A: 制約の係数行列
             column: Aのどの列と他の列が同じか参照するか（j列目）
         &#34;&#34;&#34;
-        A_j_minus_A = A[:, column].reshape(A.shape[0], 1) + A[:, (column + 1):]
+        A_j_minus_A = A[:, column].reshape(A.shape[0], 1) + A[:, (column + 1) :]
         index_0 = np.where(np.all(A_j_minus_A == 0, axis=0))[0]
         return (index_0 + column + 1).tolist()
 
@@ -357,9 +338,7 @@ hljs.highlightAll();
         )
 
         # 削除した結果, 再び同じ条件の行列ができるかもしれないので再度実行
-        A_out, b_out, c_out = self.fix_variables_by_single_row(
-            A_new, b_new, c_new
-        )
+        A_out, b_out, c_out = self.fix_variables_by_single_row(A_new, b_new, c_new)
         return A_out, b_out, c_out
 
     def fix_variables_by_multiple_rows(
@@ -378,7 +357,7 @@ hljs.highlightAll();
                 continue
 
             # b が同じだった場合
-            b_i_minus_b = b_i - b[i + 1:]
+            b_i_minus_b = b_i - b[i + 1 :]
             rows_zero = np.where(b_i_minus_b == 0)[0] + (i + 1)
             for j in set(rows_zero) - rows_remove:
                 A_i_minus_A_j = A[i, :] - A[j, :]
@@ -388,7 +367,7 @@ hljs.highlightAll();
                     columns_remove = columns_remove | set(columns_non_zero)
 
             # b が足して0だった場合
-            b_i_plus_b = b_i + b[i + 1:]
+            b_i_plus_b = b_i + b[i + 1 :]
             rows_zero = np.where(b_i_plus_b == 0)[0] + (i + 1)
             for j in set(rows_zero) - rows_remove:
                 A_i_plus_A_j = A[i, :] + A[j, :]
@@ -405,8 +384,7 @@ hljs.highlightAll();
         return A_new, b_new, c_new
 
     def fix_positive_variable_by_signs(
-        self, A: np.ndarray, b: np.ndarray, c: np.ndarray,
-        recursive_num: int = 0
+        self, A: np.ndarray, b: np.ndarray, c: np.ndarray, recursive_num: int = 0
     ) -&gt; tuple[np.ndarray, np.ndarray, np.ndarray]:
         &#34;&#34;&#34;ある行がbと同じ符号の係数が1つしかなく, それ以外は反対の符号, もしくは0の場合
         bと同じ符号の変数は他の変数との和で固定する
@@ -420,9 +398,7 @@ hljs.highlightAll();
         # bが0以外の場合について, 条件に合致するAの行を取得
         for row in np.where(b != 0)[0]:
             # Aの要素がbの符号と同じ添え字を取得
-            indexs_A_alpha_with_b = np.where(
-                A[row, :] * b[row] / abs(b[row]) &gt; 0
-            )[0]
+            indexs_A_alpha_with_b = np.where(A[row, :] * b[row] / abs(b[row]) &gt; 0)[0]
             # 要素が1つのみの場合, indexを取得し走査終了
             if len(indexs_A_alpha_with_b) == 1:
                 remove_row = row
@@ -440,7 +416,8 @@ hljs.highlightAll();
             A - A_beta_i * A_alpha.reshape(1, A.shape[1]) / A_alpha_i,
             b=b - A[:, remove_col] * b[remove_row] / A_alpha_i,
             c=c - c[remove_col] * A_alpha / A_alpha_i,
-            rows_remove={remove_row}, columns_remove={remove_col}
+            rows_remove={remove_row},
+            columns_remove={remove_col},
         )
         # 不要なオブジェクトを削除して再帰
         del A_alpha, A_beta_i, A, b, c
@@ -456,7 +433,7 @@ hljs.highlightAll();
         もし固定した結果が負の値になる場合は実行不可能
         &#34;&#34;&#34;
         for i in range(A.shape[0] - 1):
-            A_i_minus_A = A[i, :] - A[(i + 1):, :]
+            A_i_minus_A = A[i, :] - A[(i + 1) :, :]
             # 各行で非0要素になった数を集計
             counts_nonzero_by_row = np.count_nonzero(A_i_minus_A != 0, axis=1)
             # もしなければ次の行へ
@@ -474,8 +451,7 @@ hljs.highlightAll();
             # 値の更新
             b_updated = b - A[:, remove_column].flatten() * x
             A_new, b_new, c_new = self._remove_rows_and_columns(
-                A, b=b_updated, c=c,
-                rows_remove=[remove_row], columns_remove=[remove_column]
+                A, b=b_updated, c=c, rows_remove=[remove_row], columns_remove=[remove_column]
             )
             # 削除した結果, 再び同じ条件の行列ができるかもしれないので再度実行
             return self.fix_singleton_by_two_rows(A_new, b_new, c_new)
@@ -670,6 +646,7 @@ cが負ならばいくらでも小さくできてしまうので発散</p></div>
 </summary>
 <pre><code class="python">class ProblemInfeasibleError(Exception):
     &#34;&#34;&#34;前処理により実行不可能な問題であることがわかった場合に出すエラー&#34;&#34;&#34;
+
     pass</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -690,6 +667,7 @@ cが負ならばいくらでも小さくできてしまうので発散</p></div>
 </summary>
 <pre><code class="python">class ProblemUnboundedError(Exception):
     &#34;&#34;&#34;前処理により最適値が発散してしまうことがわかった場合に出すエラー&#34;&#34;&#34;
+
     pass</code></pre>
 </details>
 <h3>Ancestors</h3>

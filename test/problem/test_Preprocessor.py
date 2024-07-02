@@ -2,8 +2,7 @@
 import numpy as np
 import pytest
 
-from src.problem.preprocessor import (LPPreprocessor, ProblemInfeasibleError,
-                                      ProblemUnboundedError)
+from src.problem.preprocessor import LPPreprocessor, ProblemInfeasibleError, ProblemUnboundedError
 
 
 @pytest.fixture
@@ -83,9 +82,7 @@ def test_only_one_nonzero_elements_and_columns(aPreprocessor):
     """Aの第一行目が0以外の係数が1つしかない場合にindex 0 を出力できるか"""
     A = np.array([[2, 0, 0], [1, 3, 1]])
     lst_id = aPreprocessor.rows_only_one_nonzero(A)
-    vec, ids = aPreprocessor.only_one_nonzero_elements_and_columns(
-        A, lst_id
-    )
+    vec, ids = aPreprocessor.only_one_nonzero_elements_and_columns(A, lst_id)
     np.testing.assert_array_equal(vec, [2])
     assert ids == [0]
 
@@ -161,9 +158,7 @@ def test_fix_variables_by_multiple_rows(aPreprocessor):
     A = np.array([[2, 1], [2, 2], [1, 3]])
     b = np.array([1, 1, 3])
     c = np.ones(A.shape[1])
-    test_A, test_b, test_c = aPreprocessor.fix_variables_by_multiple_rows(
-        A, b, c
-    )
+    test_A, test_b, test_c = aPreprocessor.fix_variables_by_multiple_rows(A, b, c)
     np.testing.assert_array_equal(test_A, [[2], [1]])
     np.testing.assert_array_equal(test_b, [1, 3])
     np.testing.assert_array_equal(test_c, np.ones(test_A.shape[1]))
@@ -171,9 +166,7 @@ def test_fix_variables_by_multiple_rows(aPreprocessor):
     A = np.array([[2, 1], [-2, -2], [1, 3]])
     b = np.array([1, -1, 3])
     c = np.ones(A.shape[1])
-    test_A, test_b, test_c = aPreprocessor.fix_variables_by_multiple_rows(
-        A, b, c
-    )
+    test_A, test_b, test_c = aPreprocessor.fix_variables_by_multiple_rows(A, b, c)
     np.testing.assert_array_equal(test_A, [[2], [1]])
     np.testing.assert_array_equal(test_b, [1, 3])
     np.testing.assert_array_equal(test_c, np.ones(test_A.shape[1]))
@@ -183,12 +176,8 @@ def test_fix_positive_variable_by_signs(aPreprocessor):
     A = np.array([[1, -1, -2], [3, 1, -1], [0, 2, -1]])
     b = np.array([1, 4, 0])
     c = np.ones(A.shape[1])
-    test_A, test_b, test_c = aPreprocessor.fix_positive_variable_by_signs(
-        A, b, c
-    )
-    np.testing.assert_array_equal(
-        test_A, [[1 - 3 * (-1) / 1, -1 - 3 * (-2) / 1], [2, -1]]
-    )
+    test_A, test_b, test_c = aPreprocessor.fix_positive_variable_by_signs(A, b, c)
+    np.testing.assert_array_equal(test_A, [[1 - 3 * (-1) / 1, -1 - 3 * (-2) / 1], [2, -1]])
     np.testing.assert_array_equal(test_b, [4 - 3 * 1 / 1, 0])
     np.testing.assert_array_equal(test_c, [1 - 1 * (-1) / 1, 1 - 1 * (-2) / 1])
 

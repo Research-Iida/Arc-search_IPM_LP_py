@@ -1,13 +1,12 @@
 import numpy as np
 import pytest
 
-from src.linear_system_solver.inexact_linear_system_solver import CGLinearSystemSolver
 from src.linear_system_solver.hhl_qiskit import HHLLinearSystemSolver
+from src.linear_system_solver.inexact_linear_system_solver import CGLinearSystemSolver
 
 
 def test_CG_tolerance():
-    """勾配のノルムが解の許容度以下に収まっていることを確認する関数
-    """
+    """勾配のノルムが解の許容度以下に収まっていることを確認する関数"""
     tolerance = 10**-3
     A = np.array([[1, 2], [3, 4]])
     # パッケージそのままでは b のノルム分許容誤差が大きくなるため, bが大きくても問題ないテストにする
@@ -21,8 +20,8 @@ def test_CG_tolerance():
 
 
 def test_HHL_julia():
-    """julia による HHL アルゴリズムが正しく解けるか確認
-    """
+    """julia による HHL アルゴリズムが正しく解けるか確認"""
+    # Julia の compile が入って遅くなるのでこのテストを回すときのみ実行
     from src.linear_system_solver.hhl_julia import HHLJuliaLinearSystemSolver
 
     # 解: [2, 1, 0]
@@ -35,7 +34,7 @@ def test_HHL_julia():
     assert np.allclose(test_result, solution, atol=0.1)
 
 
-@pytest.mark.skip("Quantum が解けないので省略")
+@pytest.mark.skip("qiskit の HHL が解けないので省略")
 def test_HHL():
     """HHL アルゴリズムで求解できるか確認
 
@@ -44,7 +43,7 @@ def test_HHL():
     """
     tolerance = 10**-3
     # A はエルミート, 正定値
-    A = np.array([[1, -1 / 3, 0], [- 1 / 3, 1, -1 / 3], [0, -1 / 3, 1]])
+    A = np.array([[1, -1 / 3, 0], [-1 / 3, 1, -1 / 3], [0, -1 / 3, 1]])
     b = np.array([1, 0, 0])
     # A = np.array([[1, 1], [1, 2]])
     # b = np.array([3, 4])

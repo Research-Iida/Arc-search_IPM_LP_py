@@ -1,12 +1,13 @@
 import numpy as np
-from julia import Julia
+from julia import Main, Pkg
 
 from ..logger import get_main_logger
 from .inexact_linear_system_solver import AbstractInexactLinearSystemSolver
 
 # サーバー環境で実行するためのおまじない
-jl = Julia(compiled_modules=False)
-from julia import Pkg, Main
+# from julia import Julia
+# jl = Julia(compiled_modules=False)
+
 Pkg.activate(".")
 Pkg.instantiate()
 Main.include("src/linear_system_solver/HHLlib.jl")
@@ -15,8 +16,8 @@ logger = get_main_logger()
 
 
 class HHLJuliaLinearSystemSolver(AbstractInexactLinearSystemSolver):
-    """HHL アルゴリズムによる求解
-    """
+    """HHL アルゴリズムによる求解"""
+
     def __init__(self, n_pe_qubits: int):
         """インスタンス初期化
 
@@ -26,10 +27,7 @@ class HHLJuliaLinearSystemSolver(AbstractInexactLinearSystemSolver):
         """
         self.n_pe_qubits = n_pe_qubits
 
-    def solve(
-        self, A: np.ndarray, b: np.ndarray,
-        tolerance: float = 10**-7, *args
-    ) -> np.ndarray:
+    def solve(self, A: np.ndarray, b: np.ndarray, tolerance: float = 10**-7, *args) -> np.ndarray:
         # 数値誤差により係数行列が対称にならない場合があるため, 少し修正
         coef_matrix = (A + A.T) / 2
         right_hand_side = b.copy()
@@ -38,7 +36,7 @@ class HHLJuliaLinearSystemSolver(AbstractInexactLinearSystemSolver):
         eig_vals, _ = np.linalg.eig(coef_matrix)
         max_eigen_value = max(eig_vals)
         if max_eigen_value >= 1:
-            coef_eig_val_normalize = max_eigen_value + 10**(-3)
+            coef_eig_val_normalize = max_eigen_value + 10 ** (-3)
             coef_matrix /= coef_eig_val_normalize
         else:
             coef_eig_val_normalize = 1

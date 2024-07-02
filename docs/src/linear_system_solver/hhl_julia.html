@@ -53,8 +53,8 @@ Aの固有値の精度に関わる</dd>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class HHLJuliaLinearSystemSolver(AbstractInexactLinearSystemSolver):
-    &#34;&#34;&#34;HHL アルゴリズムによる求解
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;HHL アルゴリズムによる求解&#34;&#34;&#34;
+
     def __init__(self, n_pe_qubits: int):
         &#34;&#34;&#34;インスタンス初期化
 
@@ -64,10 +64,7 @@ Aの固有値の精度に関わる</dd>
         &#34;&#34;&#34;
         self.n_pe_qubits = n_pe_qubits
 
-    def solve(
-        self, A: np.ndarray, b: np.ndarray,
-        tolerance: float = 10**-7, *args
-    ) -&gt; np.ndarray:
+    def solve(self, A: np.ndarray, b: np.ndarray, tolerance: float = 10**-7, *args) -&gt; np.ndarray:
         # 数値誤差により係数行列が対称にならない場合があるため, 少し修正
         coef_matrix = (A + A.T) / 2
         right_hand_side = b.copy()
@@ -76,7 +73,7 @@ Aの固有値の精度に関わる</dd>
         eig_vals, _ = np.linalg.eig(coef_matrix)
         max_eigen_value = max(eig_vals)
         if max_eigen_value &gt;= 1:
-            coef_eig_val_normalize = max_eigen_value + 10**(-3)
+            coef_eig_val_normalize = max_eigen_value + 10 ** (-3)
             coef_matrix /= coef_eig_val_normalize
         else:
             coef_eig_val_normalize = 1

@@ -38,6 +38,32 @@ hljs.highlightAll();
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="src.logger.get_main_logger"><code class="name flex">
+<span>def <span class="ident">get_main_logger</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p><code>logging.conf</code> で設定されている MainLogger を出力</p>
+<p>実際に実行しないスクリプト（import されるのみ）であればこのメソッドからloggerを取得する
+ファイルに書き込む場合は <code><a title="src.logger.setup_logger" href="#src.logger.setup_logger">setup_logger()</a></code> メソッドを使用</p></div>
+</dd>
+<dt id="src.logger.setup_logger"><code class="name flex">
+<span>def <span class="ident">setup_logger</span></span>(<span>name: str, *, batch_date: datetime.date = datetime.date(2024, 7, 2), path_log: str = 'log/')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>logger のセットアップ</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>name</code></strong></dt>
+<dd>出力するlogファイルの名前</dd>
+<dt><strong><code>batch_date</code></strong></dt>
+<dd>バッチ日. default は実行した当日</dd>
+<dt><strong><code>path_log</code></strong></dt>
+<dd>log ファイルの出力先ディレクトリ</dd>
+</dl></div>
+</dd>
+</dl>
 </section>
 <section>
 </section>
@@ -55,6 +81,12 @@ hljs.highlightAll();
 <li><h3><a href="#header-submodules">Sub-modules</a></h3>
 <ul>
 <li><code><a title="src.logger.logger" href="logger.html">src.logger.logger</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="src.logger.get_main_logger" href="#src.logger.get_main_logger">get_main_logger</a></code></li>
+<li><code><a title="src.logger.setup_logger" href="#src.logger.setup_logger">setup_logger</a></code></li>
 </ul>
 </li>
 </ul>
