@@ -2,11 +2,11 @@ import shutil
 
 import numpy as np
 
-from ..utils import config_utils
-from ..logger import get_main_logger
 from ..data_access import CsvHandler
-from ..solver.solved_data import SolvedDetail
 from ..drawer import Drawer
+from ..logger import get_main_logger
+from ..solver.solved_data import SolvedDetail
+from ..utils import config_utils
 from .define_paths import path_solved_result_by_problem, path_solved_result_by_solver_with_config
 
 logger = get_main_logger()
@@ -35,7 +35,9 @@ def write_result_by_problem_solver_config(aSolvedDetail: SolvedDetail, path_resu
     """
     summary = aSolvedDetail.aSolvedSummary
     path_result_by_problem = path_solved_result_by_problem(path_result, summary.problem_name)
-    path_result_by_problem_solver_config = path_solved_result_by_solver_with_config(path_result_by_problem, summary.solver_name, summary.config_section)
+    path_result_by_problem_solver_config = path_solved_result_by_solver_with_config(
+        path_result_by_problem, summary.solver_name, summary.config_section
+    )
 
     # 変数の反復列をcsvで出力
     if len(aSolvedDetail.lst_variables_by_iter) > 0:
