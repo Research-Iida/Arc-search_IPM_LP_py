@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.1">
+<title>src.data_access.csv_handler API documentation</title>
+<meta name="description" content="">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>src.data_access.csv_handler</code></h1>
+</header>
+<section id="section-intro">
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="src.data_access.csv_handler.CannotReadError"><code class="flex name class">
+<span>class <span class="ident">CannotReadError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>この module で読み込みができない場合に発生するエラー</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class CannotReadError(Exception):
+    &#34;&#34;&#34;この module で読み込みができない場合に発生するエラー&#34;&#34;&#34;
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="src.data_access.csv_handler.CsvHandler"><code class="flex name class">
+<span>class <span class="ident">CsvHandler</span></span>
+<span>(</span><span>config_section: str = 'DEFAULT')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>csv ファイルの読み込み・書き込みに関する class</p>
+<p>初期化. <code>data</code> ディレクトリへのパスを設定する</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class CsvHandler:
+    &#34;&#34;&#34;csv ファイルの読み込み・書き込みに関する class&#34;&#34;&#34;
+    def __init__(self, config_section: str = config_utils.default_section):
+        &#34;&#34;&#34;初期化. `data` ディレクトリへのパスを設定する&#34;&#34;&#34;
+        config_ini = config_utils.read_config(section=config_section)
+
+        self._path_data = config_ini.get(&#34;PATH_DATA&#34;)
+        self._path_processed = config_ini.get(&#34;PATH_PROCESSED&#34;)
+        self._path_result = config_ini.get(&#34;PATH_RESULT&#34;)
+
+    def can_read_LP(
+        self, problem_name: str
+    ) -&gt; bool:
+        &#34;&#34;&#34;指定した問題がディレクトリに存在し, 読み取ることが可能か&#34;&#34;&#34;
+        file_prefix = f&#34;{self._path_processed}{problem_name}&#34;
+
+        can_read_A = os.path.exists(str_util.add_suffix_csv(file_prefix + &#34;_A&#34;))
+        can_read_b = os.path.exists(str_util.add_suffix_csv(file_prefix + &#34;_b&#34;))
+        can_read_c = os.path.exists(str_util.add_suffix_csv(file_prefix + &#34;_c&#34;))
+        return can_read_A and can_read_b and can_read_c
+
+    def read_LP(
+        self, problem_name: str
+    ) -&gt; LPS:
+        &#34;&#34;&#34;線形計画問題に関するcsvファイルを読み込み, 問題のクラスインスタンスを出力
+
+        csv上で欠損している箇所は0を代入する
+        &#34;&#34;&#34;
+        # 読み込めない場合, エラーを返す
+        if not self.can_read_LP(problem_name):
+            raise CannotReadError(f&#34;{self._path_processed} 以下に {problem_name} が存在しません.&#34;)
+
+        file_prefix = f&#34;{self._path_processed}{problem_name}&#34;
+
+        def read(filename: str) -&gt; np.ndarray:
+            &#34;&#34;&#34;各定数を読み込む処理&#34;&#34;&#34;
+            return np.genfromtxt(filename, delimiter=&#34;,&#34;, filling_values=0)
+
+        A = read(str_util.add_suffix_csv(file_prefix + &#34;_A&#34;))
+        b = read(str_util.add_suffix_csv(file_prefix + &#34;_b&#34;))
+        c = read(str_util.add_suffix_csv(file_prefix + &#34;_c&#34;))
+        return LPS(A, b, c, problem_name)
+
+    def write_numpy(
+        self, filename: str, data: np.ndarray, path: Optional[str] = None
+    ):
+        &#34;&#34;&#34;numpy のデータをcsvファイルに書き出す
+
+        Args:
+            filename: ファイル名. `.csv` がなくともメソッドの中でつけるので問題ない
+            data: 書き込み対象の numpy データ
+            path: 書き込み先のpath. 指定がなければ `self._path_data` 直下に置く
+        &#34;&#34;&#34;
+        # 書き込み先の決定
+        if path is None:
+            path = self._path_data
+
+        fullpath_filename = str_util.add_suffix_csv(f&#34;{path}{filename}&#34;)
+        np.savetxt(fullpath_filename, data, delimiter=&#34;,&#34;)
+        logger.info(f&#34;{fullpath_filename} is written.&#34;)
+
+    def write_LP(self, aLP: LPS, problem_name: str):
+        &#34;&#34;&#34;線形計画問題を csvファイルに書き出す
+
+        前処理したものを書き出す前提のため, `processed` ディレクトリに書き出す
+
+        TODO:
+            * 0は書き下すとファイルサイズが大きくなるので, 欠損させるようにしたい
+        &#34;&#34;&#34;
+        self.write_numpy(problem_name + &#34;_A&#34;, aLP.A, self._path_processed)
+        self.write_numpy(problem_name + &#34;_b&#34;, aLP.b, self._path_processed)
+        self.write_numpy(problem_name + &#34;_c&#34;, aLP.c, self._path_processed)
+
+    def write_SolvedSummary(
+        self, lst_solved_summary: list[SolvedSummary],
+        name: str, path: str,
+        is_append: bool = False
+    ):
+        &#34;&#34;&#34;最適化の実行によって得られた諸データを書き込む
+
+        DataclassWriter を使用するため, self.write メソッドは使用しない
+
+        Args:
+            path: 書き込み先のディレクトリ
+            is_append: 追記するか否か. 追記する場合は headerを抜く
+        &#34;&#34;&#34;
+        file_util.create_dir_if_not_exists(path)
+        filename = str_util.add_suffix_csv(f&#34;{path}{name}&#34;)
+
+        if is_append:
+            mode = &#34;a+&#34;
+        else:
+            mode = &#34;w&#34;
+
+        with open(filename, mode, newline=&#34;&#34;) as f:
+            w = DataclassWriter(f, lst_solved_summary, SolvedSummary)
+            w.write(skip_header=is_append)</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="src.data_access.csv_handler.CsvHandler.can_read_LP"><code class="name flex">
+<span>def <span class="ident">can_read_LP</span></span>(<span>self, problem_name: str) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>指定した問題がディレクトリに存在し, 読み取ることが可能か</p></div>
+</dd>
+<dt id="src.data_access.csv_handler.CsvHandler.read_LP"><code class="name flex">
+<span>def <span class="ident">read_LP</span></span>(<span>self, problem_name: str) ‑> <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>線形計画問題に関するcsvファイルを読み込み, 問題のクラスインスタンスを出力</p>
+<p>csv上で欠損している箇所は0を代入する</p></div>
+</dd>
+<dt id="src.data_access.csv_handler.CsvHandler.write_LP"><code class="name flex">
+<span>def <span class="ident">write_LP</span></span>(<span>self, aLP: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>, problem_name: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>線形計画問題を csvファイルに書き出す</p>
+<p>前処理したものを書き出す前提のため, <code>processed</code> ディレクトリに書き出す</p>
+<h2 id="todo">Todo</h2>
+<ul>
+<li>0は書き下すとファイルサイズが大きくなるので, 欠損させるようにしたい</li>
+</ul></div>
+</dd>
+<dt id="src.data_access.csv_handler.CsvHandler.write_SolvedSummary"><code class="name flex">
+<span>def <span class="ident">write_SolvedSummary</span></span>(<span>self, lst_solved_summary: list[<a title="src.solver.solved_data.SolvedSummary" href="../solver/solved_data.html#src.solver.solved_data.SolvedSummary">SolvedSummary</a>], name: str, path: str, is_append: bool = False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>最適化の実行によって得られた諸データを書き込む</p>
+<p>DataclassWriter を使用するため, self.write メソッドは使用しない</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>path</code></strong></dt>
+<dd>書き込み先のディレクトリ</dd>
+<dt><strong><code>is_append</code></strong></dt>
+<dd>追記するか否か. 追記する場合は headerを抜く</dd>
+</dl></div>
+</dd>
+<dt id="src.data_access.csv_handler.CsvHandler.write_numpy"><code class="name flex">
+<span>def <span class="ident">write_numpy</span></span>(<span>self, filename: str, data: numpy.ndarray, path: Optional[str] = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>numpy のデータをcsvファイルに書き出す</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>filename</code></strong></dt>
+<dd>ファイル名. <code>.csv</code> がなくともメソッドの中でつけるので問題ない</dd>
+<dt><strong><code>data</code></strong></dt>
+<dd>書き込み対象の numpy データ</dd>
+<dt><strong><code>path</code></strong></dt>
+<dd>書き込み先のpath. 指定がなければ <code>self._path_data</code> 直下に置く</dd>
+</dl></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="src.data_access" href="index.html">src.data_access</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="src.data_access.csv_handler.CannotReadError" href="#src.data_access.csv_handler.CannotReadError">CannotReadError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="src.data_access.csv_handler.CsvHandler" href="#src.data_access.csv_handler.CsvHandler">CsvHandler</a></code></h4>
+<ul class="">
+<li><code><a title="src.data_access.csv_handler.CsvHandler.can_read_LP" href="#src.data_access.csv_handler.CsvHandler.can_read_LP">can_read_LP</a></code></li>
+<li><code><a title="src.data_access.csv_handler.CsvHandler.read_LP" href="#src.data_access.csv_handler.CsvHandler.read_LP">read_LP</a></code></li>
+<li><code><a title="src.data_access.csv_handler.CsvHandler.write_LP" href="#src.data_access.csv_handler.CsvHandler.write_LP">write_LP</a></code></li>
+<li><code><a title="src.data_access.csv_handler.CsvHandler.write_SolvedSummary" href="#src.data_access.csv_handler.CsvHandler.write_SolvedSummary">write_SolvedSummary</a></code></li>
+<li><code><a title="src.data_access.csv_handler.CsvHandler.write_numpy" href="#src.data_access.csv_handler.CsvHandler.write_numpy">write_numpy</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.1</a>.</p>
+</footer>
+</body>
+</html>

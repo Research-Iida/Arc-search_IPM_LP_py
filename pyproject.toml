@@ -19,15 +19,32 @@ julia = "^0.6.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"
-Sphinx = "^5.0.1"
-sphinx-rtd-theme = "^1.0.0"
-flake8 = "^4.0.1"
 rope = "^1.1.1"
 pytest-cov = "^3.0.0"
 mypy = "^0.961"
 cprofilev = "^1.0.7"
-black = "^24.3.0"
+black = "^24.4.2"
+ruff = "^0.4.10"
 
+[tool.poetry.group.local.dependencies]
+pdoc3 = "^0.11.0"
+pre-commit = "^3.7.1"
+
+[tool.black]
+line-length = 119
+
+[tool.ruff]
+# Same as Black.
+line-length = 119
+
+[tool.ruff.lint]
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+[tool.ruff.format]
+# Like Black, use double quotes for strings.
+quote-style = "double"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

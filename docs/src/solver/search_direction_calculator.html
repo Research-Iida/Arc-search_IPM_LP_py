@@ -1,0 +1,509 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.1">
+<title>src.solver.search_direction_calculator API documentation</title>
+<meta name="description" content="探索方向の計算方法についてまとめたモジュール">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>src.solver.search_direction_calculator</code></h1>
+</header>
+<section id="section-intro">
+<p>探索方向の計算方法についてまとめたモジュール</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="src.solver.search_direction_calculator.AbstractSearchDirectionCalculator"><code class="flex name class">
+<span>class <span class="ident">AbstractSearchDirectionCalculator</span></span>
+<span>(</span><span>linear_system_solver: <a title="src.linear_system_solver.exact_linear_system_solver.AbstractLinearSystemSolver" href="../linear_system_solver/exact_linear_system_solver.html#src.linear_system_solver.exact_linear_system_solver.AbstractLinearSystemSolver">AbstractLinearSystemSolver</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AbstractSearchDirectionCalculator(metaclass=ABCMeta):
+    # 変数が変わっていなければ係数行列は変わらないため, 不要な計算を省くために前回の計算を記録しておく
+    pre_x_divided_s: np.ndarray | None = None
+    coef_matrix: np.ndarray | None = None
+
+    def __init__(self, linear_system_solver: AbstractLinearSystemSolver):
+        self.linear_system_solver: AbstractLinearSystemSolver = linear_system_solver
+
+    @abstractmethod
+    def run(
+        self, v: LPVariables, problem: LPS, right_hand_side: np.ndarray, tolerance: float | None
+    ) -&gt; tuple[np.ndarray, np.ndarray, np.ndarray, float]:
+        &#34;&#34;&#34;探索方向を解く.
+
+        Args:
+            v (LPVariables): その反復時点での変数
+            problem (LPS): 問題
+            right_hand_side (np.ndarray): 変形を行う前の探索方向の右辺ベクトル
+            tolerance (float): 探索方向を計算する際の誤差許容度. ExactLinearSystemSolver なら不要
+
+        Returns:
+            np.ndarray: 解いた結果の探索方向 x
+            np.ndarray: 解いた結果の探索方向 y
+            np.ndarray: 解いた結果の探索方向 s
+            float: 解いた際の結果のずれのベクトルのノルム
+        &#34;&#34;&#34;
+        pass</code></pre>
+</details>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="src.solver.search_direction_calculator.MNESSearchDirectionCalculator" href="#src.solver.search_direction_calculator.MNESSearchDirectionCalculator">MNESSearchDirectionCalculator</a></li>
+<li><a title="src.solver.search_direction_calculator.NESSearchDirectionCalculator" href="#src.solver.search_direction_calculator.NESSearchDirectionCalculator">NESSearchDirectionCalculator</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="src.solver.search_direction_calculator.AbstractSearchDirectionCalculator.coef_matrix"><code class="name">var <span class="ident">coef_matrix</span> : numpy.ndarray | None</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.solver.search_direction_calculator.AbstractSearchDirectionCalculator.pre_x_divided_s"><code class="name">var <span class="ident">pre_x_divided_s</span> : numpy.ndarray | None</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="src.solver.search_direction_calculator.AbstractSearchDirectionCalculator.run"><code class="name flex">
+<span>def <span class="ident">run</span></span>(<span>self, v: <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a>, problem: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>, right_hand_side: numpy.ndarray, tolerance: float | None) ‑> tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray, float]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>探索方向を解く.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>v</code></strong> :&ensp;<code>LPVariables</code></dt>
+<dd>その反復時点での変数</dd>
+<dt><strong><code>problem</code></strong> :&ensp;<code>LPS</code></dt>
+<dd>問題</dd>
+<dt><strong><code>right_hand_side</code></strong> :&ensp;<code>np.ndarray</code></dt>
+<dd>変形を行う前の探索方向の右辺ベクトル</dd>
+<dt><strong><code>tolerance</code></strong> :&ensp;<code>float</code></dt>
+<dd>探索方向を計算する際の誤差許容度. ExactLinearSystemSolver なら不要</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>np.ndarray</code></dt>
+<dd>解いた結果の探索方向 x</dd>
+<dt><code>np.ndarray</code></dt>
+<dd>解いた結果の探索方向 y</dd>
+<dt><code>np.ndarray</code></dt>
+<dd>解いた結果の探索方向 s</dd>
+<dt><code>float</code></dt>
+<dd>解いた際の結果のずれのベクトルのノルム</dd>
+</dl></div>
+</dd>
+</dl>
+</dd>
+<dt id="src.solver.search_direction_calculator.MNESSearchDirectionCalculator"><code class="flex name class">
+<span>class <span class="ident">MNESSearchDirectionCalculator</span></span>
+<span>(</span><span>linear_system_solver: <a title="src.linear_system_solver.exact_linear_system_solver.AbstractLinearSystemSolver" href="../linear_system_solver/exact_linear_system_solver.html#src.linear_system_solver.exact_linear_system_solver.AbstractLinearSystemSolver">AbstractLinearSystemSolver</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class MNESSearchDirectionCalculator(AbstractSearchDirectionCalculator):
+    # 初期点時点で決定できるものや1回計算すればいいものは Attributes として使いまわす
+    A_base_indexes: list[int] | None = None
+
+    def select_base_indexes(self, problem: LPS) -&gt; list[int]:
+        &#34;&#34;&#34;MNES, OSS 定式化で使用する基底の index を選択
+        先頭から1つずつ列を選んで, rank が上がれば基底として加える.
+
+        TODO:
+            * 現在のやり方だと full rank にならず永遠に回り続ける場合がある
+
+        Args:
+            problem (LPS): 選択対象の問題
+
+        Returns:
+            list[int]: index
+        &#34;&#34;&#34;
+        # すでに計算しているならそこから取る
+        if self.A_base_indexes is not None:
+            return self.A_base_indexes
+
+        doing_msg = &#34;selecting A base&#34;
+        logger.info(f&#34;Start {doing_msg}.&#34;)
+        logger.debug(f&#34;rank(A): {np.linalg.matrix_rank(problem.A)}, m: {problem.m}&#34;)
+
+        base_idxs: set[int] = set()
+        # 行で非ゼロ要素が2つ以下しかない列は線形独立としてよい
+        rows_nonzero, columns_nonzero = np.where(np.abs(problem.A) &gt; 10**(-6))
+        for i in range(problem.m):
+            idxs_row_nonzero = np.where(rows_nonzero == i)
+            if len(idxs_row_nonzero[0]) &lt;= 2:
+                base_idxs.add(columns_nonzero[idxs_row_nonzero[0][0]])
+        logger.info(f&#34;Number of columns in only one or two nonzero element row: {len(base_idxs)}&#34;)
+
+        # ``Convergence analysis of a long-step primal-dual infeasible interior-point LP algorithm based on iterative linear solvers&#39;&#39;
+        cycle_number = 0
+        added_column_number_in_cycle = 0
+        for add_column_number in itertools.cycle(range(problem.n)):
+            if len(base_idxs) == problem.m:
+                break
+
+            if add_column_number in base_idxs:
+                continue
+            logger.debug(f&#34;{indent}Target column: {add_column_number}, selected base number: {len(base_idxs)}&#34;)
+
+            # なんべんも計算するので変数化
+            if np.linalg.matrix_rank(problem.A[:, list(base_idxs) + [add_column_number]]) &gt;= len(base_idxs) + 1:
+                base_idxs.add(add_column_number)
+                added_column_number_in_cycle += 1
+
+            if add_column_number == problem.n - 1:
+                logger.info(f&#34;End cycle number: {cycle_number}, selected base number: {len(base_idxs)}&#34;)
+                if added_column_number_in_cycle == 0:
+                    raise SelectionBasisError(&#34;Cannot select basis in this cycle!&#34;)
+                cycle_number += 1
+                added_column_number_in_cycle = 0
+
+        # 計算誤差程度の大きさは rank を計算する際に rank 落ちになる可能性があるため排除
+        # indexes_A_nonzero = np.where(np.abs(problem.A) &gt; 10**(-4))
+
+        # 対角成分が非ゼロの行はどの列にそれがあるか確認
+        # for i in range(problem.m):
+        #     lst_nonzero_column = indexes_A_nonzero[1][np.where(indexes_A_nonzero[0] == i)]
+        #     if i not in lst_nonzero_column:
+        #         logger.debug(f&#34;{i}-th row doesn&#39;t have {i}-th column: {lst_nonzero_column}, {problem.A[i, lst_nonzero_column]}&#34;)
+
+        # 上三角行列を仮定し, 新しく非ゼロが出た列を選択
+        # for i, j in zip(indexes_A_nonzero[0], indexes_A_nonzero[1]):
+        #     if i &lt; len(base_idxs):
+        #         continue
+        #     if j not in base_idxs:
+        #         # 選択する内容の確認
+        #         logger.debug(f&#34;Selected row: {i}, column: {j}, element: {problem.A[i, j]}&#34;)
+        #         base_idxs.append(j)
+
+        # 出力の確認
+        logger.debug(f&#34;Selected base columns: {base_idxs}&#34;)
+        rank_selected_A = np.linalg.matrix_rank(problem.A[:, list(base_idxs)])
+        logger.debug(f&#34;{indent}selected base num: {len(base_idxs)}, m: {problem.m}, rank: {rank_selected_A}&#34;)
+        if rank_selected_A &lt; problem.m:
+            logger.warning(f&#34;{indent}Selected base is not full rank!&#34;)
+            assert False
+        logger.info(f&#34;End {doing_msg}.&#34;)
+
+        # 一回計算したら記録しておく
+        self.A_base_indexes = list(base_idxs)
+        return self.A_base_indexes
+
+    def run(
+        self, v: LPVariables, problem: LPS, right_hand_side: np.ndarray,
+        tolerance: float | None = None,
+    ) -&gt; tuple[np.ndarray, np.ndarray, np.ndarray, float]:
+        &#34;&#34;&#34;MNES の定式化で探索方向を解く.
+
+        Args:
+            v (LPVariables): その反復時点での変数
+            problem (LPS): 問題
+            right_hand_side (np.ndarray): 変形を行う前の探索方向の右辺ベクトル
+            tolerance (float): 探索方向を計算する際の誤差許容度. ExactLinearSystemSolver なら不要
+
+        Returns:
+            np.ndarray: MNES で解いた結果の探索方向 x
+            np.ndarray: MNES で解いた結果の探索方向 y
+            np.ndarray: MNES で解いた結果の探索方向 s
+            float: MNES で解いた際の結果のずれのベクトルのノルム
+        &#34;&#34;&#34;
+        m = problem.m
+        n = problem.n
+        A = problem.A
+        x_divided_s = v.x / v.s
+        AXS_inv = A @ np.diag(x_divided_s)
+
+        # MNES に変形
+        hat_B = self.select_base_indexes(problem)
+        D_B = np.diag(np.sqrt(x_divided_s[hat_B]))
+        D_B_inv_A_B_inv = np.linalg.inv(D_B) @ np.linalg.inv(A[:, hat_B])
+
+        if self.pre_x_divided_s is None or np.any(self.pre_x_divided_s != x_divided_s):
+            logger.info(&#34;Update coefficient matrix.&#34;)
+            # 事前に NES での係数行列を作ると A.T をかけることで数値誤差が出てきてしまうらしい. なのでここで一気に作成
+            coef_matrix = D_B_inv_A_B_inv @ AXS_inv @ A.T @ D_B_inv_A_B_inv.T
+            logger.info(f&#34;{indent}MNES coef matrix condition number: {np.linalg.cond(coef_matrix)}&#34;)
+
+            self.pre_x_divided_s = x_divided_s
+            self.coef_matrix = coef_matrix
+
+        right_hand_side_NES = AXS_inv @ right_hand_side[m:n + m] + right_hand_side[:m] - A @ (right_hand_side[n + m:] / v.s)
+        right_hand_side_MNES = D_B_inv_A_B_inv @ right_hand_side_NES
+
+        # inexact に求解
+        sol_MNES = self.linear_system_solver.solve(self.coef_matrix, right_hand_side_MNES, tolerance=tolerance)
+        residual_sol = self.coef_matrix @ sol_MNES - right_hand_side_MNES
+
+        # 解から復元
+        sol_y = D_B_inv_A_B_inv.T @ sol_MNES
+        sol_s = right_hand_side[m:n + m] - A.T @ sol_y
+        v_k = np.zeros(problem.n)
+        v_k[hat_B] = D_B @ residual_sol
+        sol_x = -(v.x * sol_s / v.s) + right_hand_side[n + m:] / v.s - v_k
+        return sol_x, sol_y, sol_s, np.linalg.norm(residual_sol)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="src.solver.search_direction_calculator.AbstractSearchDirectionCalculator" href="#src.solver.search_direction_calculator.AbstractSearchDirectionCalculator">AbstractSearchDirectionCalculator</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="src.solver.search_direction_calculator.MNESSearchDirectionCalculator.A_base_indexes"><code class="name">var <span class="ident">A_base_indexes</span> : list[int] | None</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="src.solver.search_direction_calculator.MNESSearchDirectionCalculator.run"><code class="name flex">
+<span>def <span class="ident">run</span></span>(<span>self, v: <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a>, problem: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>, right_hand_side: numpy.ndarray, tolerance: float | None = None) ‑> tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray, float]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>MNES の定式化で探索方向を解く.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>v</code></strong> :&ensp;<code>LPVariables</code></dt>
+<dd>その反復時点での変数</dd>
+<dt><strong><code>problem</code></strong> :&ensp;<code>LPS</code></dt>
+<dd>問題</dd>
+<dt><strong><code>right_hand_side</code></strong> :&ensp;<code>np.ndarray</code></dt>
+<dd>変形を行う前の探索方向の右辺ベクトル</dd>
+<dt><strong><code>tolerance</code></strong> :&ensp;<code>float</code></dt>
+<dd>探索方向を計算する際の誤差許容度. ExactLinearSystemSolver なら不要</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>np.ndarray</code></dt>
+<dd>MNES で解いた結果の探索方向 x</dd>
+<dt><code>np.ndarray</code></dt>
+<dd>MNES で解いた結果の探索方向 y</dd>
+<dt><code>np.ndarray</code></dt>
+<dd>MNES で解いた結果の探索方向 s</dd>
+<dt><code>float</code></dt>
+<dd>MNES で解いた際の結果のずれのベクトルのノルム</dd>
+</dl></div>
+</dd>
+<dt id="src.solver.search_direction_calculator.MNESSearchDirectionCalculator.select_base_indexes"><code class="name flex">
+<span>def <span class="ident">select_base_indexes</span></span>(<span>self, problem: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>) ‑> list[int]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>MNES, OSS 定式化で使用する基底の index を選択
+先頭から1つずつ列を選んで, rank が上がれば基底として加える.</p>
+<h2 id="todo">Todo</h2>
+<ul>
+<li>現在のやり方だと full rank にならず永遠に回り続ける場合がある</li>
+</ul>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>problem</code></strong> :&ensp;<code>LPS</code></dt>
+<dd>選択対象の問題</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list[int]</code></dt>
+<dd>index</dd>
+</dl></div>
+</dd>
+</dl>
+</dd>
+<dt id="src.solver.search_direction_calculator.NESSearchDirectionCalculator"><code class="flex name class">
+<span>class <span class="ident">NESSearchDirectionCalculator</span></span>
+<span>(</span><span>linear_system_solver: <a title="src.linear_system_solver.exact_linear_system_solver.AbstractLinearSystemSolver" href="../linear_system_solver/exact_linear_system_solver.html#src.linear_system_solver.exact_linear_system_solver.AbstractLinearSystemSolver">AbstractLinearSystemSolver</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class NESSearchDirectionCalculator(AbstractSearchDirectionCalculator):
+    def run(
+        self, v: LPVariables, problem: LPS, right_hand_side: np.ndarray,
+        tolerance: float | None = None,
+    ) -&gt; tuple[np.ndarray, np.ndarray, np.ndarray, float]:
+        &#34;&#34;&#34;NES の定式化で探索方向を解く.
+        IPMの基本はこちら
+
+        Note:
+            * iida の inexact arc-search の論文では MNES の定式化を使用するが, QIPM の実装では NES でやっている
+
+        Args:
+            v (LPVariables): その反復時点での変数
+            problem (LPS): 問題
+            right_hand_side (np.ndarray): 変形を行う前の探索方向の右辺ベクトル
+            tolerance (float): 探索方向を計算する際の誤差許容度. ExactLinearSystemSolver なら不要
+
+        Returns:
+            np.ndarray: NES で解いた結果の探索方向 x
+            np.ndarray: NES で解いた結果の探索方向 y
+            np.ndarray: NES で解いた結果の探索方向 s
+            float: NES で解いた際の結果のずれのベクトルのノルム
+        &#34;&#34;&#34;
+        m = problem.m
+        n = problem.n
+        A = problem.A
+        x_divided_s = v.x / v.s
+        AXS_inv = A @ np.diag(x_divided_s)
+
+        # NES に変形
+        if self.pre_x_divided_s is None or np.any(self.pre_x_divided_s != x_divided_s):
+            logger.info(&#34;Update coefficient matrix.&#34;)
+            coef_matrix = AXS_inv @ A.T
+            # logger.debug(f&#34;{indent}NES coef matrix condition number: {np.linalg.cond(coef_matrix)}&#34;)
+
+            self.pre_x_divided_s = x_divided_s
+            self.coef_matrix = coef_matrix
+
+        right_hand_side_NES = AXS_inv @ right_hand_side[m:n + m] + right_hand_side[:m] - A @ (right_hand_side[n + m:] / v.s)
+
+        # inexact に求解
+        sol_NES = self.linear_system_solver.solve(self.coef_matrix, right_hand_side_NES, tolerance=tolerance)
+        residual_sol = self.coef_matrix @ sol_NES - right_hand_side_NES
+
+        # 解から復元
+        sol_y = sol_NES
+        sol_s = right_hand_side[m:n + m] - A.T @ sol_y
+        sol_x = -(v.x * sol_s / v.s) + right_hand_side[n + m:] / v.s
+        return sol_x, sol_y, sol_s, np.linalg.norm(residual_sol)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="src.solver.search_direction_calculator.AbstractSearchDirectionCalculator" href="#src.solver.search_direction_calculator.AbstractSearchDirectionCalculator">AbstractSearchDirectionCalculator</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="src.solver.search_direction_calculator.NESSearchDirectionCalculator.run"><code class="name flex">
+<span>def <span class="ident">run</span></span>(<span>self, v: <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a>, problem: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>, right_hand_side: numpy.ndarray, tolerance: float | None = None) ‑> tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray, float]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>NES の定式化で探索方向を解く.
+IPMの基本はこちら</p>
+<h2 id="note">Note</h2>
+<ul>
+<li>iida の inexact arc-search の論文では MNES の定式化を使用するが, QIPM の実装では NES でやっている</li>
+</ul>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>v</code></strong> :&ensp;<code>LPVariables</code></dt>
+<dd>その反復時点での変数</dd>
+<dt><strong><code>problem</code></strong> :&ensp;<code>LPS</code></dt>
+<dd>問題</dd>
+<dt><strong><code>right_hand_side</code></strong> :&ensp;<code>np.ndarray</code></dt>
+<dd>変形を行う前の探索方向の右辺ベクトル</dd>
+<dt><strong><code>tolerance</code></strong> :&ensp;<code>float</code></dt>
+<dd>探索方向を計算する際の誤差許容度. ExactLinearSystemSolver なら不要</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>np.ndarray</code></dt>
+<dd>NES で解いた結果の探索方向 x</dd>
+<dt><code>np.ndarray</code></dt>
+<dd>NES で解いた結果の探索方向 y</dd>
+<dt><code>np.ndarray</code></dt>
+<dd>NES で解いた結果の探索方向 s</dd>
+<dt><code>float</code></dt>
+<dd>NES で解いた際の結果のずれのベクトルのノルム</dd>
+</dl></div>
+</dd>
+</dl>
+</dd>
+<dt id="src.solver.search_direction_calculator.SelectionBasisError"><code class="flex name class">
+<span>class <span class="ident">SelectionBasisError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Common base class for all non-exit exceptions.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class SelectionBasisError(Exception):
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="src.solver" href="index.html">src.solver</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="src.solver.search_direction_calculator.AbstractSearchDirectionCalculator" href="#src.solver.search_direction_calculator.AbstractSearchDirectionCalculator">AbstractSearchDirectionCalculator</a></code></h4>
+<ul class="">
+<li><code><a title="src.solver.search_direction_calculator.AbstractSearchDirectionCalculator.coef_matrix" href="#src.solver.search_direction_calculator.AbstractSearchDirectionCalculator.coef_matrix">coef_matrix</a></code></li>
+<li><code><a title="src.solver.search_direction_calculator.AbstractSearchDirectionCalculator.pre_x_divided_s" href="#src.solver.search_direction_calculator.AbstractSearchDirectionCalculator.pre_x_divided_s">pre_x_divided_s</a></code></li>
+<li><code><a title="src.solver.search_direction_calculator.AbstractSearchDirectionCalculator.run" href="#src.solver.search_direction_calculator.AbstractSearchDirectionCalculator.run">run</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="src.solver.search_direction_calculator.MNESSearchDirectionCalculator" href="#src.solver.search_direction_calculator.MNESSearchDirectionCalculator">MNESSearchDirectionCalculator</a></code></h4>
+<ul class="">
+<li><code><a title="src.solver.search_direction_calculator.MNESSearchDirectionCalculator.A_base_indexes" href="#src.solver.search_direction_calculator.MNESSearchDirectionCalculator.A_base_indexes">A_base_indexes</a></code></li>
+<li><code><a title="src.solver.search_direction_calculator.MNESSearchDirectionCalculator.run" href="#src.solver.search_direction_calculator.MNESSearchDirectionCalculator.run">run</a></code></li>
+<li><code><a title="src.solver.search_direction_calculator.MNESSearchDirectionCalculator.select_base_indexes" href="#src.solver.search_direction_calculator.MNESSearchDirectionCalculator.select_base_indexes">select_base_indexes</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="src.solver.search_direction_calculator.NESSearchDirectionCalculator" href="#src.solver.search_direction_calculator.NESSearchDirectionCalculator">NESSearchDirectionCalculator</a></code></h4>
+<ul class="">
+<li><code><a title="src.solver.search_direction_calculator.NESSearchDirectionCalculator.run" href="#src.solver.search_direction_calculator.NESSearchDirectionCalculator.run">run</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="src.solver.search_direction_calculator.SelectionBasisError" href="#src.solver.search_direction_calculator.SelectionBasisError">SelectionBasisError</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.1</a>.</p>
+</footer>
+</body>
+</html>

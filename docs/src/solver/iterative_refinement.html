@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.1">
+<title>src.solver.iterative_refinement API documentation</title>
+<meta name="description" content="">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>src.solver.iterative_refinement</code></h1>
+</header>
+<section id="section-intro">
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="src.solver.iterative_refinement.InnerSolverSelectionError"><code class="flex name class">
+<span>class <span class="ident">InnerSolverSelectionError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>solver の選択に失敗したときに発生するエラー</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class InnerSolverSelectionError(Exception):
+    &#34;&#34;&#34;solver の選択に失敗したときに発生するエラー&#34;&#34;&#34;
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="src.solver.iterative_refinement.IterativeRefinementMethod"><code class="flex name class">
+<span>class <span class="ident">IterativeRefinementMethod</span></span>
+<span>(</span><span>config_section: str = 'DEFAULT', stop_criteria_parameter: float | None = None, inner_solver: <a title="src.solver.interior_point_method.InteriorPointMethod" href="interior_point_method.html#src.solver.interior_point_method.InteriorPointMethod">InteriorPointMethod</a> | None = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Iterative Refinement によって問題を都度更新してLPを求解するクラス</p>
+<p>初期化</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>config_section</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>使用するconfig. Defaults to config_utils.default_section.</dd>
+<dt><strong><code>inner_solver</code></strong> :&ensp;<code>InteriorPointMethod | None</code>, optional</dt>
+<dd>内部で使用するソルバー.
+インスタンス化されているので設定も含む. Defaults to None.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class IterativeRefinementMethod(LPSolver):
+    &#34;&#34;&#34;Iterative Refinement によって問題を都度更新してLPを求解するクラス
+    &#34;&#34;&#34;
+    @property
+    def hat_zeta(self) -&gt; float:
+        return self.parameters.ITERATIVE_REFINEMENT_OPTIMAL_THRESHOLD_OF_SOLVER
+
+    def _get_inner_solver(self) -&gt; InteriorPointMethod:
+        &#34;&#34;&#34;Iterative Refinement 内部で実行する inexact solver の取得
+        &#34;&#34;&#34;
+        str_solver = self.parameters.ITERATIVE_REFINEMENT_INNER_SOLVER
+        solved_checker = InexactSolvedChecker(self.hat_zeta, self.parameters.THRESHOLD_XS_NEGATIVE, False)
+        match str_solver:
+            case &#34;inexact_arc&#34;:
+                return InexactArcSearchIPM(self.config_section, solved_checker)
+            case &#34;inexact_line&#34;:
+                return InexactLineSearchIPM(self.config_section, solved_checker)
+            case &#34;arc&#34;:
+                return ArcSearchIPM(self.config_section, solved_checker)
+            case &#34;line&#34;:
+                return LineSearchIPM(self.config_section, solved_checker)
+            case _:
+                raise InnerSolverSelectionError(f&#34;Don&#39;t match solver for {str_solver}&#34;)
+
+    def __init__(
+        self,
+        config_section: str = config_utils.default_section,
+        stop_criteria_parameter: float | None = None,
+        inner_solver: InteriorPointMethod | None = None,
+    ):
+        &#34;&#34;&#34;初期化
+
+        Args:
+            config_section (str, optional): 使用するconfig. Defaults to config_utils.default_section.
+            inner_solver (InteriorPointMethod | None, optional): 内部で使用するソルバー.
+                インスタンス化されているので設定も含む. Defaults to None.
+        &#34;&#34;&#34;
+        self._set_config_and_parameters(config_section)
+        self.solved_checker = IterativeRefinementSolvedChecker(self.parameters.STOP_CRITERIA_PARAMETER, self.parameters.THRESHOLD_XS_NEGATIVE)
+
+        if inner_solver is None:
+            self.inner_solver = self._get_inner_solver()
+        else:
+            self.inner_solver = inner_solver
+        logger.info(f&#34;Inner solver is {self.inner_solver.__class__.__name__}.&#34;)
+
+    @property
+    def zeta(self) -&gt; float:
+        return self.stop_criteria_parameter
+
+    @property
+    def rho(self) -&gt; float:
+        return self.parameters.ITERATIVE_REFINEMENT_SCALING_MULTIPLIER
+
+    def run_inner_solver(self, problem: LPS, v: LPVariables | None = None) -&gt; SolvedDetail:
+        # ログで見やすいように線を入れておく
+        logger.info(f&#34;{&#39;-&#39; * 3} inner solver start {&#39;-&#39; * 50}&#34;)
+        result = self.inner_solver.run(problem, v)
+        logger.info(f&#34;{&#39;-&#39; * 3} inner solver end {&#39;-&#39; * 50}&#34;)
+        return result
+
+    def run_algorithm(self, problem_0: LPS, v_0: LPVariables) -&gt; SolvedDetail:
+        &#34;&#34;&#34;反復で解くアルゴリズム部分の実行
+
+        Returns:
+            SolvedDetail: 最適解に関する詳細情報を格納したデータ構造
+        &#34;&#34;&#34;
+        # 実行時間記録開始
+        start_time = time.time()
+
+        problem_name_prefix = f&#34;{problem_0.name}_refined_&#34;
+        count_iterative_refinement = 0
+        large_delta_p_k = 1
+        large_delta_d_k = 1
+
+        # 最初の求解
+        aSolvedDetail = self.run_inner_solver(problem_0, v_0)
+        v_star = aSolvedDetail.v
+        # problem = aSolvedDetail.problem
+        iter_num = aSolvedDetail.aSolvedSummary.iter_num
+
+        b_bar = problem_0.b - problem_0.A @ v_star.x
+        c_bar = problem_0.c - problem_0.A.T @ v_star.y
+
+        delta_p_k = max(np.abs(b_bar))
+        delta_d_k = max(max(-c_bar), 0)
+        logger.info(f&#34;delta_p_k: {delta_p_k}, delta_d_k: {delta_d_k}&#34;)
+
+        is_terminated = self.is_terminate(
+            v_star, problem_0, count_iterative_refinement,
+            time.time() - start_time,
+            delta_p_k, delta_d_k, aSolvedDetail
+        )
+
+        lst_variables = copy.deepcopy(aSolvedDetail.lst_variables_by_iter)
+        lst_mu = copy.deepcopy(aSolvedDetail.lst_mu_by_iter)
+        lst_alpha_x = copy.deepcopy(aSolvedDetail.lst_main_step_size_by_iter)
+        lst_alpha_s = copy.deepcopy(aSolvedDetail.lst_dual_step_size_by_iter)
+        lst_norm_vdot = copy.deepcopy(aSolvedDetail.lst_norm_vdot_by_iter)
+        lst_norm_vddot = copy.deepcopy(aSolvedDetail.lst_norm_vddot_by_iter)
+        lst_max_norm_main_const = copy.deepcopy(aSolvedDetail.lst_max_norm_main_constraint_by_iter)
+        lst_max_norm_dual_const = copy.deepcopy(aSolvedDetail.lst_max_norm_dual_constraint_by_iter)
+        lst_residual_inexact_vdot = copy.deepcopy(aSolvedDetail.lst_residual_inexact_vdot)
+        lst_tolerance_inexact_vdot = copy.deepcopy(aSolvedDetail.lst_tolerance_inexact_vdot)
+        lst_residual_inexact_vddot = copy.deepcopy(aSolvedDetail.lst_residual_inexact_vddot)
+        lst_tolerance_inexact_vddot = copy.deepcopy(aSolvedDetail.lst_tolerance_inexact_vddot)
+        lst_iteration_number_updated_by_iterative_refinement: list[float] = []
+
+        # 収束条件を満たすまで反復する
+        while not is_terminated:
+            count_iterative_refinement += 1
+            logger.info(f&#34;Iterative Refinement number: {count_iterative_refinement}&#34;)
+            logger.info(f&#34;{indent}total iteration: {iter_num}&#34;)
+
+            # 定数の更新
+            # QIPM の論文に合わせる場合
+            # large_delta_p_k = 2 ** np.ceil(np.log(1 / max(delta_p_k, 1 / (self.rho * large_delta_p_k))))
+            # large_delta_d_k = 2 ** np.ceil(np.log(1 / max(delta_d_k, 1 / (self.rho * large_delta_d_k))))
+            # iterative refinement の元論文に合わせる場合
+            large_delta_p_k = 1 / max(delta_p_k, 1 / (self.rho * large_delta_p_k))
+            large_delta_d_k = 1 / max(delta_d_k, 1 / (self.rho * large_delta_d_k))
+            logger.info(f&#34;large_delta_p_k: {large_delta_p_k}, large_delta_d_k: {large_delta_d_k}&#34;)
+
+            # 問題の更新
+            problem = LPS(
+                problem_0.A,
+                large_delta_p_k * (b_bar + problem_0.A @ v_star.x),
+                large_delta_d_k * c_bar,
+                f&#34;{problem_name_prefix}{count_iterative_refinement}&#34;
+            )
+
+            # inexact ソルバーで求解
+            aSolvedDetail = self.run_inner_solver(problem)
+            v_hat = aSolvedDetail.v
+            # problem = aSolvedDetail.problem
+            iter_num += aSolvedDetail.aSolvedSummary.iter_num
+
+            # 記録と更新
+            x_star = v_hat.x / large_delta_p_k
+            y_star = v_star.y + v_hat.y / large_delta_d_k
+
+            b_bar = problem_0.b - problem_0.A @ x_star
+            c_bar = problem_0.c - problem_0.A.T @ y_star
+
+            delta_p_k = max(np.abs(b_bar))
+            delta_d_k = max(max(-c_bar), 0)
+            logger.info(f&#34;delta_p_k: {delta_p_k}, delta_d_k: {delta_d_k}&#34;)
+
+            # s は最適解に到達しているかの判定にのみ使用する
+            # 理論的には c - A^T y &gt;= -epsilon になるはず, 誤差で負の値になるため0以上に修正
+            s_star = np.where(c_bar &lt; 0, 0, c_bar)
+            v_star = LPVariables(x_star, y_star, s_star)
+
+            lst_variables += aSolvedDetail.lst_variables_by_iter
+            lst_mu += aSolvedDetail.lst_mu_by_iter
+            lst_alpha_x += aSolvedDetail.lst_main_step_size_by_iter
+            lst_alpha_s += aSolvedDetail.lst_dual_step_size_by_iter
+            lst_norm_vdot += aSolvedDetail.lst_norm_vdot_by_iter
+            lst_norm_vddot += aSolvedDetail.lst_norm_vddot_by_iter
+            lst_max_norm_main_const += aSolvedDetail.lst_max_norm_main_constraint_by_iter
+            lst_max_norm_dual_const += aSolvedDetail.lst_max_norm_dual_constraint_by_iter
+            lst_residual_inexact_vdot += aSolvedDetail.lst_residual_inexact_vdot
+            lst_tolerance_inexact_vdot += aSolvedDetail.lst_tolerance_inexact_vdot
+            lst_residual_inexact_vddot += aSolvedDetail.lst_residual_inexact_vddot
+            lst_tolerance_inexact_vddot += aSolvedDetail.lst_tolerance_inexact_vddot
+            lst_iteration_number_updated_by_iterative_refinement.append(iter_num)
+
+            logger.info(f&#34;Duality parameter: {v_star.mu}&#34;)
+            logger.info(&#34;Max constraint violation:&#34;)
+            logger.info(f&#34;{indent}main: {max(np.abs(problem_0.residual_main_constraint(v_star.x)))}&#34;)
+            logger.info(f&#34;{indent}dual: {max(np.abs(problem_0.residual_dual_constraint(v_star.y, v_star.s)))}&#34;)
+
+            is_terminated = self.is_terminate(
+                v_star, problem_0, count_iterative_refinement,
+                time.time() - start_time,
+                delta_p_k, delta_d_k, aSolvedDetail
+            )
+
+        # 時間計測終了
+        elapsed_time = time.time() - start_time
+        logger.info(f&#34;Needed iterative refinement number: {count_iterative_refinement}&#34;)
+
+        # 出力の作成
+        # delta_k での判定は iterative refinement 特有のもので問題自体を解けたかは不明. なので relative な判定を行う
+        is_solved = self.solved_checker.is_relative_solved(v_star, problem_0)
+        # 反復回数上限に達したかどうかは iterative refinement を何回行ったかで判断
+        aSolvedSummary = self.make_SolvedSummary(
+            v_star, problem_0, is_solved,
+            iter_num, self.is_iteration_number_reached_upper(count_iterative_refinement, problem_0),
+            elapsed_time
+        )
+        output = SolvedDetail(
+            aSolvedSummary, v_star, problem_0, v_0, problem_0,
+            lst_variables_by_iter=lst_variables,
+            lst_main_step_size_by_iter=lst_alpha_x,
+            lst_dual_step_size_by_iter=lst_alpha_s,
+            lst_mu_by_iter=lst_mu,
+            lst_norm_vdot_by_iter=lst_norm_vdot,
+            lst_norm_vddot_by_iter=lst_norm_vddot,
+            lst_max_norm_main_constraint_by_iter=lst_max_norm_main_const,
+            lst_max_norm_dual_constraint_by_iter=lst_max_norm_dual_const,
+            lst_iteration_number_updated_by_iterative_refinement=lst_iteration_number_updated_by_iterative_refinement,
+            lst_residual_inexact_vdot=lst_residual_inexact_vdot,
+            lst_tolerance_inexact_vdot=lst_tolerance_inexact_vdot,
+            lst_residual_inexact_vddot=lst_residual_inexact_vddot,
+            lst_tolerance_inexact_vddot=lst_tolerance_inexact_vddot,
+        )
+        return output
+
+    def is_iteration_number_reached_upper(self, iter_num: int, problem: LPS) -&gt; bool:
+        &#34;&#34;&#34;反復回数が上限を超えたか
+
+        Iterative refinement の反復回数上限に達したかで判定
+        本来は O(L) だが, L を算出する意味があまり見いだせない
+
+        Args:
+            iter_num: iterative refinement 実施回数
+        &#34;&#34;&#34;
+        return iter_num &gt;= self.parameters.ITERATIVE_REFINEMENT_ITER_UPPER
+
+    def is_terminate(
+        self, v: LPVariables, problem: LPS, count_iterative_refinement: int,
+        elapsed_time: float,
+        delta_p_k: float, delta_d_k: float,
+        inner_solved_data: SolvedDetail,
+    ) -&gt; bool:
+        if self.solved_checker.run(v, problem, delta_p_k=delta_p_k, delta_d_k=delta_d_k):
+            logger.info(f&#34;{indent}Variables satisfy the solution condition.&#34;)
+            return True
+        # 変数が最適性を満たしていれば, iterative refinement の終了条件に関わらず終了する
+        if self.solved_checker.is_relative_solved(v, problem):
+            logger.info(f&#34;{indent}Variables satisfy the solution condition with relative criteria.&#34;)
+            return True
+
+        if self.is_iteration_number_reached_upper(count_iterative_refinement, problem):
+            logger.warning(f&#34;{indent}Algorithm terminates upper bound of iterative refinement.&#34;)
+            return True
+
+        if self.is_calculation_time_reached_upper(elapsed_time):
+            logger.warning(f&#34;{indent}Algorithm terminates calculation time upper bound.&#34;)
+            return True
+
+        # inner solver が求解できなかった場合は終了
+        if not inner_solved_data.aSolvedSummary.is_solved:
+            logger.warning(f&#34;{indent}Inner solver cannot solve {inner_solved_data.aSolvedSummary.problem_name}.&#34;)
+            return True
+
+        return False</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="src.solver.solver.LPSolver" href="solver.html#src.solver.solver.LPSolver">LPSolver</a></li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="src.solver.iterative_refinement.IterativeRefinementMethod.hat_zeta"><code class="name">prop <span class="ident">hat_zeta</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def hat_zeta(self) -&gt; float:
+    return self.parameters.ITERATIVE_REFINEMENT_OPTIMAL_THRESHOLD_OF_SOLVER</code></pre>
+</details>
+</dd>
+<dt id="src.solver.iterative_refinement.IterativeRefinementMethod.rho"><code class="name">prop <span class="ident">rho</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def rho(self) -&gt; float:
+    return self.parameters.ITERATIVE_REFINEMENT_SCALING_MULTIPLIER</code></pre>
+</details>
+</dd>
+<dt id="src.solver.iterative_refinement.IterativeRefinementMethod.zeta"><code class="name">prop <span class="ident">zeta</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def zeta(self) -&gt; float:
+    return self.stop_criteria_parameter</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="src.solver.iterative_refinement.IterativeRefinementMethod.is_iteration_number_reached_upper"><code class="name flex">
+<span>def <span class="ident">is_iteration_number_reached_upper</span></span>(<span>self, iter_num: int, problem: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>反復回数が上限を超えたか</p>
+<p>Iterative refinement の反復回数上限に達したかで判定
+本来は O(L) だが, L を算出する意味があまり見いだせない</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>iter_num</code></strong></dt>
+<dd>iterative refinement 実施回数</dd>
+</dl></div>
+</dd>
+<dt id="src.solver.iterative_refinement.IterativeRefinementMethod.is_terminate"><code class="name flex">
+<span>def <span class="ident">is_terminate</span></span>(<span>self, v: <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a>, problem: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>, count_iterative_refinement: int, elapsed_time: float, delta_p_k: float, delta_d_k: float, inner_solved_data: <a title="src.solver.solved_data.SolvedDetail" href="solved_data.html#src.solver.solved_data.SolvedDetail">SolvedDetail</a>) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.solver.iterative_refinement.IterativeRefinementMethod.run_inner_solver"><code class="name flex">
+<span>def <span class="ident">run_inner_solver</span></span>(<span>self, problem: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>, v: <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a> | None = None) ‑> <a title="src.solver.solved_data.SolvedDetail" href="solved_data.html#src.solver.solved_data.SolvedDetail">SolvedDetail</a></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="src.solver.solver.LPSolver" href="solver.html#src.solver.solver.LPSolver">LPSolver</a></b></code>:
+<ul class="hlist">
+<li><code><a title="src.solver.solver.LPSolver.initial_variables" href="solver.html#src.solver.solver.LPSolver.initial_variables">initial_variables</a></code></li>
+<li><code><a title="src.solver.solver.LPSolver.is_calculation_time_reached_upper" href="solver.html#src.solver.solver.LPSolver.is_calculation_time_reached_upper">is_calculation_time_reached_upper</a></code></li>
+<li><code><a title="src.solver.solver.LPSolver.is_stopping_criteria_relative" href="solver.html#src.solver.solver.LPSolver.is_stopping_criteria_relative">is_stopping_criteria_relative</a></code></li>
+<li><code><a title="src.solver.solver.LPSolver.log_initial_problem_information" href="solver.html#src.solver.solver.LPSolver.log_initial_problem_information">log_initial_problem_information</a></code></li>
+<li><code><a title="src.solver.solver.LPSolver.log_initial_situation" href="solver.html#src.solver.solver.LPSolver.log_initial_situation">log_initial_situation</a></code></li>
+<li><code><a title="src.solver.solver.LPSolver.log_positive_variables_negativity" href="solver.html#src.solver.solver.LPSolver.log_positive_variables_negativity">log_positive_variables_negativity</a></code></li>
+<li><code><a title="src.solver.solver.LPSolver.log_solved_data" href="solver.html#src.solver.solver.LPSolver.log_solved_data">log_solved_data</a></code></li>
+<li><code><a title="src.solver.solver.LPSolver.make_SolvedSummary" href="solver.html#src.solver.solver.LPSolver.make_SolvedSummary">make_SolvedSummary</a></code></li>
+<li><code><a title="src.solver.solver.LPSolver.run" href="solver.html#src.solver.solver.LPSolver.run">run</a></code></li>
+<li><code><a title="src.solver.solver.LPSolver.run_algorithm" href="solver.html#src.solver.solver.LPSolver.run_algorithm">run_algorithm</a></code></li>
+<li><code><a title="src.solver.solver.LPSolver.scale_step_size" href="solver.html#src.solver.solver.LPSolver.scale_step_size">scale_step_size</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="src.solver.iterative_refinement.IterativeRefinementSolvedChecker"><code class="flex name class">
+<span>class <span class="ident">IterativeRefinementSolvedChecker</span></span>
+<span>(</span><span>stop_criteria_threshold: float, threshold_xs_negative: float)</span>
+</code></dt>
+<dd>
+<div class="desc"><p><em>summary</em></p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>stop_criteria_threshold</code></strong></dt>
+<dd>どれだけ最適解に肉薄していればアルゴリズムを停止するかの threshold.
+ソルバーによって停止条件は異なるため, 使われ方はソルバーごとに異なる</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class IterativeRefinementSolvedChecker(SolvedChecker):
+    def run(
+        self, v: LPVariables, problem: LPS,
+        *args, **kwargs,
+    ) -&gt; bool:
+        &#34;&#34;&#34;Iterative Refinement が最適性を満たし, 最適解にたどり着いたかを確認
+
+        アルゴリズム実行中は delta_k が存在するので, relative に加えてそちらでも判定を行う.
+        もしなければ（LPSolver で SolvedSummary 作るときとか）は relative のみで判定
+        &#34;&#34;&#34;
+        if &#34;delta_p_k&#34; in kwargs or &#34;delta_d_k&#34; in kwargs:
+            delta_p_k = kwargs[&#34;delta_p_k&#34;]
+            delta_d_k = kwargs[&#34;delta_d_k&#34;]
+            if delta_p_k &lt;= self.stop_criteria_threshold and delta_d_k &lt;= self.stop_criteria_threshold and v.mu &lt;= self.stop_criteria_threshold:
+                return True
+
+        return self.is_relative_solved(v, problem)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="src.solver.solved_checker.SolvedChecker" href="solved_checker.html#src.solver.solved_checker.SolvedChecker">SolvedChecker</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="src.solver.iterative_refinement.IterativeRefinementSolvedChecker.run"><code class="name flex">
+<span>def <span class="ident">run</span></span>(<span>self, v: <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a>, problem: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>, *args, **kwargs) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Iterative Refinement が最適性を満たし, 最適解にたどり着いたかを確認</p>
+<p>アルゴリズム実行中は delta_k が存在するので, relative に加えてそちらでも判定を行う.
+もしなければ（LPSolver で SolvedSummary 作るときとか）は relative のみで判定</p></div>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="src.solver.solved_checker.SolvedChecker" href="solved_checker.html#src.solver.solved_checker.SolvedChecker">SolvedChecker</a></b></code>:
+<ul class="hlist">
+<li><code><a title="src.solver.solved_checker.SolvedChecker.is_relative_solved" href="solved_checker.html#src.solver.solved_checker.SolvedChecker.is_relative_solved">is_relative_solved</a></code></li>
+<li><code><a title="src.solver.solved_checker.SolvedChecker.is_xs_positive" href="solved_checker.html#src.solver.solved_checker.SolvedChecker.is_xs_positive">is_xs_positive</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="src.solver" href="index.html">src.solver</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="src.solver.iterative_refinement.InnerSolverSelectionError" href="#src.solver.iterative_refinement.InnerSolverSelectionError">InnerSolverSelectionError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="src.solver.iterative_refinement.IterativeRefinementMethod" href="#src.solver.iterative_refinement.IterativeRefinementMethod">IterativeRefinementMethod</a></code></h4>
+<ul class="">
+<li><code><a title="src.solver.iterative_refinement.IterativeRefinementMethod.hat_zeta" href="#src.solver.iterative_refinement.IterativeRefinementMethod.hat_zeta">hat_zeta</a></code></li>
+<li><code><a title="src.solver.iterative_refinement.IterativeRefinementMethod.is_iteration_number_reached_upper" href="#src.solver.iterative_refinement.IterativeRefinementMethod.is_iteration_number_reached_upper">is_iteration_number_reached_upper</a></code></li>
+<li><code><a title="src.solver.iterative_refinement.IterativeRefinementMethod.is_terminate" href="#src.solver.iterative_refinement.IterativeRefinementMethod.is_terminate">is_terminate</a></code></li>
+<li><code><a title="src.solver.iterative_refinement.IterativeRefinementMethod.rho" href="#src.solver.iterative_refinement.IterativeRefinementMethod.rho">rho</a></code></li>
+<li><code><a title="src.solver.iterative_refinement.IterativeRefinementMethod.run_inner_solver" href="#src.solver.iterative_refinement.IterativeRefinementMethod.run_inner_solver">run_inner_solver</a></code></li>
+<li><code><a title="src.solver.iterative_refinement.IterativeRefinementMethod.zeta" href="#src.solver.iterative_refinement.IterativeRefinementMethod.zeta">zeta</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="src.solver.iterative_refinement.IterativeRefinementSolvedChecker" href="#src.solver.iterative_refinement.IterativeRefinementSolvedChecker">IterativeRefinementSolvedChecker</a></code></h4>
+<ul class="">
+<li><code><a title="src.solver.iterative_refinement.IterativeRefinementSolvedChecker.run" href="#src.solver.iterative_refinement.IterativeRefinementSolvedChecker.run">run</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.1</a>.</p>
+</footer>
+</body>
+</html>
