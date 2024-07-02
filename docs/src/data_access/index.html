@@ -44,6 +44,349 @@ hljs.highlightAll();
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="src.data_access.CsvHandler"><code class="flex name class">
+<span>class <span class="ident">CsvHandler</span></span>
+<span>(</span><span>config_section: str = 'DEFAULT')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>csv ファイルの読み込み・書き込みに関する class</p>
+<p>初期化. <code>data</code> ディレクトリへのパスを設定する</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class CsvHandler:
+    &#34;&#34;&#34;csv ファイルの読み込み・書き込みに関する class&#34;&#34;&#34;
+    def __init__(self, config_section: str = config_utils.default_section):
+        &#34;&#34;&#34;初期化. `data` ディレクトリへのパスを設定する&#34;&#34;&#34;
+        config_ini = config_utils.read_config(section=config_section)
+
+        self._path_data = config_ini.get(&#34;PATH_DATA&#34;)
+        self._path_processed = config_ini.get(&#34;PATH_PROCESSED&#34;)
+        self._path_result = config_ini.get(&#34;PATH_RESULT&#34;)
+
+    def can_read_LP(
+        self, problem_name: str
+    ) -&gt; bool:
+        &#34;&#34;&#34;指定した問題がディレクトリに存在し, 読み取ることが可能か&#34;&#34;&#34;
+        file_prefix = f&#34;{self._path_processed}{problem_name}&#34;
+
+        can_read_A = os.path.exists(str_util.add_suffix_csv(file_prefix + &#34;_A&#34;))
+        can_read_b = os.path.exists(str_util.add_suffix_csv(file_prefix + &#34;_b&#34;))
+        can_read_c = os.path.exists(str_util.add_suffix_csv(file_prefix + &#34;_c&#34;))
+        return can_read_A and can_read_b and can_read_c
+
+    def read_LP(
+        self, problem_name: str
+    ) -&gt; LPS:
+        &#34;&#34;&#34;線形計画問題に関するcsvファイルを読み込み, 問題のクラスインスタンスを出力
+
+        csv上で欠損している箇所は0を代入する
+        &#34;&#34;&#34;
+        # 読み込めない場合, エラーを返す
+        if not self.can_read_LP(problem_name):
+            raise CannotReadError(f&#34;{self._path_processed} 以下に {problem_name} が存在しません.&#34;)
+
+        file_prefix = f&#34;{self._path_processed}{problem_name}&#34;
+
+        def read(filename: str) -&gt; np.ndarray:
+            &#34;&#34;&#34;各定数を読み込む処理&#34;&#34;&#34;
+            return np.genfromtxt(filename, delimiter=&#34;,&#34;, filling_values=0)
+
+        A = read(str_util.add_suffix_csv(file_prefix + &#34;_A&#34;))
+        b = read(str_util.add_suffix_csv(file_prefix + &#34;_b&#34;))
+        c = read(str_util.add_suffix_csv(file_prefix + &#34;_c&#34;))
+        return LPS(A, b, c, problem_name)
+
+    def write_numpy(
+        self, filename: str, data: np.ndarray, path: Optional[str] = None
+    ):
+        &#34;&#34;&#34;numpy のデータをcsvファイルに書き出す
+
+        Args:
+            filename: ファイル名. `.csv` がなくともメソッドの中でつけるので問題ない
+            data: 書き込み対象の numpy データ
+            path: 書き込み先のpath. 指定がなければ `self._path_data` 直下に置く
+        &#34;&#34;&#34;
+        # 書き込み先の決定
+        if path is None:
+            path = self._path_data
+
+        fullpath_filename = str_util.add_suffix_csv(f&#34;{path}{filename}&#34;)
+        np.savetxt(fullpath_filename, data, delimiter=&#34;,&#34;)
+        logger.info(f&#34;{fullpath_filename} is written.&#34;)
+
+    def write_LP(self, aLP: LPS, problem_name: str):
+        &#34;&#34;&#34;線形計画問題を csvファイルに書き出す
+
+        前処理したものを書き出す前提のため, `processed` ディレクトリに書き出す
+
+        TODO:
+            * 0は書き下すとファイルサイズが大きくなるので, 欠損させるようにしたい
+        &#34;&#34;&#34;
+        self.write_numpy(problem_name + &#34;_A&#34;, aLP.A, self._path_processed)
+        self.write_numpy(problem_name + &#34;_b&#34;, aLP.b, self._path_processed)
+        self.write_numpy(problem_name + &#34;_c&#34;, aLP.c, self._path_processed)
+
+    def write_SolvedSummary(
+        self, lst_solved_summary: list[SolvedSummary],
+        name: str, path: str,
+        is_append: bool = False
+    ):
+        &#34;&#34;&#34;最適化の実行によって得られた諸データを書き込む
+
+        DataclassWriter を使用するため, self.write メソッドは使用しない
+
+        Args:
+            path: 書き込み先のディレクトリ
+            is_append: 追記するか否か. 追記する場合は headerを抜く
+        &#34;&#34;&#34;
+        file_util.create_dir_if_not_exists(path)
+        filename = str_util.add_suffix_csv(f&#34;{path}{name}&#34;)
+
+        if is_append:
+            mode = &#34;a+&#34;
+        else:
+            mode = &#34;w&#34;
+
+        with open(filename, mode, newline=&#34;&#34;) as f:
+            w = DataclassWriter(f, lst_solved_summary, SolvedSummary)
+            w.write(skip_header=is_append)</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="src.data_access.CsvHandler.can_read_LP"><code class="name flex">
+<span>def <span class="ident">can_read_LP</span></span>(<span>self, problem_name: str) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>指定した問題がディレクトリに存在し, 読み取ることが可能か</p></div>
+</dd>
+<dt id="src.data_access.CsvHandler.read_LP"><code class="name flex">
+<span>def <span class="ident">read_LP</span></span>(<span>self, problem_name: str) ‑> <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>線形計画問題に関するcsvファイルを読み込み, 問題のクラスインスタンスを出力</p>
+<p>csv上で欠損している箇所は0を代入する</p></div>
+</dd>
+<dt id="src.data_access.CsvHandler.write_LP"><code class="name flex">
+<span>def <span class="ident">write_LP</span></span>(<span>self, aLP: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>, problem_name: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>線形計画問題を csvファイルに書き出す</p>
+<p>前処理したものを書き出す前提のため, <code>processed</code> ディレクトリに書き出す</p>
+<h2 id="todo">Todo</h2>
+<ul>
+<li>0は書き下すとファイルサイズが大きくなるので, 欠損させるようにしたい</li>
+</ul></div>
+</dd>
+<dt id="src.data_access.CsvHandler.write_SolvedSummary"><code class="name flex">
+<span>def <span class="ident">write_SolvedSummary</span></span>(<span>self, lst_solved_summary: list[<a title="src.solver.solved_data.SolvedSummary" href="../solver/solved_data.html#src.solver.solved_data.SolvedSummary">SolvedSummary</a>], name: str, path: str, is_append: bool = False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>最適化の実行によって得られた諸データを書き込む</p>
+<p>DataclassWriter を使用するため, self.write メソッドは使用しない</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>path</code></strong></dt>
+<dd>書き込み先のディレクトリ</dd>
+<dt><strong><code>is_append</code></strong></dt>
+<dd>追記するか否か. 追記する場合は headerを抜く</dd>
+</dl></div>
+</dd>
+<dt id="src.data_access.CsvHandler.write_numpy"><code class="name flex">
+<span>def <span class="ident">write_numpy</span></span>(<span>self, filename: str, data: numpy.ndarray, path: Optional[str] = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>numpy のデータをcsvファイルに書き出す</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>filename</code></strong></dt>
+<dd>ファイル名. <code>.csv</code> がなくともメソッドの中でつけるので問題ない</dd>
+<dt><strong><code>data</code></strong></dt>
+<dd>書き込み対象の numpy データ</dd>
+<dt><strong><code>path</code></strong></dt>
+<dd>書き込み先のpath. 指定がなければ <code>self._path_data</code> 直下に置く</dd>
+</dl></div>
+</dd>
+</dl>
+</dd>
+<dt id="src.data_access.MpsLoader"><code class="flex name class">
+<span>class <span class="ident">MpsLoader</span></span>
+<span>(</span><span>path_netlib: str = 'data/raw/netlib/')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>SIF file からLPを読み込む際に必要になる処理についてまとめたクラス</p>
+<p>SIF file は制約ごとに上限, 下限が設定されていたり, box constraint が存在したりする
+標準形式に起こす必要がある</p>
+<p>初期化</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>path_netlib</code></strong></dt>
+<dd>NETLIB のベンチマークSIF file が格納されているディレクトリまでのパス</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class MpsLoader:
+    &#34;&#34;&#34;SIF file からLPを読み込む際に必要になる処理についてまとめたクラス
+
+    SIF file は制約ごとに上限, 下限が設定されていたり, box constraint が存在したりする
+    標準形式に起こす必要がある
+    &#34;&#34;&#34;
+    def __init__(self, path_netlib: str = path_netlib):
+        &#34;&#34;&#34;初期化
+
+        Args:
+            path_netlib: NETLIB のベンチマークSIF file が格納されているディレクトリまでのパス
+        &#34;&#34;&#34;
+        self._path = path_netlib
+
+    def get_problem_names(self) -&gt; list[str]:
+        &#34;&#34;&#34;参照しているディレクトリに存在する `SIF` ファイルの一覧を取得
+
+        問題名のみ取り出したいので, `.SIF` を削除して出力する
+        &#34;&#34;&#34;
+        path = pathlib.Path(self._path)
+        return [fullpath.name[:-4] for fullpath in path.glob(&#34;*.SIF&#34;)]
+
+    def separate_by_constraint_type(
+        self, types_constraint: list[str], A: np.ndarray, b_origin: np.ndarray
+    ):
+        &#34;&#34;&#34;制約の種類（等式, 上限, 下限）によって A,b のインスタンスを分ける
+
+        Args:
+            types_constraint: A, b の制約の種類. E or G or L
+        &#34;&#34;&#34;
+        lst_index_eq = [
+            idx for idx, val in enumerate(types_constraint) if val == &#34;E&#34;
+        ]
+        A_E = A[lst_index_eq, :]
+        b_E = b_origin[lst_index_eq]
+        lst_index_ge = [
+            idx for idx, val in enumerate(types_constraint) if val == &#34;G&#34;
+        ]
+        A_G = A[lst_index_ge, :]
+        b_G = b_origin[lst_index_ge]
+        lst_index_le = [
+            idx for idx, val in enumerate(types_constraint) if val == &#34;L&#34;
+        ]
+        A_L = A[lst_index_le, :]
+        b_L = b_origin[lst_index_le]
+        return A_E, A_G, A_L, b_E, b_G, b_L
+
+    def add_suffix(self, problem_name: str) -&gt; str:
+        &#34;&#34;&#34;パスを Attributes から取得し, `.SIF` が頭についていなければ追加&#34;&#34;&#34;
+        suffix = &#34;.SIF&#34;
+        return str_util.add_suffix(f&#34;{self._path}{problem_name}&#34;, suffix)
+
+    def run(self, problem_name: str) -&gt; LP:
+        &#34;&#34;&#34;MPS ファイルを読み込んで線形計画問題インスタンスを出力する
+
+        Args:
+            problem_name: 問題名. パスは含まない. `.SIF` はついていてもいなくてもよい
+
+        Returns:
+            LP: 線形計画問題のインスタンス
+        &#34;&#34;&#34;
+        mps_obj = smps.load_mps(self.add_suffix(problem_name))
+
+        # 制約数
+        m_origin = len(mps_obj[2])
+        A_origin = mps_obj[7]
+
+        # 変数次元数
+        n_origin = len(mps_obj[3])
+        c_origin = mps_obj[6]
+
+        # すべて0であれば SIF file への記載が省略されるため, 明示的に設定
+        if not len(c_origin):
+            c_origin = np.zeros(n_origin)
+
+        # 制約
+        name_constraints = mps_obj[8]
+        # 制約の右辺がすべて0の場合省略されるため, 明示的に設定
+        if name_constraints:
+            b_origin = mps_obj[9][name_constraints[0]]
+        else:
+            b_origin = np.zeros(m_origin)
+        # 変数の上下限制約
+        name_bounds = mps_obj[10]
+        # 上下限制約がない場合記載が省略されるため, 明示的に設定
+        if name_bounds:
+            dct_bound = mps_obj[11][name_bounds[0]]
+            lb_origin = dct_bound[&#34;LO&#34;]
+            ub_origin = dct_bound[&#34;UP&#34;]
+        else:
+            lb_origin = np.zeros(n_origin)
+            ub_origin = np.full(n_origin, np.inf)
+
+        # 変数上限は制約に追加されるので, 上限があるものを取得しておく
+        lst_index_lb = np.where(lb_origin != -np.inf)[0]
+        lst_index_ub = np.where(ub_origin != np.inf)[0]
+        lb = lb_origin[lst_index_lb]
+        ub = ub_origin[lst_index_ub]
+
+        # 等式制約, 上限 or 下限不等式制約に分ける
+        types_constraint = mps_obj[5]
+        A_E, A_G, A_L, b_E, b_G, b_L = self.separate_by_constraint_type(
+            types_constraint, A_origin, b_origin
+        )
+
+        output = LP(
+            A_E, b_E, A_G, b_G, A_L, b_L,
+            lst_index_lb, lb, lst_index_ub, ub,
+            c_origin, problem_name
+        )
+        return output</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="src.data_access.MpsLoader.add_suffix"><code class="name flex">
+<span>def <span class="ident">add_suffix</span></span>(<span>self, problem_name: str) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>パスを Attributes から取得し, <code>.SIF</code> が頭についていなければ追加</p></div>
+</dd>
+<dt id="src.data_access.MpsLoader.get_problem_names"><code class="name flex">
+<span>def <span class="ident">get_problem_names</span></span>(<span>self) ‑> list[str]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>参照しているディレクトリに存在する <code>SIF</code> ファイルの一覧を取得</p>
+<p>問題名のみ取り出したいので, <code>.SIF</code> を削除して出力する</p></div>
+</dd>
+<dt id="src.data_access.MpsLoader.run"><code class="name flex">
+<span>def <span class="ident">run</span></span>(<span>self, problem_name: str) ‑> <a title="src.problem.problem.LinearProgrammingProblem" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblem">LinearProgrammingProblem</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>MPS ファイルを読み込んで線形計画問題インスタンスを出力する</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>problem_name</code></strong></dt>
+<dd>問題名. パスは含まない. <code>.SIF</code> はついていてもいなくてもよい</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>LP</code></dt>
+<dd>線形計画問題のインスタンス</dd>
+</dl></div>
+</dd>
+<dt id="src.data_access.MpsLoader.separate_by_constraint_type"><code class="name flex">
+<span>def <span class="ident">separate_by_constraint_type</span></span>(<span>self, types_constraint: list[str], A: numpy.ndarray, b_origin: numpy.ndarray)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>制約の種類（等式, 上限, 下限）によって A,b のインスタンスを分ける</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>types_constraint</code></strong></dt>
+<dd>A, b の制約の種類. E or G or L</dd>
+</dl></div>
+</dd>
+</dl>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -60,6 +403,29 @@ hljs.highlightAll();
 <ul>
 <li><code><a title="src.data_access.csv_handler" href="csv_handler.html">src.data_access.csv_handler</a></code></li>
 <li><code><a title="src.data_access.mps_handler" href="mps_handler.html">src.data_access.mps_handler</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="src.data_access.CsvHandler" href="#src.data_access.CsvHandler">CsvHandler</a></code></h4>
+<ul class="">
+<li><code><a title="src.data_access.CsvHandler.can_read_LP" href="#src.data_access.CsvHandler.can_read_LP">can_read_LP</a></code></li>
+<li><code><a title="src.data_access.CsvHandler.read_LP" href="#src.data_access.CsvHandler.read_LP">read_LP</a></code></li>
+<li><code><a title="src.data_access.CsvHandler.write_LP" href="#src.data_access.CsvHandler.write_LP">write_LP</a></code></li>
+<li><code><a title="src.data_access.CsvHandler.write_SolvedSummary" href="#src.data_access.CsvHandler.write_SolvedSummary">write_SolvedSummary</a></code></li>
+<li><code><a title="src.data_access.CsvHandler.write_numpy" href="#src.data_access.CsvHandler.write_numpy">write_numpy</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="src.data_access.MpsLoader" href="#src.data_access.MpsLoader">MpsLoader</a></code></h4>
+<ul class="">
+<li><code><a title="src.data_access.MpsLoader.add_suffix" href="#src.data_access.MpsLoader.add_suffix">add_suffix</a></code></li>
+<li><code><a title="src.data_access.MpsLoader.get_problem_names" href="#src.data_access.MpsLoader.get_problem_names">get_problem_names</a></code></li>
+<li><code><a title="src.data_access.MpsLoader.run" href="#src.data_access.MpsLoader.run">run</a></code></li>
+<li><code><a title="src.data_access.MpsLoader.separate_by_constraint_type" href="#src.data_access.MpsLoader.separate_by_constraint_type">separate_by_constraint_type</a></code></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
