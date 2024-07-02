@@ -19,6 +19,7 @@ def test_CG_tolerance():
     assert np.linalg.norm(A @ sol_x - b) <= tolerance
 
 
+@pytest.mark.julia
 def test_HHL_julia():
     """julia による HHL アルゴリズムが正しく解けるか確認"""
     # Julia の compile が入って遅くなるのでこのテストを回すときのみ実行
