@@ -1,12 +1,14 @@
 """探索方向の計算方法についてまとめたモジュール"""
-from abc import ABCMeta, abstractmethod
+
 import itertools
+from abc import ABCMeta, abstractmethod
 
 import numpy as np
+from scipy.sparse import csr_matrix as Csr
 
+from ..linear_system_solver.exact_linear_system_solver import AbstractLinearSystemSolver
 from ..logger import get_main_logger, indent
 from ..problem import LinearProgrammingProblemStandard as LPS
-from ..linear_system_solver.exact_linear_system_solver import AbstractLinearSystemSolver
 from .variables import LPVariables
 
 logger = get_main_logger()
@@ -19,7 +21,7 @@ class SelectionBasisError(Exception):
 class AbstractSearchDirectionCalculator(metaclass=ABCMeta):
     # 変数が変わっていなければ係数行列は変わらないため, 不要な計算を省くために前回の計算を記録しておく
     pre_x_divided_s: np.ndarray | None = None
-    coef_matrix: np.ndarray | None = None
+    coef_matrix: Csr | None = None
 
     def __init__(self, linear_system_solver: AbstractLinearSystemSolver):
         self.linear_system_solver: AbstractLinearSystemSolver = linear_system_solver
@@ -47,7 +49,10 @@ class AbstractSearchDirectionCalculator(metaclass=ABCMeta):
 
 class NESSearchDirectionCalculator(AbstractSearchDirectionCalculator):
     def run(
-        self, v: LPVariables, problem: LPS, right_hand_side: np.ndarray,
+        self,
+        v: LPVariables,
+        problem: LPS,
+        right_hand_side: np.ndarray,
         tolerance: float | None = None,
     ) -> tuple[np.ndarray, np.ndarray, np.ndarray, float]:
         """NES の定式化で探索方向を解く.
@@ -70,7 +75,7 @@ class NESSearchDirectionCalculator(AbstractSearchDirectionCalculator):
         """
         m = problem.m
         n = problem.n
-        A = problem.A
+        A: Csr = problem.A
         x_divided_s = v.x / v.s
         AXS_inv = A @ np.diag(x_divided_s)
 
@@ -83,7 +88,9 @@ class NESSearchDirectionCalculator(AbstractSearchDirectionCalculator):
             self.pre_x_divided_s = x_divided_s
             self.coef_matrix = coef_matrix
 
-        right_hand_side_NES = AXS_inv @ right_hand_side[m:n + m] + right_hand_side[:m] - A @ (right_hand_side[n + m:] / v.s)
+        right_hand_side_NES = (
+            AXS_inv @ right_hand_side[m : n + m] + right_hand_side[:m] - A @ (right_hand_side[n + m :] / v.s)
+        )
 
         # inexact に求解
         sol_NES = self.linear_system_solver.solve(self.coef_matrix, right_hand_side_NES, tolerance=tolerance)
@@ -91,8 +98,8 @@ class NESSearchDirectionCalculator(AbstractSearchDirectionCalculator):
 
         # 解から復元
         sol_y = sol_NES
-        sol_s = right_hand_side[m:n + m] - A.T @ sol_y
-        sol_x = -(v.x * sol_s / v.s) + right_hand_side[n + m:] / v.s
+        sol_s = right_hand_side[m : n + m] - A.T @ sol_y
+        sol_x = -(v.x * sol_s / v.s) + right_hand_side[n + m :] / v.s
         return sol_x, sol_y, sol_s, np.linalg.norm(residual_sol)
 
 
@@ -123,7 +130,7 @@ class MNESSearchDirectionCalculator(AbstractSearchDirectionCalculator):
 
         base_idxs: set[int] = set()
         # 行で非ゼロ要素が2つ以下しかない列は線形独立としてよい
-        rows_nonzero, columns_nonzero = np.where(np.abs(problem.A) > 10**(-6))
+        rows_nonzero, columns_nonzero = np.where(np.abs(problem.A) > 10 ** (-6))
         for i in range(problem.m):
             idxs_row_nonzero = np.where(rows_nonzero == i)
             if len(idxs_row_nonzero[0]) <= 2:
@@ -185,7 +192,10 @@ class MNESSearchDirectionCalculator(AbstractSearchDirectionCalculator):
         return self.A_base_indexes
 
     def run(
-        self, v: LPVariables, problem: LPS, right_hand_side: np.ndarray,
+        self,
+        v: LPVariables,
+        problem: LPS,
+        right_hand_side: np.ndarray,
         tolerance: float | None = None,
     ) -> tuple[np.ndarray, np.ndarray, np.ndarray, float]:
         """MNES の定式化で探索方向を解く.
@@ -204,7 +214,7 @@ class MNESSearchDirectionCalculator(AbstractSearchDirectionCalculator):
         """
         m = problem.m
         n = problem.n
-        A = problem.A
+        A: Csr = problem.A
         x_divided_s = v.x / v.s
         AXS_inv = A @ np.diag(x_divided_s)
 
@@ -216,13 +226,15 @@ class MNESSearchDirectionCalculator(AbstractSearchDirectionCalculator):
         if self.pre_x_divided_s is None or np.any(self.pre_x_divided_s != x_divided_s):
             logger.info("Update coefficient matrix.")
             # 事前に NES での係数行列を作ると A.T をかけることで数値誤差が出てきてしまうらしい. なのでここで一気に作成
-            coef_matrix = D_B_inv_A_B_inv @ AXS_inv @ A.T @ D_B_inv_A_B_inv.T
-            logger.info(f"{indent}MNES coef matrix condition number: {np.linalg.cond(coef_matrix)}")
+            coef_matrix: Csr = D_B_inv_A_B_inv @ AXS_inv @ A.T @ D_B_inv_A_B_inv.T
+            logger.info(f"{indent}MNES coef matrix condition number: {np.linalg.cond(coef_matrix.toarray())}")
 
             self.pre_x_divided_s = x_divided_s
             self.coef_matrix = coef_matrix
 
-        right_hand_side_NES = AXS_inv @ right_hand_side[m:n + m] + right_hand_side[:m] - A @ (right_hand_side[n + m:] / v.s)
+        right_hand_side_NES = (
+            AXS_inv @ right_hand_side[m : n + m] + right_hand_side[:m] - A @ (right_hand_side[n + m :] / v.s)
+        )
         right_hand_side_MNES = D_B_inv_A_B_inv @ right_hand_side_NES
 
         # inexact に求解
@@ -231,8 +243,8 @@ class MNESSearchDirectionCalculator(AbstractSearchDirectionCalculator):
 
         # 解から復元
         sol_y = D_B_inv_A_B_inv.T @ sol_MNES
-        sol_s = right_hand_side[m:n + m] - A.T @ sol_y
+        sol_s = right_hand_side[m : n + m] - A.T @ sol_y
         v_k = np.zeros(problem.n)
         v_k[hat_B] = D_B @ residual_sol
-        sol_x = -(v.x * sol_s / v.s) + right_hand_side[n + m:] / v.s - v_k
+        sol_x = -(v.x * sol_s / v.s) + right_hand_side[n + m :] / v.s - v_k
         return sol_x, sol_y, sol_s, np.linalg.norm(residual_sol)

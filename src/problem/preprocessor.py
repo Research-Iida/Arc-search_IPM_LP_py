@@ -1,7 +1,9 @@
 """LPに関する前処理を行う module"""
+
 from typing import Optional
 
 import numpy as np
+from scipy.sparse import csr_matrix
 from tqdm import tqdm
 
 from ..logger import get_main_logger
@@ -27,7 +29,7 @@ class LPPreprocessor:
 
     def _remove_rows_and_columns(
         self,
-        A: np.ndarray,
+        A: csr_matrix,
         b: np.ndarray = None,
         c: np.ndarray = None,
         rows_remove: set[int] = set(),
@@ -58,14 +60,14 @@ class LPPreprocessor:
 
         return A_out, b_out, c_out
 
-    def remove_empty_row(self, A: np.ndarray, b: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    def remove_empty_row(self, A: csr_matrix, b: np.ndarray) -> tuple[csr_matrix, np.ndarray]:
         """空行で制約が存在しないAの行は削除する
 
         もしAの係数がないのにbが0以外の場合, どうやってもその制約は満たせないのでエラー
         """
         rows_remove = set()
         # A が空行になっているindexに対して処理
-        for i in np.where(np.all(A == 0, axis=1))[0]:
+        for i in np.where(np.all(A.todense() == 0, axis=1))[0]:
             # もしAが空行なのにbが0でなければ実行不可能
             if b[i] != 0:
                 raise ProblemInfeasibleError
@@ -123,7 +125,7 @@ class LPPreprocessor:
         A_out, b_out, _ = self._remove_rows_and_columns(A, b=b, rows_remove=rows_remove)
         return A_out, b_out
 
-    def remove_empty_column(self, A: np.ndarray, c: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    def remove_empty_column(self, A: csr_matrix, c: np.ndarray) -> tuple[csr_matrix, np.ndarray]:
         """空列で制約が存在しない変数は自由な値を取れるので, 削除する
 
         自由な値がとれる場合, cが正ならば0が最適値
@@ -131,7 +133,7 @@ class LPPreprocessor:
         """
         columns_remove = set()
         # Aが空列になっている index に対してのみ処理
-        for i in np.where(np.all(A == 0, axis=0))[0]:
+        for i in np.where(np.all(A.toarray() == 0, axis=0))[0]:
             # もしAが空列なのにcが負であれば unbounded
             if c[i] < 0:
                 raise ProblemUnboundedError
@@ -164,28 +166,29 @@ class LPPreprocessor:
         A_out, _, c_out = self._remove_rows_and_columns(A, c=c, columns_remove=columns_remove)
         return A_out, c_out
 
-    def rows_only_one_nonzero(self, A: np.ndarray) -> list[int]:
+    def rows_only_one_nonzero(self, A: csr_matrix) -> list[int]:
         """Aの行のうち1つしか0以外の係数が存在しない行のインデックス取得
 
         A が1行m列の制約になった場合エラーとなるので, その時は axis を変更する
         """
-        if A.shape[1] == 1:
-            output = np.where(np.count_nonzero(A, axis=0) == 1)
+        A_dense = A.toarray()
+        if A_dense.shape[1] == 1:
+            output = np.where(np.count_nonzero(A_dense, axis=0) == 1)
         else:
-            output = np.where(np.count_nonzero(A, axis=1) == 1)
+            output = np.where(np.count_nonzero(A_dense, axis=1) == 1)
         return output[0]
 
     def only_one_nonzero_elements_and_columns(
-        self, A: np.ndarray, row_indexs_only_one_nonzero: list[int]
-    ) -> tuple[np.ndarray, list[int]]:
+        self, A: csr_matrix, row_indexs_only_one_nonzero: list[int]
+    ) -> tuple[csr_matrix, list[int]]:
         """1つしか係数がない行の係数のベクトル形式と, 列のインデックスを取得"""
         A_only_one_nonzero = A[row_indexs_only_one_nonzero, :]
-        indexes_tmp = np.nonzero(A_only_one_nonzero)
-        return A_only_one_nonzero[indexes_tmp], indexes_tmp[1]
+        indexes_tmp = A_only_one_nonzero.indices
+        return A_only_one_nonzero.data, indexes_tmp
 
     def remove_row_singleton(
-        self, A: np.ndarray, b: np.ndarray, c: np.ndarray
-    ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+        self, A: csr_matrix, b: np.ndarray, c: np.ndarray
+    ) -> tuple[csr_matrix, np.ndarray, np.ndarray]:
         """1つしか係数がかかっていない行は1つの値に定めることで次元数削除"""
         # 1つしか係数がない行の特定
         rows_remove = self.rows_only_one_nonzero(A)
@@ -279,18 +282,18 @@ class LPPreprocessor:
             return A, b, c
 
     def fix_variables_by_single_row(
-        self, A: np.ndarray, b: np.ndarray, c: np.ndarray
-    ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+        self, A: csr_matrix, b: np.ndarray, c: np.ndarray
+    ) -> tuple[csr_matrix, np.ndarray, np.ndarray]:
         """bが負の時に制約が正の係数しか持たない, もしくはbが正の時に制約が負の係数しか
         もたない場合実行不可能. bが0の時に制約が正 or 負どちらかの係数しか持たない場合,
         解はすべて0として制約と変数を削除する
         """
         # 実行不可能性の確認
         rows_b_negative = np.where(b < 0)[0]
-        if np.any(np.all(A[rows_b_negative, :] >= 0, axis=1)):
+        if np.any(np.all(A[rows_b_negative, :].toarray() >= 0, axis=1)):
             raise ProblemInfeasibleError
         rows_b_positive = np.where(b > 0)[0]
-        if np.any(np.all(A[rows_b_positive, :] <= 0, axis=1)):
+        if np.any(np.all(A[rows_b_positive, :].toarray() <= 0, axis=1)):
             raise ProblemInfeasibleError
 
         # 制約, 変数の削除
@@ -299,9 +302,9 @@ class LPPreprocessor:
         rows_b_zero = np.where(b == 0)[0]
         for row in rows_b_zero:
             row_A = A[row, :]
-            columns_A_nonzero = np.where(row_A != 0)[0]
+            columns_A_nonzero = row_A.indices
             # 係数が正 or 負のどちらかしか持たない場合, 解はすべて0とする
-            if np.all(row_A >= 0) or np.all(row_A <= 0):
+            if np.all(row_A.toarray() >= 0) or np.all(row_A.toarray() <= 0):
                 rows_remove.add(row)
                 columns_remove = columns_remove | set(columns_A_nonzero)
 
@@ -361,8 +364,8 @@ class LPPreprocessor:
         return A_new, b_new, c_new
 
     def fix_positive_variable_by_signs(
-        self, A: np.ndarray, b: np.ndarray, c: np.ndarray, recursive_num: int = 0
-    ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+        self, A: csr_matrix, b: np.ndarray, c: np.ndarray, recursive_num: int = 0
+    ) -> tuple[csr_matrix, np.ndarray, np.ndarray]:
         """ある行がbと同じ符号の係数が1つしかなく, それ以外は反対の符号, もしくは0の場合
         bと同じ符号の変数は他の変数との和で固定する
 
@@ -375,7 +378,7 @@ class LPPreprocessor:
         # bが0以外の場合について, 条件に合致するAの行を取得
         for row in np.where(b != 0)[0]:
             # Aの要素がbの符号と同じ添え字を取得
-            indexs_A_alpha_with_b = np.where(A[row, :] * b[row] / abs(b[row]) > 0)[0]
+            indexs_A_alpha_with_b = np.where(A[row, :].toarray() * b[row] / abs(b[row]) > 0)[0]
             # 要素が1つのみの場合, indexを取得し走査終了
             if len(indexs_A_alpha_with_b) == 1:
                 remove_row = row
@@ -386,18 +389,18 @@ class LPPreprocessor:
             return A, b, c
 
         # 各行, 列に対して値を更新
-        A_alpha = A[remove_row, :]
+        A_alpha = A[remove_row, :].data
         A_alpha_i = A_alpha[remove_col]
-        A_beta_i = A[:, remove_col].reshape(A.shape[0], 1)
+        A_beta = A[:, remove_col].toarray()
         A_new, b_new, c_new = self._remove_rows_and_columns(
-            A - A_beta_i * A_alpha.reshape(1, A.shape[1]) / A_alpha_i,
-            b=b - A[:, remove_col] * b[remove_row] / A_alpha_i,
+            A=csr_matrix(A - A_beta * A_alpha.reshape(1, A.shape[1]) / A_alpha_i),
+            b=b - A_beta.reshape(-1) * b[remove_row] / A_alpha_i,
             c=c - c[remove_col] * A_alpha / A_alpha_i,
             rows_remove={remove_row},
             columns_remove={remove_col},
         )
         # 不要なオブジェクトを削除して再帰
-        del A_alpha, A_beta_i, A, b, c
+        del A_alpha, A, b, c
         num = recursive_num + 1
         return self.fix_positive_variable_by_signs(A_new, b_new, c_new, num)
 
@@ -446,7 +449,7 @@ class LPPreprocessor:
             LPS: 前処理後の線形計画問題
         """
         logger.info("Start preprocessing.")
-        A = problem.A.copy()
+        A: csr_matrix = problem.A.copy()
         b = problem.b.copy()
         c = problem.c.copy()
 
@@ -475,7 +478,8 @@ class LPPreprocessor:
         logger.info("Checking changing...")
         # まずは次元の確認から. 一致していることがわかった後に要素の確認をしないとサイズ違いでエラーとなる
         if A.shape == problem.A.shape and b.shape == problem.b.shape and c.shape == problem.c.shape:
-            if np.all(A == problem.A) and np.all(b == problem.b) and np.all(c == problem.c):
+            # scipy sparce は行列で比較して0以外の要素がなければok
+            if len((A != problem.A).data) == 0 and np.all(b == problem.b) and np.all(c == problem.c):
                 logger.info("End preprocessing.")
                 if not problem.is_full_row_rank():
                     logger.warning("This problem is not full row rank!")

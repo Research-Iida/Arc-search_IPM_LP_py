@@ -47,6 +47,7 @@ hljs.highlightAll();
 </summary>
 <pre><code class="python">class CannotReadError(Exception):
     &#34;&#34;&#34;この module で読み込みができない場合に発生するエラー&#34;&#34;&#34;
+
     pass</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -68,6 +69,7 @@ hljs.highlightAll();
 </summary>
 <pre><code class="python">class CsvHandler:
     &#34;&#34;&#34;csv ファイルの読み込み・書き込みに関する class&#34;&#34;&#34;
+
     def __init__(self, config_section: str = config_utils.default_section):
         &#34;&#34;&#34;初期化. `data` ディレクトリへのパスを設定する&#34;&#34;&#34;
         config_ini = config_utils.read_config(section=config_section)
@@ -76,9 +78,7 @@ hljs.highlightAll();
         self._path_processed = config_ini.get(&#34;PATH_PROCESSED&#34;)
         self._path_result = config_ini.get(&#34;PATH_RESULT&#34;)
 
-    def can_read_LP(
-        self, problem_name: str
-    ) -&gt; bool:
+    def can_read_LP(self, problem_name: str) -&gt; bool:
         &#34;&#34;&#34;指定した問題がディレクトリに存在し, 読み取ることが可能か&#34;&#34;&#34;
         file_prefix = f&#34;{self._path_processed}{problem_name}&#34;
 
@@ -87,9 +87,7 @@ hljs.highlightAll();
         can_read_c = os.path.exists(str_util.add_suffix_csv(file_prefix + &#34;_c&#34;))
         return can_read_A and can_read_b and can_read_c
 
-    def read_LP(
-        self, problem_name: str
-    ) -&gt; LPS:
+    def read_LP(self, problem_name: str) -&gt; LPS:
         &#34;&#34;&#34;線形計画問題に関するcsvファイルを読み込み, 問題のクラスインスタンスを出力
 
         csv上で欠損している箇所は0を代入する
@@ -109,9 +107,7 @@ hljs.highlightAll();
         c = read(str_util.add_suffix_csv(file_prefix + &#34;_c&#34;))
         return LPS(A, b, c, problem_name)
 
-    def write_numpy(
-        self, filename: str, data: np.ndarray, path: Optional[str] = None
-    ):
+    def write_numpy(self, filename: str, data: np.ndarray, path: Optional[str] = None):
         &#34;&#34;&#34;numpy のデータをcsvファイルに書き出す
 
         Args:
@@ -140,9 +136,7 @@ hljs.highlightAll();
         self.write_numpy(problem_name + &#34;_c&#34;, aLP.c, self._path_processed)
 
     def write_SolvedSummary(
-        self, lst_solved_summary: list[SolvedSummary],
-        name: str, path: str,
-        is_append: bool = False
+        self, lst_solved_summary: list[SolvedSummary], name: str, path: str, is_append: bool = False
     ):
         &#34;&#34;&#34;最適化の実行によって得られた諸データを書き込む
 

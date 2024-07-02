@@ -1,29 +1,28 @@
+from ..data_access import CsvHandler
 from ..logger import get_main_logger
+from ..problem import LinearProgrammingProblemStandard as LPS
+from ..problem import LPPreprocessor
+from ..problem.repository import LPRepository
 from ..slack.slack import get_slack_api
-from ..data_access import CsvHandler, MpsLoader
-from ..problem import LPPreprocessor, LinearProgrammingProblemStandard as LPS
+from ..solver.solved_data import SolvedDetail
 from ..solver.solver import LPSolver
 from ..solver.variables import LPVariables
-from ..solver.solved_data import SolvedDetail
 
 logger = get_main_logger()
 aSlack = get_slack_api()
 
 
-def preprocess(
-    problem_name: str, aMpsLoader: MpsLoader, aCsvHandler: CsvHandler
-) -> LPS:
-    """前処理を施し, 標準形となった Netlib LP を csv で書き込む
-    """
+def preprocess(problem_name: str, aLPRepository: LPRepository) -> LPS:
+    """前処理を施し, 標準形となった Netlib LP を csv で書き込む"""
     logger.info(f"Start loading problem '{problem_name}'")
-    aLP_origin = aMpsLoader.run(problem_name).convert_standard()
+    aLP_origin = aLPRepository.read_raw_LP(problem_name).convert_standard()
     logger.info("End loading.")
     logger.info(f"Origin dimension: n: {aLP_origin.n}, m: {aLP_origin.m}")
     logger.info("Start preprocessing.")
     aLP = LPPreprocessor().run(aLP_origin)
     logger.info("End preprocessing.")
     logger.info("Start writing csv.")
-    aCsvHandler.write_LP(aLP, problem_name)
+    aLPRepository.write_LP(aLP, problem_name)
     logger.info("End writing.")
     return aLP
 
@@ -62,12 +61,7 @@ def optimize(aLP: LPS, aLPSolver: LPSolver, v_0: LPVariables | None = None) -> S
     return output
 
 
-def solve(
-    problem_name: str,
-    aLPSolver: LPSolver,
-    aMpsLoader: MpsLoader,
-    aCsvHandler: CsvHandler
-) -> SolvedDetail:
+def solve(problem_name: str, aLPSolver: LPSolver, aLPRepository: LPRepository) -> SolvedDetail:
     """ベンチマークの問題を読み取り, 解く
 
     すでに問題を前処理したファイルが存在する場合, そこから読み取ることで時間を短縮する
@@ -81,32 +75,28 @@ def solve(
         SolvedDetail: 最適化によって作成された諸解群
     """
     # すでに前処理済みの問題であれば, csvファイルから読み込む
-    if aCsvHandler.can_read_LP(problem_name):
+    if aLPRepository.can_read_processed_LP(problem_name):
         logger.info(f"There are preprocessed {problem_name} data.")
-        logger.info(f"Read {problem_name} csv files.")
-        aLP = aCsvHandler.read_LP(problem_name)
+        logger.info(f"Read {problem_name} data.")
+        aLP = aLPRepository.read_processed_LP(problem_name)
     # そうでなければ前処理を行い, csvファイルに書き込んでおく
     else:
-        aLP = preprocess(problem_name, aMpsLoader, aCsvHandler)
+        aLP = preprocess(problem_name, aLPRepository)
 
     # 最適化
     return optimize(aLP, aLPSolver)
 
 
 def solve_and_write(
-    filename: str, solver: LPSolver, aMpsLoader: MpsLoader, aCsvHandler: CsvHandler,
-    name_result: str, path_result: str
+    filename: str,
+    solver: LPSolver,
+    aLPRepository: LPRepository,
+    aCsvHandler: CsvHandler,
+    name_result: str,
+    path_result: str,
 ) -> SolvedDetail:
     """問題を解き, 結果を格納する. `__main__.py` で使用するので書き出しておく"""
-    aSolvedDetail = solve(
-        filename, solver,
-        aMpsLoader=aMpsLoader, aCsvHandler=aCsvHandler
-    )
+    aSolvedDetail = solve(filename, solver, aLPRepository=aLPRepository)
     # 計算が終わるたびに都度書き込みを行う
-    aCsvHandler.write_SolvedSummary(
-        [aSolvedDetail.aSolvedSummary],
-        name_result,
-        path=path_result,
-        is_append=True
-    )
+    aCsvHandler.write_SolvedSummary([aSolvedDetail.aSolvedSummary], name_result, path=path_result, is_append=True)
     return aSolvedDetail

@@ -7,6 +7,10 @@ import dataclasses
 
 import numpy as np
 import scipy
+from scipy.sparse import csr_matrix as Csr
+from scipy.sparse import hstack, vstack
+from scipy.sparse import lil_matrix as Lil
+from scipy.sparse.linalg import eigsh
 
 
 class SettingProblemError(Exception):
@@ -29,7 +33,7 @@ class LinearProgrammingProblemStandard:
         name: 問題名. デフォルトは空白
     """
 
-    A: np.ndarray
+    A: Csr
     b: np.ndarray
     c: np.ndarray
     name: str = ""
@@ -74,17 +78,18 @@ class LinearProgrammingProblemStandard:
 
     @property
     def condition_number_A(self) -> float:
-        return np.linalg.cond(self.A)
+        return np.linalg.cond(self.A.todense())
 
     @property
     def max_sqrt_eigen_value_AAT(self) -> float:
-        eig_val, _ = np.linalg.eig(self.A @ self.A.T)
-        return np.max(np.sqrt(eig_val))
+        max_eig_val = eigsh(self.A @ self.A.T, k=1, which="LM", return_eigenvectors=False)
+        return np.sqrt(max_eig_val[0])
 
     @property
     def min_sqrt_eigen_value_AAT(self) -> float:
-        eig_val, _ = np.linalg.eig(self.A @ self.A.T)
-        return np.min(np.sqrt(eig_val))
+        """最小固有値は eigsh だと求めにくい（反復上限に達するとエラーを吐く）ので使わない方が吉"""
+        min_eig_val = eigsh(self.A @ self.A.T, k=1, which="SM", return_eigenvectors=False)
+        return np.sqrt(min_eig_val[0])
 
     def is_full_row_rank(self) -> bool:
         """制約行列 A が full row rank かを出力
@@ -92,7 +97,7 @@ class LinearProgrammingProblemStandard:
         Returns:
             bool: A が full row rank であれば true
         """
-        return np.linalg.matrix_rank(self.A) == self.m
+        return np.linalg.matrix_rank(self.A.todense()) == self.m
 
     def objective_main(self, x: np.ndarray) -> float:
         """主問題の目的関数値の出力"""
@@ -175,11 +180,11 @@ class LinearProgrammingProblem:
         name: 問題名. デフォルトは空白
     """
 
-    A_E: np.ndarray
+    A_E: Lil
     b_E: np.ndarray
-    A_G: np.ndarray
+    A_G: Lil
     b_G: np.ndarray
-    A_L: np.ndarray
+    A_L: Lil
     b_L: np.ndarray
     LB_index: list[int]
     LB: np.ndarray
@@ -217,8 +222,8 @@ class LinearProgrammingProblem:
     # データが入っていなくても実行可能なため classmethod
     @classmethod
     def reverse_non_lower_bound(
-        cls, lb: np.ndarray, ub: np.ndarray, A: np.ndarray, c: np.ndarray
-    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        cls, lb: np.ndarray, ub: np.ndarray, A: Lil, c: np.ndarray
+    ) -> tuple[np.ndarray, np.ndarray, Lil, np.ndarray]:
         """変数の下限が存在せず, 上限が存在する場合, 対応する変数の添え字の符号を反転させる
 
         Args:
@@ -230,7 +235,7 @@ class LinearProgrammingProblem:
         Returns:
             np.ndarray: 変数の lower bound
             np.ndarray: 変数の upper bound
-            np.ndarray: A. のちにどの制約かによって区分けするが, ここでの出力はひとまとめにしたもの
+            Lil: A. のちにどの制約かによって区分けするが, ここでの出力はひとまとめにしたもの
             np.ndarray: c
         """
         # 下限が存在せず, 上限が存在する添え字の取得
@@ -250,8 +255,8 @@ class LinearProgrammingProblem:
 
     @classmethod
     def separate_free_variable(
-        cls, lb: np.ndarray, ub: np.ndarray, A: np.ndarray, c: np.ndarray
-    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        cls, lb: np.ndarray, ub: np.ndarray, A: Lil, c: np.ndarray
+    ) -> tuple[np.ndarray, np.ndarray, Lil, np.ndarray]:
         """変数に下限も上限もない自由変数の場合, 新しい変数列を作成して正の部分と負の部分に分ける
 
         正部分に関する変数は同じ場所に残し, 負部分に関する変数は末尾に追加する
@@ -267,7 +272,7 @@ class LinearProgrammingProblem:
         Returns:
             np.ndarray: 変数の lower bound
             np.ndarray: 変数の upper bound
-            np.ndarray: A
+            Lil: A
             np.ndarray: c
         """
         # 自由変数の添え字の取得
@@ -289,12 +294,12 @@ class LinearProgrammingProblem:
             # 負部分の添え字（追加）
             lb_out = np.append(lb_out, 0)
             ub_out = np.append(ub_out, np.inf)
-            A_out = np.concatenate([A_out, -A[:, id_].reshape(m, 1)], axis=1)
+            A_out = hstack([A_out, -A[:, id_].reshape(m, 1)]).tolil()
             c_out = np.append(c_out, -c[id_])
         return lb_out, ub_out, A_out, c_out
 
     @classmethod
-    def make_standard_A(cls, A_E: np.ndarray, A_G: np.ndarray, A_L: np.ndarray, ub: np.ndarray) -> np.ndarray:
+    def make_standard_A(cls, A_E: Lil, A_G: Lil, A_L: Lil, ub: np.ndarray) -> Csr:
         """等式制約, 不等式制約から標準形式の係数行列を作成する
 
         Args:
@@ -318,15 +323,15 @@ class LinearProgrammingProblem:
             A_B[i, index_up] = 1
 
         # 組み合わせて一つの行列に
-        output = np.concatenate(
+        output = vstack(
             [
-                np.concatenate([A_E, np.zeros([m_e, m_g + m_l + m_b])], 1),
-                np.concatenate([A_G, -np.eye(m_g), np.zeros([m_g, m_l + m_b])], 1),
-                np.concatenate([A_L, np.zeros([m_l, m_g]), np.eye(m_l), np.zeros([m_l, m_b])], 1),
+                hstack([A_E, np.zeros([m_e, m_g + m_l + m_b])]),
+                hstack([A_G, -np.eye(m_g), np.zeros([m_g, m_l + m_b])]),
+                hstack([A_L, np.zeros([m_l, m_g]), np.eye(m_l), np.zeros([m_l, m_b])]),
                 np.concatenate([A_B, np.zeros([m_b, m_g + m_l]), np.eye(m_b)], 1),
             ]
         )
-        return output
+        return output.tocsr()
 
     @classmethod
     def make_standard_b(cls, A_E, A_G, A_L, b_E, b_G, b_L, lb, ub) -> np.ndarray:
@@ -362,7 +367,7 @@ class LinearProgrammingProblem:
     def convert_standard(self) -> LinearProgrammingProblemStandard:
         """等式制約のみの標準形線形計画問題に修正する"""
         # 変数の正負, 自由変数において変更があるため A はまとめておく
-        A = np.concatenate([self.A_E, self.A_G, self.A_L])
+        A: Lil = vstack([self.A_E, self.A_G, self.A_L]).tolil()
 
         # 変数の上下限が存在しない箇所は発散させておく
         lb = np.full(self.n, -np.inf)
@@ -382,7 +387,7 @@ class LinearProgrammingProblem:
         A_L = A_tmp[range(m_e + m_g, m_e + m_gl), :]
 
         # 変形して標準形式の A, b, c 作成
-        A_out = self.make_standard_A(A_E, A_G, A_L, ub_tmp)
+        A_out: Csr = self.make_standard_A(A_E, A_G, A_L, ub_tmp)
         b_out = self.make_standard_b(A_E, A_G, A_L, self.b_E, self.b_G, self.b_L, lb_tmp, ub_tmp)
         c_out = self.make_standard_c(c_tmp, m_gl, ub_tmp)
 

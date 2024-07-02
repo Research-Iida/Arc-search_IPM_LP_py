@@ -1,25 +1,25 @@
-import sys
 import argparse
+import sys
 from datetime import date
 from typing import Optional
 
-from .utils import config_utils, str_util
-from .profiler.profiler import profile_decorator
-from .data_access import CsvHandler, MpsLoader
+from .data_access import CsvHandler
 from .logger import get_main_logger, setup_logger
-from .slack.slack import get_slack_api
-from .run_utils.get_solvers import get_solvers
+from .problem.repository import LPRepository
+from .profiler.profiler import profile_decorator
 from .run_utils.define_paths import path_solved_result_by_date, path_solved_result_by_problem
+from .run_utils.get_solvers import get_solvers
 from .run_utils.solve_problem import solve_and_write
 from .run_utils.write_files import write_result_by_problem_solver_config
+from .slack.slack import get_slack_api
+from .utils import config_utils, str_util
 
 logger = get_main_logger()
 aSlack = get_slack_api()
 
 
 def main(problem_name: str, solver_name: Optional[str], config_section: Optional[str]):
-    """main 関数
-    """
+    """main 関数"""
     # 直接実行された場合ファイルに起こす必要があるため, 新たにlogger設定
     log_file_name = f"solve_{problem_name}"
     if solver_name is not None:
@@ -31,7 +31,7 @@ def main(problem_name: str, solver_name: Optional[str], config_section: Optional
     config = config_utils.read_config(section=config_section)
     path_result = path_solved_result_by_date(config.get("PATH_RESULT"))
     path_result_by_problem = path_solved_result_by_problem(path_result, problem_name)
-    aMpsLoader = MpsLoader(config.get("PATH_NETLIB"))
+    repository = LPRepository(config_section)
     aCsvHandler = CsvHandler(config_section)
 
     # 出力されるファイル名
@@ -42,7 +42,9 @@ def main(problem_name: str, solver_name: Optional[str], config_section: Optional
 
     # ソルバーごとに解く
     for solver in get_solvers(solver_name, config_section):
-        aSolvedDetail = solve_and_write(problem_name, solver, aMpsLoader, aCsvHandler, name_result, path_result_by_problem)
+        aSolvedDetail = solve_and_write(
+            problem_name, solver, repository, aCsvHandler, name_result, path_result_by_problem
+        )
         write_result_by_problem_solver_config(aSolvedDetail, path_result)
 
 
@@ -65,6 +67,6 @@ if __name__ == "__main__":
     try:
         profile_decorator(main, profile_name, problem_name, solver_name, config_section)
         aSlack.notify_mentioned("End calculation")
-    except: # NOQA
+    except:  # NOQA
         aSlack.notify_error()
         logger.exception(sys.exc_info())
