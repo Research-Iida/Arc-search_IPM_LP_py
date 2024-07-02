@@ -101,9 +101,6 @@ ENV/
 # mypy
 .mypy_cache/
 
-# IDE settings
-.vscode/
-
 # nohup.out ignore
 nohup*.out
 
