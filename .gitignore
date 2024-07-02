@@ -107,7 +107,8 @@ nohup*.out
 # 問題のファイルが大きすぎるので, 圧縮ファイル以外は ignore
 data/raw/netlib/*
 !data/raw/netlib/.gitkeep
-data/processed/*_*.csv
+data/processed/*
+!data/processed/.gitkeep
 
 # 出力結果は test ディレクトリ以外 commitしなくてよい
 # result/test ディレクトリにおいても, 日付ごとに出力が変化するディレクトリは commitしない

@@ -21,7 +21,7 @@ def preprocess(problem_name: str, aLPRepository: LPRepository) -> LPS:
     logger.info("Start preprocessing.")
     aLP = LPPreprocessor().run(aLP_origin)
     logger.info("End preprocessing.")
-    logger.info("Start writing csv.")
+    logger.info("Start writing data.")
     aLPRepository.write_LP(aLP, problem_name)
     logger.info("End writing.")
     return aLP
