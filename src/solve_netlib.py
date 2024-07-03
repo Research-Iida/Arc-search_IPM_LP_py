@@ -3,7 +3,6 @@ import sys
 from datetime import date
 from pathlib import Path
 
-# from .run_utils.write_files import write_and_draw_result
 from .drawer import Drawer
 from .infra.path_generator import PathGenerator
 from .infra.repository_problem import LPRepository
@@ -45,7 +44,6 @@ def main(problem_name: str, solver_name: str | None, config_section: str | None)
         aSolvedDetail = solve_and_write(
             problem_name, solver, repository, aSolvedDataRepository, name_result, path_result_by_problem
         )
-        # write_and_draw_result(aSolvedDetail, aSolvedDataRepository, path_generator)
 
         aSolvedDataRepository.write_variables_by_iteration(aSolvedDetail)
 
