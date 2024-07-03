@@ -7,7 +7,6 @@
 from abc import ABCMeta, abstractmethod
 
 import numpy as np
-from scipy.sparse.linalg import inv
 
 from ..logger import get_main_logger, indent
 from ..problem import LinearProgrammingProblemStandard as LPS
@@ -146,8 +145,8 @@ class LPSolver(metaclass=ABCMeta):
         """
         A = problem.A
         c = problem.c
+        AA_T_inv = problem.AA_T_inv
 
-        AA_T_inv = inv(A @ A.T)
         yhat = AA_T_inv @ A @ c
         s_hat = c - A.T @ yhat
         x_hat = A.T @ AA_T_inv @ problem.b
@@ -169,15 +168,14 @@ class LPSolver(metaclass=ABCMeta):
 
     def _initial_variables_by_Lustig(self, problem: LPS) -> LPVariables:
         """Lustig etc. の
-        `On implementing Mehrotra's predictor corrector interior-point method
-        for linear programming` を参考にした初期点作成
+        `On implementing Mehrotra's predictor corrector interior-point method for linear programming`
+        を参考にした初期点作成
         """
         A = problem.A
         b = problem.b
         c = problem.c
 
-        AA_T_inv = inv(A @ A.T)
-        x_hat = A.T @ AA_T_inv @ b
+        x_hat = A.T @ problem.AA_T_inv @ b
         xi_1 = max(-100 * x_hat.min(), 100, np.linalg.norm(b, ord=1) / 100)
         xi_2 = 1 + np.linalg.norm(c, ord=1)
         x_0 = x_hat.copy()

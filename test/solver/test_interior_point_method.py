@@ -1,9 +1,11 @@
 import numpy as np
 import pytest
+from scipy.sparse import csr_matrix as Csr
 
 from src.problem import LinearProgrammingProblemStandard as LPS
-from src.solver.variables import LPVariables
 from src.solver.interior_point_method import ArcSearchIPM, LineSearchIPM
+from src.solver.variables import LPVariables
+
 from .utils import solver_by_test_LP
 
 config_section = "TEST"
@@ -31,7 +33,7 @@ def test_residual_constraint():
     A = np.eye(2)
     b = np.array([0, 1])
     c = np.array([1, 0])
-    problem = LPS(A, b, c)
+    problem = LPS(Csr(A), b, c)
 
     x = np.ones(2)
     test_vector = problem.residual_main_constraint(x)
@@ -45,7 +47,7 @@ def test_residual_constraint():
 
 def test_calc_first_derivatives(anAlgorithm):
     """一次微分の出力を確認"""
-    problem = LPS(np.eye(2), np.array([0, 1]), np.array([1, 0]))
+    problem = LPS(Csr(np.eye(2)), np.array([0, 1]), np.array([1, 0]))
     v = LPVariables(np.ones(2), np.zeros(2), np.ones(2))
     x_dot, y_dot, s_dot = anAlgorithm.calc_first_derivatives(v, problem)
     np.testing.assert_array_equal(y_dot, [0, 0])
@@ -63,7 +65,7 @@ def test_centering_parameter(anAlgorithm):
     s_dot = np.array([2, 1])
 
     sigma = anAlgorithm.centering_parameter(v, x_dot, s_dot)
-    assert sigma == (1 / 8)**3
+    assert sigma == (1 / 8) ** 3
 
 
 def test_calc_second_derivative(anAlgorithm):
@@ -73,7 +75,7 @@ def test_calc_second_derivative(anAlgorithm):
         * 解は手計算で行った
         * 一次微分値, および mu, sigma は計算しやすいように適当な値を代入
     """
-    problem = LPS(np.eye(2), np.array([0, 1]), np.array([1, 0]))
+    problem = LPS(Csr(np.eye(2)), np.array([0, 1]), np.array([1, 0]))
     v = LPVariables(np.ones(2), np.zeros(2), np.ones(2))
     x_ddot, y_ddot, s_ddot = anAlgorithm.calc_second_derivative(
         v, np.ones(2), np.ones(2), np.ones(2), problem, mu=1, sigma=8

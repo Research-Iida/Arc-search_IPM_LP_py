@@ -374,7 +374,7 @@ class LPPreprocessor:
         # bが0以外の場合について, 条件に合致するAの行を取得
         for row in np.where(b != 0)[0]:
             # Aの要素がbの符号と同じ添え字を取得
-            indexs_A_alpha_with_b = np.where(A[row, :].toarray() * b[row] / abs(b[row]) > 0)[0]
+            indexs_A_alpha_with_b = np.where(A[row, :].toarray()[0] * b[row] / abs(b[row]) > 0)[0]
             # 要素が1つのみの場合, indexを取得し走査終了
             if len(indexs_A_alpha_with_b) == 1:
                 remove_row = row
@@ -473,9 +473,11 @@ class LPPreprocessor:
         # A, b, c について変更されているか確認し, もしされていなければ出力
         logger.info("Checking changing...")
         # まずは次元の確認から. 一致していることがわかった後に要素の確認をしないとサイズ違いでエラーとなる
+        logger.debug(f"{A.shape}, {b.shape}, {c.shape}")
         if A.shape == problem.A.shape and b.shape == problem.b.shape and c.shape == problem.c.shape:
-            # scipy sparce は行列で比較して0以外の要素がなければok
-            if len((A != problem.A).data) == 0 and np.all(b == problem.b) and np.all(c == problem.c):
+            logger.debug(f"{(A - problem.A).nnz}, {np.all(b == problem.b)}, {np.all(c == problem.c)}")
+            # scipy sparse は行列で比較して0以外の要素がなければok
+            if (A - problem.A).nnz == 0 and np.all(b == problem.b) and np.all(c == problem.c):
                 logger.info("End preprocessing.")
                 if not problem.is_full_row_rank():
                     logger.warning("This problem is not full row rank!")

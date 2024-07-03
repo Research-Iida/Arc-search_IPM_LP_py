@@ -54,6 +54,7 @@ logging にも使用するので文字列で取得しておく</dd>
 </summary>
 <pre><code class="python">class ArcSearchIPM(MehrotraTypeIPM):
     &#34;&#34;&#34;LPを解く arc-search アルゴリズムの実装&#34;&#34;&#34;
+
     def __init__(
         self,
         config_section: str = config_utils.default_section,
@@ -140,8 +141,8 @@ logging にも使用するので文字列で取得しておく</dd>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class ExactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
-    &#34;&#34;&#34;線形方程式を正確に解くことを前提とした内点法
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;線形方程式を正確に解くことを前提とした内点法&#34;&#34;&#34;
+
     search_direction_calculator: AbstractSearchDirectionCalculator
 
     def __init__(
@@ -160,10 +161,13 @@ logging にも使用するので文字列で取得しておく</dd>
         self.search_direction_calculator = NESSearchDirectionCalculator(ExactLinearSystemSolver())
 
     def calc_first_derivatives(
-        self, v: LPVariables, problem: LPS,
+        self,
+        v: LPVariables,
+        problem: LPS,
         coef_matrix: np.ndarray | None = None,
         right_hand_side: np.ndarray | None = None,
-        *args, **kwargs,
+        *args,
+        **kwargs,
     ) -&gt; tuple[np.ndarray, np.ndarray, np.ndarray]:
         &#34;&#34;&#34;一次微分の値を出力
 
@@ -176,20 +180,15 @@ logging にも使用するので文字列で取得しておく</dd>
             np.ndarray: y の一次微分
             np.ndarray: s の一次微分
         &#34;&#34;&#34;
-        right_hand_side = np.concatenate([
-            problem.residual_main_constraint(v.x),
-            problem.residual_dual_constraint(v.y, v.s),
-            v.x * v.s
-        ])
+        right_hand_side = np.concatenate(
+            [problem.residual_main_constraint(v.x), problem.residual_dual_constraint(v.y, v.s), v.x * v.s]
+        )
 
         # 求解
         x_dot, y_dot, s_dot, _ = self.search_direction_calculator.run(v, problem, right_hand_side)
         return x_dot, y_dot, s_dot
 
-    def centering_parameter(
-        self, v: LPVariables, x_dot: np.ndarray, s_dot: np.ndarray,
-        mu: float = None
-    ) -&gt; float:
+    def centering_parameter(self, v: LPVariables, x_dot: np.ndarray, s_dot: np.ndarray, mu: float = None) -&gt; float:
         &#34;&#34;&#34;centering parameter sigma の出力
 
         Args:
@@ -206,13 +205,17 @@ logging にも使用するので文字列で取得しておく</dd>
         s_minus_alpha_s_dot = v.s - alpha_s * s_dot
         mu_a = x_minus_alpha_x_dot.T @ s_minus_alpha_s_dot / dim
 
-        return (mu_a / mu)**3
+        return (mu_a / mu) ** 3
 
     def calc_second_derivative(
-        self, v: LPVariables,
-        x_dot: np.ndarray, y_dot: np.ndarray, s_dot: np.ndarray,
+        self,
+        v: LPVariables,
+        x_dot: np.ndarray,
+        y_dot: np.ndarray,
+        s_dot: np.ndarray,
         problem: LPS,
-        *args, **kwargs,
+        *args,
+        **kwargs,
     ) -&gt; tuple[np.ndarray, np.ndarray, np.ndarray]:
         &#34;&#34;&#34;二次微分の値を出力
 
@@ -369,6 +372,7 @@ logging にも使用するので文字列で取得しておく</dd>
 </summary>
 <pre><code class="python">class InteriorPointMethod(LPSolver, metaclass=ABCMeta):
     &#34;&#34;&#34;LPを内点法で解く際のインターフェース&#34;&#34;&#34;
+
     variable_updater: VariableUpdater
 
     @property
@@ -391,8 +395,7 @@ logging にも使用するので文字列で取得しておく</dd>
         pass
 
     def is_not_decrease_residuals(
-        self, pre_r_b: np.ndarray, pre_r_c: np.ndarray,
-        post_r_b: np.ndarray, post_r_c: np.ndarray
+        self, pre_r_b: np.ndarray, pre_r_c: np.ndarray, post_r_b: np.ndarray, post_r_c: np.ndarray
     ) -&gt; bool:
         &#34;&#34;&#34;制約の残渣においていずれかが減少せず, 加えて前の反復点より10倍以上小さくなった制約が存在しないか確認
 
@@ -413,10 +416,16 @@ logging にも使用するので文字列で取得しておく</dd>
 
     def is_terminate(
         self,
-        is_solved: bool, iter_num: int, problem: LPS, elapsed_time: float,
-        alpha_x: float = None, alpha_s: float = None,
-        pre_r_b: np.ndarray = None, pre_r_c: np.ndarray = None,
-        r_b: np.ndarray = None, r_c: np.ndarray = None,
+        is_solved: bool,
+        iter_num: int,
+        problem: LPS,
+        elapsed_time: float,
+        alpha_x: float = None,
+        alpha_s: float = None,
+        pre_r_b: np.ndarray = None,
+        pre_r_c: np.ndarray = None,
+        r_b: np.ndarray = None,
+        r_c: np.ndarray = None,
     ) -&gt; bool:
         &#34;&#34;&#34;アルゴリズムが停止条件を満たしたか否か
 
@@ -559,6 +568,7 @@ logging にも使用するので文字列で取得しておく</dd>
 </summary>
 <pre><code class="python">class LineSearchIPM(MehrotraTypeIPM):
     &#34;&#34;&#34;LPを解く line search アルゴリズムの実装&#34;&#34;&#34;
+
     def __init__(
         self,
         config_section: str = config_utils.default_section,
@@ -649,6 +659,7 @@ logging にも使用するので文字列で取得しておく</dd>
     &#34;&#34;&#34;Mehrotra と同じ種類のIPM
     アルゴリズムが異なってくるので別にした
     &#34;&#34;&#34;
+
     def run_algorithm(self, problem_0: LPS, v_0: LPVariables) -&gt; SolvedDetail:
         &#34;&#34;&#34;反復で解く内点法の実行
         アルゴリズムは基本的に異なるため abstractmethod.
@@ -703,10 +714,12 @@ logging にも使用するので文字列で取得しておく</dd>
             v_max_step = LPVariables(
                 self.variable_updater.run(v.x, x_dot, x_ddot, alpha_x_max),
                 self.variable_updater.run(v.y, y_dot, y_ddot, alpha_s_max),
-                self.variable_updater.run(v.s, s_dot, s_ddot, alpha_s_max)
+                self.variable_updater.run(v.s, s_dot, s_ddot, alpha_s_max),
             )
             is_solved = self.solved_checker.run(v_max_step, problem, mu_0=mu_0, r_b_0=r_b_0, r_c_0=r_c_0)
-            if self.is_terminate(is_solved, iter_num, problem, time.time() - start_time, alpha_x=alpha_x_max, alpha_s=alpha_s_max):
+            if self.is_terminate(
+                is_solved, iter_num, problem, time.time() - start_time, alpha_x=alpha_x_max, alpha_s=alpha_s_max
+            ):
                 # break しないが, while最後の is_terminate が True になるので問題ない
                 logger.info(f&#34;{indent}Variables satisfy terminate criteria with max step size.&#34;)
                 alpha_x = alpha_x_max
@@ -719,7 +732,7 @@ logging にも使用するので文字列で取得しておく</dd>
                 v = LPVariables(
                     self.variable_updater.run(v.x, x_dot, x_ddot, alpha_x),
                     self.variable_updater.run(v.y, y_dot, y_ddot, alpha_s),
-                    self.variable_updater.run(v.s, s_dot, s_ddot, alpha_s)
+                    self.variable_updater.run(v.s, s_dot, s_ddot, alpha_s),
                 )
 
             logger.info(f&#34;{indent}Step size:&#34;)
@@ -743,7 +756,7 @@ logging にも使用するので文字列で取得しておく</dd>
             r_b = problem.residual_main_constraint(x)
             r_c = problem.residual_dual_constraint(v.y, s)
             # 制約残差がどうなっているかlogging
-            rate_reduce = (1 - np.sin(alpha_x))
+            rate_reduce = 1 - np.sin(alpha_x)
             logger.debug(f&#34;{indent}1 - sin(alpha_x) = {rate_reduce}&#34;)
             mu = v.mu
 
@@ -757,10 +770,16 @@ logging にも使用するので文字列で取得しておく</dd>
 
             is_solved = self.solved_checker.run(v, problem, mu_0=mu_0, r_b_0=r_b_0, r_c_0=r_c_0)
             is_terminated = self.is_terminate(
-                is_solved, iter_num, problem, time.time() - start_time,
-                alpha_x, alpha_s,
-                pre_r_b=pre_r_b, pre_r_c=pre_r_c,
-                r_b=r_b, r_c=r_c,
+                is_solved,
+                iter_num,
+                problem,
+                time.time() - start_time,
+                alpha_x,
+                alpha_s,
+                pre_r_b=pre_r_b,
+                pre_r_c=pre_r_c,
+                r_b=r_b,
+                r_c=r_c,
             )
 
         # 時間計測終了
@@ -768,12 +787,14 @@ logging にも使用するので文字列で取得しておく</dd>
 
         # 出力の作成
         aSolvedSummary = self.make_SolvedSummary(
-            v, problem, is_solved,
-            iter_num, self.is_iteration_number_reached_upper(iter_num, problem),
-            elapsed_time
+            v, problem, is_solved, iter_num, self.is_iteration_number_reached_upper(iter_num, problem), elapsed_time
         )
         output = SolvedDetail(
-            aSolvedSummary, v, problem, v_0, problem_0,
+            aSolvedSummary,
+            v,
+            problem,
+            v_0,
+            problem_0,
             lst_variables_by_iter=lst_variables,
             lst_main_step_size_by_iter=lst_alpha_x,
             lst_dual_step_size_by_iter=lst_alpha_s,

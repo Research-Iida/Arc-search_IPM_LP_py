@@ -6,10 +6,11 @@ Strategy パターン採用.
 """
 
 from abc import ABCMeta, abstractmethod
+from typing import Callable
 
 import numpy as np
-from scipy.linalg import lu_factor, lu_solve
 from scipy.sparse import csr_matrix as Csr
+from scipy.sparse.linalg import factorized
 
 from ..logger import get_main_logger
 
@@ -24,7 +25,7 @@ class AbstractLinearSystemSolver(metaclass=ABCMeta):
             再び同じ前処理をしなくて済むように持っておく
     """
 
-    prev_A: Csr = None
+    prev_A: Csr | None = None
 
     @abstractmethod
     def solve(self, A: Csr, b: np.ndarray, tolerance: float | None, *args) -> np.ndarray:
@@ -37,30 +38,32 @@ class AbstractLinearSystemSolver(metaclass=ABCMeta):
 
         Returns:
             np.ndarray: 解
+
+        TODO:
+            * tolerance は必要なクラスとそうでないクラスがあるので, Attribute に移す
         """
         pass
 
 
 class ExactLinearSystemSolver(AbstractLinearSystemSolver):
     """線形方程式を正確に解くクラス
-    シンプルに numpy で解く
+    シンプルにLU分解で解く
 
     Attributes:
-        prev_lu_factor: `prev_A` を `scipy.linalg.lu_factor` にかけて求めたLU分解.
+        prev_factorized: `prev_A` をLU分解した結果. 前回使ったものと同じであれば同様のものを使いまわせる
     """
 
-    prev_lu_factor = None
+    prev_factorized: Callable | None = None
 
     def solve(self, A: Csr, b: np.ndarray, tolerance: float | None = None) -> np.ndarray:
         """線形方程式 Ax=b を numpy によるLU分解によって解く"""
-        if self.prev_lu_factor is not None:
-            if self.prev_A.shape == A.shape and len((self.prev_A != A).data) == 0:
+        if self.prev_factorized is not None:
+            if self.prev_A.shape == A.shape and (self.prev_A - A).nnz == 0:
                 logger.info("Use prev_A information.")
-                return lu_solve(self.prev_lu_factor, b)
-
-        LU_factor = lu_factor(A)
+                return self.prev_factorized(b)
 
         self.prev_A = A.copy()
-        self.prev_lu_factor = LU_factor
+        # scipy.sparse.linalg.factorized は csc_matrix を引数に取らないと warning を出す
+        self.prev_factorized = factorized(A.tocsc())
 
-        return lu_solve(LU_factor, b)
+        return self.prev_factorized(b)
