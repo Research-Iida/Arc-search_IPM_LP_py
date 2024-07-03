@@ -31,7 +31,7 @@ def main(problem_name: str, solver_name: str | None, config_section: str | None)
     path_generator = PathGenerator(config_section=config_section)
     path_result_by_problem = path_generator.generate_path_result_by_date_problem(problem_name)
     repository = LPRepository(config_section)
-    aSolvedDataRepository = SolvedDataRepository()
+    aSolvedDataRepository = SolvedDataRepository(config_section)
 
     # 出力されるファイル名
     str_today = date.today().strftime("%Y%m%d")

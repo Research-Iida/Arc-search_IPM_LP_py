@@ -133,7 +133,7 @@ def main(
 
     # 各種インスタンスの用意
     aLPRepository = LPRepository(config_section)
-    aSolvedDataRepository = SolvedDataRepository()
+    aSolvedDataRepository = SolvedDataRepository(config_section)
 
     # 対象の問題の決定
     problem_files = decide_solved_problems(aLPRepository, num_problem, start_problem_number)
