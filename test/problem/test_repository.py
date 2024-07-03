@@ -6,13 +6,14 @@ import pytest
 from pysmps import smps_loader as smps
 from scipy.sparse import csr_matrix
 
+from src.infra.path_generator import PathGenerator
+from src.infra.repository_problem import LPRepository
 from src.problem import LinearProgrammingProblemStandard as LPS
-from src.problem.repository import CannotReadError, LPRepository
-from src.utils.config_utils import read_config, test_section
+from src.problem.repository import CannotReadError
+from src.utils.config_utils import test_section
 
-config_ini = read_config(section=test_section)
-path_netlib = config_ini.get("PATH_NETLIB")
-path_data = config_ini.get("PATH_DATA")
+path_generator = PathGenerator(test_section)
+path_netlib = path_generator.generate_path_netlib()
 
 # ファイル名の設定
 filename_written = "written"
@@ -25,7 +26,7 @@ def aLPRepository() -> LPRepository:
 
 def test_load_mps_KB2():
     """`pysmps` モジュールの `load_mps` メソッドがどのような振る舞いをするか確認する"""
-    test_obj = smps.load_mps(f"{path_netlib}KB2.SIF")
+    test_obj = smps.load_mps(path_netlib.joinpath("KB2.SIF"))
 
     # 制約数の確認
     m = len(test_obj[2])
@@ -93,7 +94,7 @@ def test_cannot_read_LP(aLPRepository):
 def remove_written_file():
     """書き込みのテスト前にファイルが存在するとテストが通ったのかいなかわからないので,
     書き込む前に存在するファイルは削除する"""
-    file_list = glob.glob(f"{path_data}*/{filename_written}*")
+    file_list = glob.glob(f"{path_generator.generate_path_data()}*/{filename_written}*")
     for filename in file_list:
         os.remove(filename)
 

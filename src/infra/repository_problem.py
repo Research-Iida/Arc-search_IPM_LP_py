@@ -13,6 +13,7 @@ from ..problem import LinearProgrammingProblem as LP
 from ..problem import LinearProgrammingProblemStandard as LPS
 from ..problem.repository import CannotReadError, ILPRepository
 from ..utils import config_utils, str_util
+from .path_generator import PathGenerator
 
 logger = get_main_logger()
 
@@ -26,12 +27,10 @@ class LPRepository(ILPRepository):
 
     def __init__(self, config_section: str = config_utils.default_section):
         """初期化. `data` ディレクトリへのパスを設定する"""
-        config_ini = config_utils.read_config(section=config_section)
+        path_generator = PathGenerator(config_section=config_section)
 
-        self._path_netlib: Path = Path(config_ini.get("PATH_NETLIB"))
-        self._path_data: Path = Path(config_ini.get("PATH_DATA"))
-        self._path_processed: Path = Path(config_ini.get("PATH_PROCESSED"))
-        self._path_result: Path = Path(config_ini.get("PATH_RESULT"))
+        self._path_netlib: Path = path_generator.generate_path_netlib()
+        self._path_processed: Path = path_generator.generate_path_data_processed()
 
     def get_problem_names(self) -> list[str]:
         """参照しているディレクトリに存在する `SIF` ファイルの一覧を取得

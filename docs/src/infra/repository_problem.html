@@ -58,12 +58,10 @@ hljs.highlightAll();
 
     def __init__(self, config_section: str = config_utils.default_section):
         &#34;&#34;&#34;初期化. `data` ディレクトリへのパスを設定する&#34;&#34;&#34;
-        config_ini = config_utils.read_config(section=config_section)
+        path_generator = PathGenerator(config_section=config_section)
 
-        self._path_netlib: Path = Path(config_ini.get(&#34;PATH_NETLIB&#34;))
-        self._path_data: Path = Path(config_ini.get(&#34;PATH_DATA&#34;))
-        self._path_processed: Path = Path(config_ini.get(&#34;PATH_PROCESSED&#34;))
-        self._path_result: Path = Path(config_ini.get(&#34;PATH_RESULT&#34;))
+        self._path_netlib: Path = path_generator.generate_path_netlib()
+        self._path_processed: Path = path_generator.generate_path_data_processed()
 
     def get_problem_names(self) -&gt; list[str]:
         &#34;&#34;&#34;参照しているディレクトリに存在する `SIF` ファイルの一覧を取得

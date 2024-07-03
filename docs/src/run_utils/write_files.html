@@ -34,18 +34,18 @@ hljs.highlightAll();
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="src.run_utils.write_files.copy_optimization_parameters"><code class="name flex">
-<span>def <span class="ident">copy_optimization_parameters</span></span>(<span>path_result: str, config_section: str = 'DEFAULT')</span>
+<span>def <span class="ident">copy_optimization_parameters</span></span>(<span>path_result: pathlib.Path, config_section: str = 'DEFAULT')</span>
 </code></dt>
 <dd>
 <div class="desc"><p><code>config_optimizer.ini</code> を結果を格納するディレクトリにコピー</p>
 <h2 id="args">Args</h2>
 <dl>
-<dt><strong><code>path_result</code></strong> :&ensp;<code>str</code></dt>
+<dt><strong><code>path_result</code></strong> :&ensp;<code>Path</code></dt>
 <dd>結果を書き込む先のディレクトリ</dd>
 </dl></div>
 </dd>
 <dt id="src.run_utils.write_files.write_and_draw_result"><code class="name flex">
-<span>def <span class="ident">write_and_draw_result</span></span>(<span>aSolvedDetail: <a title="src.solver.solved_data.SolvedDetail" href="../solver/solved_data.html#src.solver.solved_data.SolvedDetail">SolvedDetail</a>, repository: <a title="src.solver.repository.ISolvedDataRepository" href="../solver/repository.html#src.solver.repository.ISolvedDataRepository">ISolvedDataRepository</a>, path_result: str)</span>
+<span>def <span class="ident">write_and_draw_result</span></span>(<span>aSolvedDetail: <a title="src.solver.solved_data.SolvedDetail" href="../solver/solved_data.html#src.solver.solved_data.SolvedDetail">SolvedDetail</a>, repository: <a title="src.solver.repository.ISolvedDataRepository" href="../solver/repository.html#src.solver.repository.ISolvedDataRepository">ISolvedDataRepository</a>, path_generator: <a title="src.infra.path_generator.PathGenerator" href="../infra/path_generator.html#src.infra.path_generator.PathGenerator">PathGenerator</a>)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>計算に関わるいろいろな設定を書き込む</p>
