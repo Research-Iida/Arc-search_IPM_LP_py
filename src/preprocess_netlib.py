@@ -1,15 +1,14 @@
 import argparse
 import sys
-from typing import Optional
 
+from .infra.repository_problem import LPRepository
 from .logger import get_main_logger, setup_logger
-from .problem.repository import LPRepository
 from .run_utils.solve_problem import preprocess
 
 logger = get_main_logger()
 
 
-def main(problem_name: str, config_section: Optional[str]):
+def main(problem_name: str, config_section: str | None):
     """main 関数"""
     # 直接実行された場合ファイルに起こす必要があるため, 新たにlogger設定
     log_file_name = f"preprocess_{problem_name}"

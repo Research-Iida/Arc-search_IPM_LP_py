@@ -4,6 +4,7 @@ from pathlib import Path
 
 import numpy as np
 
+from .infra.repository_solved_data import SolvedDataRepository
 from .logger import get_main_logger, setup_logger
 from .run_utils.define_paths import path_solved_result_by_date
 from .run_utils.generate_problem import generate_problem
@@ -40,7 +41,7 @@ def main(n: int, m: int, solver_name: str | None, config_section: str | None, ra
         aSolvedDetail = optimize(problem, solver)
         if not aSolvedDetail.v.isclose(opt_sol, threshold=10 ** (-3)):
             logger.warning(f"Isn't close solution! opt: {opt_sol}, sol: {aSolvedDetail.v}")
-        write_and_draw_result(aSolvedDetail, path_result)
+        write_and_draw_result(aSolvedDetail, SolvedDataRepository(), path_result)
 
 
 if __name__ == "__main__":
