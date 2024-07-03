@@ -471,7 +471,7 @@ class LPPreprocessor:
         # A, b, c = self.fix_singleton_by_two_rows(A, b, c)
 
         # A, b, c について変更されているか確認し, もしされていなければ出力
-        logger.info("Checking changing...")
+        logger.info("Checking change...")
         # まずは次元の確認から. 一致していることがわかった後に要素の確認をしないとサイズ違いでエラーとなる
         logger.debug(f"{A.shape}, {b.shape}, {c.shape}")
         if A.shape == problem.A.shape and b.shape == problem.b.shape and c.shape == problem.c.shape:

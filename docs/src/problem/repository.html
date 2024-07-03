@@ -81,18 +81,17 @@ hljs.highlightAll();
         &#34;&#34;&#34;初期化. `data` ディレクトリへのパスを設定する&#34;&#34;&#34;
         config_ini = config_utils.read_config(section=config_section)
 
-        self._path_netlib = config_ini.get(&#34;PATH_NETLIB&#34;)
-        self._path_data = config_ini.get(&#34;PATH_DATA&#34;)
-        self._path_processed = config_ini.get(&#34;PATH_PROCESSED&#34;)
-        self._path_result = config_ini.get(&#34;PATH_RESULT&#34;)
+        self._path_netlib: Path = Path(config_ini.get(&#34;PATH_NETLIB&#34;))
+        self._path_data: Path = Path(config_ini.get(&#34;PATH_DATA&#34;))
+        self._path_processed: Path = Path(config_ini.get(&#34;PATH_PROCESSED&#34;))
+        self._path_result: Path = Path(config_ini.get(&#34;PATH_RESULT&#34;))
 
     def get_problem_names(self) -&gt; list[str]:
         &#34;&#34;&#34;参照しているディレクトリに存在する `SIF` ファイルの一覧を取得
 
         問題名のみ取り出したいので, `.SIF` を削除して出力する
         &#34;&#34;&#34;
-        path = Path(self._path_netlib)
-        return [fullpath.name[:-4] for fullpath in path.glob(&#34;*.SIF&#34;)]
+        return [fullpath.name[:-4] for fullpath in self._path_netlib.glob(&#34;*.SIF&#34;)]
 
     def separate_by_constraint_type(self, types_constraint: list[str], A: lil_matrix, b_origin: np.ndarray):
         &#34;&#34;&#34;制約の種類（等式, 上限, 下限）によって A,b のインスタンスを分ける
@@ -120,7 +119,8 @@ hljs.highlightAll();
         Returns:
             LP: 線形計画問題のインスタンス
         &#34;&#34;&#34;
-        mps_obj = smps.load_mps(str_util.add_suffix(f&#34;{self._path_netlib}{problem_name}&#34;, &#34;.SIF&#34;))
+        problem_filename = str_util.add_suffix(problem_name, &#34;.SIF&#34;)
+        mps_obj = smps.load_mps(self._path_netlib.joinpath(problem_filename))
 
         # 制約数
         m_origin = len(mps_obj[2])
@@ -165,25 +165,6 @@ hljs.highlightAll();
         output = LP(A_E, b_E, A_G, b_G, A_L, b_L, lst_index_lb, lb, lst_index_ub, ub, c_origin, problem_name)
         return output
 
-    def write_numpy(self, filename: str, data: np.ndarray, path: Optional[str] = None):
-        &#34;&#34;&#34;numpy のデータをcsvファイルに書き出す
-
-        Args:
-            filename: ファイル名. `.csv` がなくともメソッドの中でつけるので問題ない
-            data: 書き込み対象の numpy データ
-            path: 書き込み先のpath. 指定がなければ `self._path_data` 直下に置く
-
-        TODO:
-            * SolvedDetail を書き込む際も使用しており, 責務が滅茶苦茶
-        &#34;&#34;&#34;
-        # 書き込み先の決定
-        if path is None:
-            path = self._path_data
-
-        fullpath_filename = str_util.add_suffix_csv(f&#34;{path}{filename}&#34;)
-        np.savetxt(fullpath_filename, data, delimiter=&#34;,&#34;)
-        logger.info(f&#34;{fullpath_filename} is written.&#34;)
-
     def write_LP(self, aLP: LPS, problem_name: str):
         &#34;&#34;&#34;線形計画問題を csvファイルに書き出す
 
@@ -193,20 +174,19 @@ hljs.highlightAll();
             * 0は書き下すとファイルサイズが大きくなるので, 欠損させるようにしたい
         &#34;&#34;&#34;
         # Aの書き出し, scipy.sparce の型なので別で書き出しする
-        save_npz(f&#34;{self._path_processed}{problem_name}_A.npz&#34;, aLP.A)
-        # self.write_numpy(problem_name + &#34;_A&#34;, aLP.A, self._path_processed)
+        save_npz(self._path_processed.joinpath(f&#34;{problem_name}_A.npz&#34;), aLP.A)
 
-        self.write_numpy(problem_name + &#34;_b&#34;, aLP.b, self._path_processed)
-        self.write_numpy(problem_name + &#34;_c&#34;, aLP.c, self._path_processed)
+        np.save(self._path_processed.joinpath(f&#34;{problem_name}_b.npy&#34;), aLP.b)
+        np.save(self._path_processed.joinpath(f&#34;{problem_name}_c.npy&#34;), aLP.c)
+
+        logger.info(f&#34;&#39;{problem_name}&#39; is written in {self._path_processed}.&#34;)
 
     def can_read_processed_LP(self, problem_name: str) -&gt; bool:
         &#34;&#34;&#34;指定した問題がディレクトリに存在し, 読み取ることが可能か&#34;&#34;&#34;
-        file_prefix = f&#34;{self._path_processed}{problem_name}&#34;
-
-        can_read_A = os.path.exists(str_util.add_suffix(file_prefix + &#34;_A&#34;, &#34;.npz&#34;))
-        can_read_b = os.path.exists(str_util.add_suffix_csv(file_prefix + &#34;_b&#34;))
-        can_read_c = os.path.exists(str_util.add_suffix_csv(file_prefix + &#34;_c&#34;))
-        return can_read_A and can_read_b and can_read_c
+        is_exist_A = os.path.exists(self._path_processed.joinpath(f&#34;{problem_name}_A.npz&#34;))
+        is_exist_b = os.path.exists(self._path_processed.joinpath(f&#34;{problem_name}_b.npy&#34;))
+        is_exist_c = os.path.exists(self._path_processed.joinpath(f&#34;{problem_name}_c.npy&#34;))
+        return is_exist_A and is_exist_b and is_exist_c
 
     def read_processed_LP(self, problem_name: str) -&gt; LPS:
         &#34;&#34;&#34;線形計画問題に関するcsvファイルを読み込み, 問題のクラスインスタンスを出力
@@ -215,18 +195,13 @@ hljs.highlightAll();
         &#34;&#34;&#34;
         # 読み込めない場合, エラーを返す
         if not self.can_read_processed_LP(problem_name):
-            raise CannotReadError(f&#34;{self._path_processed} 以下に {problem_name} が存在しません.&#34;)
+            raise CannotReadError(f&#34;{self._path_processed} 以下に前処理済みの &#39;{problem_name}&#39; data が存在しません.&#34;)
 
-        file_prefix = f&#34;{self._path_processed}{problem_name}&#34;
+        A = load_npz(self._path_processed.joinpath(f&#34;{problem_name}_A.npz&#34;))
 
-        A = load_npz(str_util.add_suffix(file_prefix + &#34;_A&#34;, &#34;.npz&#34;))
+        b = np.load(self._path_processed.joinpath(f&#34;{problem_name}_b.npy&#34;))
+        c = np.load(self._path_processed.joinpath(f&#34;{problem_name}_c.npy&#34;))
 
-        def read(filename: str) -&gt; np.ndarray:
-            &#34;&#34;&#34;各定数を読み込む処理&#34;&#34;&#34;
-            return np.genfromtxt(filename, delimiter=&#34;,&#34;, filling_values=0)
-
-        b = read(str_util.add_suffix_csv(file_prefix + &#34;_b&#34;))
-        c = read(str_util.add_suffix_csv(file_prefix + &#34;_c&#34;))
         return LPS(A, b, c, problem_name)</code></pre>
 </details>
 <h3>Methods</h3>
@@ -289,25 +264,6 @@ hljs.highlightAll();
 <li>0は書き下すとファイルサイズが大きくなるので, 欠損させるようにしたい</li>
 </ul></div>
 </dd>
-<dt id="src.problem.repository.LPRepository.write_numpy"><code class="name flex">
-<span>def <span class="ident">write_numpy</span></span>(<span>self, filename: str, data: numpy.ndarray, path: Optional[str] = None)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>numpy のデータをcsvファイルに書き出す</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>filename</code></strong></dt>
-<dd>ファイル名. <code>.csv</code> がなくともメソッドの中でつけるので問題ない</dd>
-<dt><strong><code>data</code></strong></dt>
-<dd>書き込み対象の numpy データ</dd>
-<dt><strong><code>path</code></strong></dt>
-<dd>書き込み先のpath. 指定がなければ <code>self._path_data</code> 直下に置く</dd>
-</dl>
-<h2 id="todo">Todo</h2>
-<ul>
-<li>SolvedDetail を書き込む際も使用しており, 責務が滅茶苦茶</li>
-</ul></div>
-</dd>
 </dl>
 </dd>
 </dl>
@@ -337,7 +293,6 @@ hljs.highlightAll();
 <li><code><a title="src.problem.repository.LPRepository.read_raw_LP" href="#src.problem.repository.LPRepository.read_raw_LP">read_raw_LP</a></code></li>
 <li><code><a title="src.problem.repository.LPRepository.separate_by_constraint_type" href="#src.problem.repository.LPRepository.separate_by_constraint_type">separate_by_constraint_type</a></code></li>
 <li><code><a title="src.problem.repository.LPRepository.write_LP" href="#src.problem.repository.LPRepository.write_LP">write_LP</a></code></li>
-<li><code><a title="src.problem.repository.LPRepository.write_numpy" href="#src.problem.repository.LPRepository.write_numpy">write_numpy</a></code></li>
 </ul>
 </li>
 </ul>

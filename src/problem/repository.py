@@ -3,7 +3,6 @@
 
 import os
 from pathlib import Path
-from typing import Optional
 
 import numpy as np
 from pysmps import smps_loader as smps
@@ -34,18 +33,17 @@ class LPRepository:
         """初期化. `data` ディレクトリへのパスを設定する"""
         config_ini = config_utils.read_config(section=config_section)
 
-        self._path_netlib = config_ini.get("PATH_NETLIB")
-        self._path_data = config_ini.get("PATH_DATA")
-        self._path_processed = config_ini.get("PATH_PROCESSED")
-        self._path_result = config_ini.get("PATH_RESULT")
+        self._path_netlib: Path = Path(config_ini.get("PATH_NETLIB"))
+        self._path_data: Path = Path(config_ini.get("PATH_DATA"))
+        self._path_processed: Path = Path(config_ini.get("PATH_PROCESSED"))
+        self._path_result: Path = Path(config_ini.get("PATH_RESULT"))
 
     def get_problem_names(self) -> list[str]:
         """参照しているディレクトリに存在する `SIF` ファイルの一覧を取得
 
         問題名のみ取り出したいので, `.SIF` を削除して出力する
         """
-        path = Path(self._path_netlib)
-        return [fullpath.name[:-4] for fullpath in path.glob("*.SIF")]
+        return [fullpath.name[:-4] for fullpath in self._path_netlib.glob("*.SIF")]
 
     def separate_by_constraint_type(self, types_constraint: list[str], A: lil_matrix, b_origin: np.ndarray):
         """制約の種類（等式, 上限, 下限）によって A,b のインスタンスを分ける
@@ -73,7 +71,8 @@ class LPRepository:
         Returns:
             LP: 線形計画問題のインスタンス
         """
-        mps_obj = smps.load_mps(str_util.add_suffix(f"{self._path_netlib}{problem_name}", ".SIF"))
+        problem_filename = str_util.add_suffix(problem_name, ".SIF")
+        mps_obj = smps.load_mps(self._path_netlib.joinpath(problem_filename))
 
         # 制約数
         m_origin = len(mps_obj[2])
@@ -118,25 +117,6 @@ class LPRepository:
         output = LP(A_E, b_E, A_G, b_G, A_L, b_L, lst_index_lb, lb, lst_index_ub, ub, c_origin, problem_name)
         return output
 
-    def write_numpy(self, filename: str, data: np.ndarray, path: Optional[str] = None):
-        """numpy のデータをcsvファイルに書き出す
-
-        Args:
-            filename: ファイル名. `.csv` がなくともメソッドの中でつけるので問題ない
-            data: 書き込み対象の numpy データ
-            path: 書き込み先のpath. 指定がなければ `self._path_data` 直下に置く
-
-        TODO:
-            * SolvedDetail を書き込む際も使用しており, 責務が滅茶苦茶
-        """
-        # 書き込み先の決定
-        if path is None:
-            path = self._path_data
-
-        fullpath_filename = str_util.add_suffix_csv(f"{path}{filename}")
-        np.savetxt(fullpath_filename, data, delimiter=",")
-        logger.info(f"{fullpath_filename} is written.")
-
     def write_LP(self, aLP: LPS, problem_name: str):
         """線形計画問題を csvファイルに書き出す
 
@@ -146,20 +126,19 @@ class LPRepository:
             * 0は書き下すとファイルサイズが大きくなるので, 欠損させるようにしたい
         """
         # Aの書き出し, scipy.sparce の型なので別で書き出しする
-        save_npz(f"{self._path_processed}{problem_name}_A.npz", aLP.A)
-        # self.write_numpy(problem_name + "_A", aLP.A, self._path_processed)
+        save_npz(self._path_processed.joinpath(f"{problem_name}_A.npz"), aLP.A)
 
-        self.write_numpy(problem_name + "_b", aLP.b, self._path_processed)
-        self.write_numpy(problem_name + "_c", aLP.c, self._path_processed)
+        np.save(self._path_processed.joinpath(f"{problem_name}_b.npy"), aLP.b)
+        np.save(self._path_processed.joinpath(f"{problem_name}_c.npy"), aLP.c)
+
+        logger.info(f"'{problem_name}' is written in {self._path_processed}.")
 
     def can_read_processed_LP(self, problem_name: str) -> bool:
         """指定した問題がディレクトリに存在し, 読み取ることが可能か"""
-        file_prefix = f"{self._path_processed}{problem_name}"
-
-        can_read_A = os.path.exists(str_util.add_suffix(file_prefix + "_A", ".npz"))
-        can_read_b = os.path.exists(str_util.add_suffix_csv(file_prefix + "_b"))
-        can_read_c = os.path.exists(str_util.add_suffix_csv(file_prefix + "_c"))
-        return can_read_A and can_read_b and can_read_c
+        is_exist_A = os.path.exists(self._path_processed.joinpath(f"{problem_name}_A.npz"))
+        is_exist_b = os.path.exists(self._path_processed.joinpath(f"{problem_name}_b.npy"))
+        is_exist_c = os.path.exists(self._path_processed.joinpath(f"{problem_name}_c.npy"))
+        return is_exist_A and is_exist_b and is_exist_c
 
     def read_processed_LP(self, problem_name: str) -> LPS:
         """線形計画問題に関するcsvファイルを読み込み, 問題のクラスインスタンスを出力
@@ -168,16 +147,11 @@ class LPRepository:
         """
         # 読み込めない場合, エラーを返す
         if not self.can_read_processed_LP(problem_name):
-            raise CannotReadError(f"{self._path_processed} 以下に {problem_name} が存在しません.")
+            raise CannotReadError(f"{self._path_processed} 以下に前処理済みの '{problem_name}' data が存在しません.")
 
-        file_prefix = f"{self._path_processed}{problem_name}"
+        A = load_npz(self._path_processed.joinpath(f"{problem_name}_A.npz"))
 
-        A = load_npz(str_util.add_suffix(file_prefix + "_A", ".npz"))
+        b = np.load(self._path_processed.joinpath(f"{problem_name}_b.npy"))
+        c = np.load(self._path_processed.joinpath(f"{problem_name}_c.npy"))
 
-        def read(filename: str) -> np.ndarray:
-            """各定数を読み込む処理"""
-            return np.genfromtxt(filename, delimiter=",", filling_values=0)
-
-        b = read(str_util.add_suffix_csv(file_prefix + "_b"))
-        c = read(str_util.add_suffix_csv(file_prefix + "_c"))
         return LPS(A, b, c, problem_name)
