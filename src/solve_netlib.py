@@ -1,7 +1,7 @@
 import argparse
 import sys
 from datetime import date
-from typing import Optional
+from pathlib import Path
 
 from .logger import get_main_logger, setup_logger
 from .problem.repository import LPRepository
@@ -18,7 +18,7 @@ logger = get_main_logger()
 aSlack = get_slack_api()
 
 
-def main(problem_name: str, solver_name: Optional[str], config_section: Optional[str]):
+def main(problem_name: str, solver_name: str | None, config_section: str | None):
     """main 関数"""
     # 直接実行された場合ファイルに起こす必要があるため, 新たにlogger設定
     log_file_name = f"solve_{problem_name}"
@@ -38,7 +38,7 @@ def main(problem_name: str, solver_name: Optional[str], config_section: Optional
     str_today = date.today().strftime("%Y%m%d")
     name_result = str_util.add_suffix_csv(f"{str_today}_result")
     # csvのヘッダーを書き出す
-    aSolvedDataRepository.write_SolvedSummary([], name_result, path=path_result_by_problem)
+    aSolvedDataRepository.write_SolvedSummary([], name_result, path=Path(path_result_by_problem))
 
     # ソルバーごとに解く
     for solver in get_solvers(solver_name, config_section):

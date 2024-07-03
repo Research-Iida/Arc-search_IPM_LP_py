@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from ..logger import get_main_logger
 from ..problem import LinearProgrammingProblemStandard as LPS
 from ..problem import LPPreprocessor
@@ -99,6 +101,6 @@ def solve_and_write(
     aSolvedDetail = solve(filename, solver, aLPRepository=aLPRepository)
     # 計算が終わるたびに都度書き込みを行う
     aSolvedDataRepository.write_SolvedSummary(
-        [aSolvedDetail.aSolvedSummary], name_result, path=path_result, is_append=True
+        [aSolvedDetail.aSolvedSummary], name_result, path=Path(path_result), is_append=True
     )
     return aSolvedDetail
