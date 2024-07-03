@@ -2,9 +2,9 @@ import shutil
 
 import numpy as np
 
-from ..data_access import CsvHandler
 from ..drawer import Drawer
 from ..logger import get_main_logger
+from ..problem.repository import LPRepository
 from ..solver.solved_data import SolvedDetail
 from ..utils import config_utils
 from .define_paths import path_solved_result_by_problem, path_solved_result_by_solver_with_config
@@ -42,7 +42,7 @@ def write_result_by_problem_solver_config(aSolvedDetail: SolvedDetail, path_resu
     # 変数の反復列をcsvで出力
     if len(aSolvedDetail.lst_variables_by_iter) > 0:
         variables = np.stack([np.concatenate([v.x, v.y, v.s]) for v in aSolvedDetail.lst_variables_by_iter])
-        CsvHandler().write_numpy("variables", variables, path_result_by_problem_solver_config)
+        LPRepository().write_numpy("variables", variables, path_result_by_problem_solver_config)
 
     # グラフ描画
     Drawer(path_result_by_problem_solver_config).run(aSolvedDetail)

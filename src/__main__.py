@@ -2,7 +2,6 @@ import argparse
 import sys
 from datetime import date
 
-from .data_access import CsvHandler
 from .logger import get_main_logger, setup_logger
 from .problem.repository import LPRepository
 from .profiler.profiler import profile_decorator
@@ -11,6 +10,7 @@ from .run_utils.get_solvers import get_solver, get_solvers
 from .run_utils.solve_problem import solve, solve_and_write
 from .run_utils.write_files import copy_optimization_parameters, write_result_by_problem_solver_config
 from .slack.slack import get_slack_api
+from .solver.repository import SolvedDataRepository
 from .utils import config_utils, str_util
 
 logger = get_main_logger()
@@ -133,7 +133,7 @@ def main(
     # 各種インスタンスの用意
     config = config_utils.read_config(section=config_section)
     aLPRepository = LPRepository(config_section)
-    aCsvHandler = CsvHandler(config_section)
+    aSolvedDataRepository = SolvedDataRepository()
 
     # 対象の問題の決定
     problem_files = decide_solved_problems(aLPRepository, num_problem, start_problem_number)
@@ -146,7 +146,7 @@ def main(
     copy_optimization_parameters(path_result, config_section)
 
     # csvのヘッダーを書き出す
-    aCsvHandler.write_SolvedSummary([], name_result, path=path_result)
+    aSolvedDataRepository.write_SolvedSummary([], name_result, path=path_result)
 
     # 並列処理の設定
     # max_cpu_core = os.cpu_count() - 1
@@ -164,7 +164,9 @@ def main(
 
         # ソルバーごとに解く. 毎回初期化した方が都合がいいので for 構文の中で取り出す
         for solver in get_solvers(name_solver, config_section):
-            aSolvedDetail = solve_and_write(filename, solver, aLPRepository, aCsvHandler, name_result, path_result)
+            aSolvedDetail = solve_and_write(
+                filename, solver, aLPRepository, aSolvedDataRepository, name_result, path_result
+            )
             write_result_by_problem_solver_config(aSolvedDetail, path_result)
 
         # 並列処理: メモリが爆発して逆に遅くなるためやらないほうがいい
@@ -172,7 +174,7 @@ def main(
         # process_list = []
         # for solver in lst_solver:
         #     kwargs = {
-        #         "filename": filename, "solver": solver, "aLPRepository": aLPRepository, "aCsvHandler": aCsvHandler,
+        #         "filename": filename, "solver": solver, "aLPRepository": aLPRepository, "aSolvedDataRepository": aSolvedDataRepository,
         #         "name_result": name_result, "path_result": path_result
         #     }
         #     process = Process(target=solve_and_write, kwargs=kwargs)

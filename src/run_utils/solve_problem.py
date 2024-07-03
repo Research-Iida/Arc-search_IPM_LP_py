@@ -1,9 +1,9 @@
-from ..data_access import CsvHandler
 from ..logger import get_main_logger
 from ..problem import LinearProgrammingProblemStandard as LPS
 from ..problem import LPPreprocessor
 from ..problem.repository import LPRepository
 from ..slack.slack import get_slack_api
+from ..solver.repository import SolvedDataRepository
 from ..solver.solved_data import SolvedDetail
 from ..solver.solver import LPSolver
 from ..solver.variables import LPVariables
@@ -91,12 +91,14 @@ def solve_and_write(
     filename: str,
     solver: LPSolver,
     aLPRepository: LPRepository,
-    aCsvHandler: CsvHandler,
+    aSolvedDataRepository: SolvedDataRepository,
     name_result: str,
     path_result: str,
 ) -> SolvedDetail:
     """問題を解き, 結果を格納する. `__main__.py` で使用するので書き出しておく"""
     aSolvedDetail = solve(filename, solver, aLPRepository=aLPRepository)
     # 計算が終わるたびに都度書き込みを行う
-    aCsvHandler.write_SolvedSummary([aSolvedDetail.aSolvedSummary], name_result, path=path_result, is_append=True)
+    aSolvedDataRepository.write_SolvedSummary(
+        [aSolvedDetail.aSolvedSummary], name_result, path=path_result, is_append=True
+    )
     return aSolvedDetail

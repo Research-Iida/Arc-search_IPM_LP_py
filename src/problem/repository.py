@@ -125,6 +125,9 @@ class LPRepository:
             filename: ファイル名. `.csv` がなくともメソッドの中でつけるので問題ない
             data: 書き込み対象の numpy データ
             path: 書き込み先のpath. 指定がなければ `self._path_data` 直下に置く
+
+        TODO:
+            * SolvedDetail を書き込む際も使用しており, 責務が滅茶苦茶
         """
         # 書き込み先の決定
         if path is None:

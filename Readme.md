@@ -95,16 +95,18 @@ poetry run python -m src.profile_result {対称のファイル名}
 poetry run cprofilev -f {対称のファイル名}
 ```
 
-## クラス図の作成
-```sh
-poetry run pyreverse -o png src/
-```
-
 ---
 ## Building documents
 ```sh
 poetry run pdoc src --html -o docs --force
 ```
+
+---
+## クラス図の作成
+```sh
+poetry run pyreverse -o png src/
+```
+
 ---
 ## 仮想環境管理
 ### パッケージ追加
