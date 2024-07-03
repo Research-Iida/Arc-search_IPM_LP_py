@@ -5,10 +5,10 @@ from ..problem import LinearProgrammingProblemStandard as LPS
 from ..problem import LPPreprocessor
 from ..problem.repository import ILPRepository
 from ..slack.slack import get_slack_api
-from ..solver.repository import ISolvedDataRepository
-from ..solver.solved_data import SolvedDetail
-from ..solver.solver import LPSolver
-from ..solver.variables import LPVariables
+from .repository import ISolvedDataRepository
+from .solved_data import SolvedDetail
+from .solver import LPSolver
+from .variables import LPVariables
 
 logger = get_main_logger()
 aSlack = get_slack_api()

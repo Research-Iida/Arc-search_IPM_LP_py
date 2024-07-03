@@ -1,14 +1,14 @@
 from collections.abc import Iterator
 
-from ..solver.inexact_interior_point_method import InexactArcSearchIPM, InexactLineSearchIPM
-from ..solver.interior_point_method import ArcSearchIPM, LineSearchIPM
-from ..solver.interior_point_method_with_restarting_strategy import (
+from ..utils.config_utils import default_section
+from .inexact_interior_point_method import InexactArcSearchIPM, InexactLineSearchIPM
+from .interior_point_method import ArcSearchIPM, LineSearchIPM
+from .interior_point_method_with_restarting_strategy import (
     ArcSearchIPMWithRestartingStrategy,
     ArcSearchIPMWithRestartingStrategyProven,
 )
-from ..solver.iterative_refinement import IterativeRefinementMethod
-from ..solver.solver import LPSolver
-from ..utils.config_utils import default_section
+from .iterative_refinement import IterativeRefinementMethod
+from .solver import LPSolver
 
 # 計算対象のアルゴリズム一覧
 target_algorithms: list[str] = [

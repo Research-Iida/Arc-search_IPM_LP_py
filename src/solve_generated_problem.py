@@ -7,9 +7,9 @@ from .drawer import Drawer
 from .infra.path_generator import PathGenerator
 from .infra.repository_solved_data import SolvedDataRepository
 from .logger import get_main_logger, setup_logger
-from .run_utils.generate_problem import generate_problem
-from .run_utils.get_solvers import get_solvers
-from .run_utils.solve_problem import optimize
+from .problem.generate_problem import generate_problem
+from .solver.get_solvers import get_solvers
+from .solver.solve_problem import optimize
 
 logger = get_main_logger()
 
@@ -39,7 +39,6 @@ def main(n: int, m: int, solver_name: str | None, config_section: str | None, ra
         aSolvedDetail = optimize(problem, solver)
         if not aSolvedDetail.v.isclose(opt_sol, threshold=10 ** (-3)):
             logger.warning(f"Isn't close solution! opt: {opt_sol}, sol: {aSolvedDetail.v}")
-        # write_and_draw_result(aSolvedDetail, aSolvedDataRepository, path_generator)
         aSolvedDataRepository.write_variables_by_iteration(aSolvedDetail)
 
         summary = aSolvedDetail.aSolvedSummary
