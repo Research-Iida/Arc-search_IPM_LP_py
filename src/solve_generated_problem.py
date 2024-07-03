@@ -38,7 +38,7 @@ def main(n: int, m: int, solver_name: str | None, config_section: str | None, ra
         aSolvedDetail = optimize(problem, solver)
         if not aSolvedDetail.v.isclose(opt_sol, threshold=10 ** (-3)):
             logger.warning(f"Isn't close solution! opt: {opt_sol}, sol: {aSolvedDetail.v}")
-        write_and_draw_result(aSolvedDetail, SolvedDataRepository(), path_generator)
+        write_and_draw_result(aSolvedDetail, SolvedDataRepository(config_section), path_generator)
 
 
 if __name__ == "__main__":

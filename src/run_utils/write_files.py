@@ -45,7 +45,7 @@ def write_and_draw_result(
         summary.problem_name, summary.solver_name, summary.config_section
     )
 
-    repository.write_variables_by_iteration(aSolvedDetail, path_result_by_problem_solver_config)
+    repository.write_variables_by_iteration(aSolvedDetail)
 
     # グラフ描画
     Drawer(path_result_by_problem_solver_config).run(aSolvedDetail)

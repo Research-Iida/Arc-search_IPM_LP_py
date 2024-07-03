@@ -8,10 +8,6 @@ from src.infra.repository_solved_data import SolvedDataRepository
 from src.solver.solver import SolvedSummary
 from src.utils.config_utils import read_config, test_section
 
-config_ini = read_config(section=test_section)
-path_data = config_ini.get("PATH_DATA")
-path_result = config_ini.get("PATH_RESULT")
-
 # ファイル名の設定
 filename_read = "test_problem"
 filename_written = "test_written"
@@ -19,11 +15,13 @@ filename_written = "test_written"
 
 @pytest.fixture
 def aSolvedDataRepository() -> SolvedDataRepository:
-    return SolvedDataRepository()
+    return SolvedDataRepository(test_section)
 
 
 @pytest.fixture
 def remove_written_directory() -> Path:
+    config_ini = read_config(section=test_section)
+    path_result = config_ini.get("PATH_RESULT")
     path_output = Path(f"{path_result}test_SolvedDataRepository/")
     shutil.rmtree(path_output) if os.path.exists(path_output) else None
 

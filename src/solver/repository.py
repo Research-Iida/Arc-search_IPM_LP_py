@@ -18,6 +18,6 @@ class ISolvedDataRepository(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def write_variables_by_iteration(self, aSolvedDetail: SolvedDetail, path: Path):
+    def write_variables_by_iteration(self, aSolvedDetail: SolvedDetail):
         """変数の反復列を出力"""
         pass
