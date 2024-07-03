@@ -1,6 +1,7 @@
 import argparse
 import sys
 from datetime import date
+from pathlib import Path
 
 from .logger import get_main_logger, setup_logger
 from .problem.repository import LPRepository
@@ -146,7 +147,7 @@ def main(
     copy_optimization_parameters(path_result, config_section)
 
     # csvのヘッダーを書き出す
-    aSolvedDataRepository.write_SolvedSummary([], name_result, path=path_result)
+    aSolvedDataRepository.write_SolvedSummary([], name_result, path=Path(path_result))
 
     # 並列処理の設定
     # max_cpu_core = os.cpu_count() - 1

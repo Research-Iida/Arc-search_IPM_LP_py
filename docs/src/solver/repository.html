@@ -46,7 +46,7 @@ hljs.highlightAll();
 </summary>
 <pre><code class="python">class SolvedDataRepository:
     def write_SolvedSummary(
-        self, lst_solved_summary: list[SolvedSummary], name: str, path: str, is_append: bool = False
+        self, lst_solved_summary: list[SolvedSummary], name: str, path: Path, is_append: bool = False
     ):
         &#34;&#34;&#34;最適化の実行によって得られた諸データを書き込む
 
@@ -57,21 +57,21 @@ hljs.highlightAll();
             is_append: 追記するか否か. 追記する場合は headerを抜く
         &#34;&#34;&#34;
         file_util.create_dir_if_not_exists(path)
-        filename = str_util.add_suffix_csv(f&#34;{path}{name}&#34;)
+        filename = str_util.add_suffix_csv(name)
 
         if is_append:
             mode = &#34;a+&#34;
         else:
             mode = &#34;w&#34;
 
-        with open(filename, mode, newline=&#34;&#34;) as f:
+        with open(path.joinpath(filename), mode, newline=&#34;&#34;) as f:
             w = DataclassWriter(f, lst_solved_summary, SolvedSummary)
             w.write(skip_header=is_append)</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
 <dt id="src.solver.repository.SolvedDataRepository.write_SolvedSummary"><code class="name flex">
-<span>def <span class="ident">write_SolvedSummary</span></span>(<span>self, lst_solved_summary: list[<a title="src.solver.solved_data.SolvedSummary" href="solved_data.html#src.solver.solved_data.SolvedSummary">SolvedSummary</a>], name: str, path: str, is_append: bool = False)</span>
+<span>def <span class="ident">write_SolvedSummary</span></span>(<span>self, lst_solved_summary: list[<a title="src.solver.solved_data.SolvedSummary" href="solved_data.html#src.solver.solved_data.SolvedSummary">SolvedSummary</a>], name: str, path: pathlib.Path, is_append: bool = False)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>最適化の実行によって得られた諸データを書き込む</p>

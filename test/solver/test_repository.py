@@ -1,5 +1,6 @@
 import os
 import shutil
+from pathlib import Path
 
 import pytest
 
@@ -22,11 +23,11 @@ def aSolvedDataRepository() -> SolvedDataRepository:
 
 
 @pytest.fixture
-def remove_written_directory():
-    path_output = f"{path_result}test_SolvedDataRepository/"
+def remove_written_directory() -> Path:
+    path_output = Path(f"{path_result}test_SolvedDataRepository/")
     shutil.rmtree(path_output) if os.path.exists(path_output) else None
 
-    yield path_output
+    return path_output
 
 
 def test_write_SolvedSummary(aSolvedDataRepository, remove_written_directory):
