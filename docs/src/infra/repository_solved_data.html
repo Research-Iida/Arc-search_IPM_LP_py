@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.1">
-<title>src.solve_netlib API documentation</title>
+<title>src.infra.repository_solved_data API documentation</title>
 <meta name="description" content="">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
@@ -22,7 +22,7 @@ hljs.highlightAll();
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>src.solve_netlib</code></h1>
+<h1 class="title">Module <code>src.infra.repository_solved_data</code></h1>
 </header>
 <section id="section-intro">
 </section>
@@ -31,17 +31,109 @@ hljs.highlightAll();
 <section>
 </section>
 <section>
-<h2 class="section-title" id="header-functions">Functions</h2>
-<dl>
-<dt id="src.solve_netlib.main"><code class="name flex">
-<span>def <span class="ident">main</span></span>(<span>problem_name: str, solver_name: str | None, config_section: str | None)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>main 関数</p></div>
-</dd>
-</dl>
 </section>
 <section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="src.infra.repository_solved_data.SolvedDataRepository"><code class="flex name class">
+<span>class <span class="ident">SolvedDataRepository</span></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Helper class that provides a standard way to create an ABC using
+inheritance.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class SolvedDataRepository(ISolvedDataRepository):
+    def write_SolvedSummary(
+        self, lst_solved_summary: list[SolvedSummary], name: str, path: Path, is_append: bool = False
+    ):
+        &#34;&#34;&#34;最適化の実行によって得られた諸データを書き込む
+
+        DataclassWriter を使用するため, self.write メソッドは使用しない
+
+        Args:
+            path: 書き込み先のディレクトリ
+            is_append: 追記するか否か. 追記する場合は headerを抜く
+        &#34;&#34;&#34;
+        file_util.create_dir_if_not_exists(path)
+        filename = str_util.add_suffix_csv(name)
+
+        if is_append:
+            mode = &#34;a+&#34;
+        else:
+            mode = &#34;w&#34;
+
+        with open(path.joinpath(filename), mode, newline=&#34;&#34;) as f:
+            w = DataclassWriter(f, lst_solved_summary, SolvedSummary)
+            w.write(skip_header=is_append)
+
+    def write_numpy_as_csv(self, filename: str, data: np.ndarray, path: Path):
+        &#34;&#34;&#34;numpy のデータをcsvファイルに書き出す
+
+        Args:
+            filename: ファイル名. `.csv` がなくともメソッドの中でつけるので問題ない
+            data: 書き込み対象の numpy データ
+            path: 書き込み先のpath
+        &#34;&#34;&#34;
+        fullpath_filename = str_util.add_suffix_csv(f&#34;{path}{filename}&#34;)
+        np.savetxt(fullpath_filename, data, delimiter=&#34;,&#34;)
+        logger.info(f&#34;{fullpath_filename} is written.&#34;)
+
+    def write_variables_by_iteration(self, aSolvedDetail: SolvedDetail, path: Path):
+        &#34;&#34;&#34;変数の反復列を出力&#34;&#34;&#34;
+        if len(aSolvedDetail.lst_variables_by_iter) &gt; 0:
+            variables = np.stack([np.concatenate([v.x, v.y, v.s]) for v in aSolvedDetail.lst_variables_by_iter])
+            self.write_numpy_as_csv(&#34;variables&#34;, variables, path)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="src.solver.repository.ISolvedDataRepository" href="../solver/repository.html#src.solver.repository.ISolvedDataRepository">ISolvedDataRepository</a></li>
+<li>abc.ABC</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="src.infra.repository_solved_data.SolvedDataRepository.write_SolvedSummary"><code class="name flex">
+<span>def <span class="ident">write_SolvedSummary</span></span>(<span>self, lst_solved_summary: list[<a title="src.solver.solved_data.SolvedSummary" href="../solver/solved_data.html#src.solver.solved_data.SolvedSummary">SolvedSummary</a>], name: str, path: pathlib.Path, is_append: bool = False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>最適化の実行によって得られた諸データを書き込む</p>
+<p>DataclassWriter を使用するため, self.write メソッドは使用しない</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>path</code></strong></dt>
+<dd>書き込み先のディレクトリ</dd>
+<dt><strong><code>is_append</code></strong></dt>
+<dd>追記するか否か. 追記する場合は headerを抜く</dd>
+</dl></div>
+</dd>
+<dt id="src.infra.repository_solved_data.SolvedDataRepository.write_numpy_as_csv"><code class="name flex">
+<span>def <span class="ident">write_numpy_as_csv</span></span>(<span>self, filename: str, data: numpy.ndarray, path: pathlib.Path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>numpy のデータをcsvファイルに書き出す</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>filename</code></strong></dt>
+<dd>ファイル名. <code>.csv</code> がなくともメソッドの中でつけるので問題ない</dd>
+<dt><strong><code>data</code></strong></dt>
+<dd>書き込み対象の numpy データ</dd>
+<dt><strong><code>path</code></strong></dt>
+<dd>書き込み先のpath</dd>
+</dl></div>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="src.solver.repository.ISolvedDataRepository" href="../solver/repository.html#src.solver.repository.ISolvedDataRepository">ISolvedDataRepository</a></b></code>:
+<ul class="hlist">
+<li><code><a title="src.solver.repository.ISolvedDataRepository.write_variables_by_iteration" href="../solver/repository.html#src.solver.repository.ISolvedDataRepository.write_variables_by_iteration">write_variables_by_iteration</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -51,12 +143,18 @@ hljs.highlightAll();
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="src" href="index.html">src</a></code></li>
+<li><code><a title="src.infra" href="index.html">src.infra</a></code></li>
 </ul>
 </li>
-<li><h3><a href="#header-functions">Functions</a></h3>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="src.infra.repository_solved_data.SolvedDataRepository" href="#src.infra.repository_solved_data.SolvedDataRepository">SolvedDataRepository</a></code></h4>
 <ul class="">
-<li><code><a title="src.solve_netlib.main" href="#src.solve_netlib.main">main</a></code></li>
+<li><code><a title="src.infra.repository_solved_data.SolvedDataRepository.write_SolvedSummary" href="#src.infra.repository_solved_data.SolvedDataRepository.write_SolvedSummary">write_SolvedSummary</a></code></li>
+<li><code><a title="src.infra.repository_solved_data.SolvedDataRepository.write_numpy_as_csv" href="#src.infra.repository_solved_data.SolvedDataRepository.write_numpy_as_csv">write_numpy_as_csv</a></code></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

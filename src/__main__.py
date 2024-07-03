@@ -3,15 +3,16 @@ import sys
 from datetime import date
 from pathlib import Path
 
+from .infra.repository_problem import LPRepository
+from .infra.repository_solved_data import SolvedDataRepository
 from .logger import get_main_logger, setup_logger
-from .problem.repository import LPRepository
+from .problem.repository import ILPRepository
 from .profiler.profiler import profile_decorator
 from .run_utils.define_paths import path_solved_result_by_date
 from .run_utils.get_solvers import get_solver, get_solvers
 from .run_utils.solve_problem import solve, solve_and_write
 from .run_utils.write_files import copy_optimization_parameters, write_and_draw_result
 from .slack.slack import get_slack_api
-from .solver.repository import SolvedDataRepository
 from .utils import config_utils, str_util
 
 logger = get_main_logger()
@@ -66,7 +67,7 @@ class TargetProblemError(Exception):
 
 
 def decide_solved_problems(
-    aLPRepository: LPRepository,
+    aLPRepository: ILPRepository,
     num_problem: int | None = None,
     start_problem_number: int | None = None,
 ) -> list[str]:
@@ -168,7 +169,7 @@ def main(
             aSolvedDetail = solve_and_write(
                 filename, solver, aLPRepository, aSolvedDataRepository, name_result, path_result
             )
-            write_and_draw_result(aSolvedDetail, path_result)
+            write_and_draw_result(aSolvedDetail, aSolvedDataRepository, path_result)
 
         # 並列処理: メモリが爆発して逆に遅くなるためやらないほうがいい
         # from multiprocessing import Process

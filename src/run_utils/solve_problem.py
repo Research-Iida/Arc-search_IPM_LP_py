@@ -3,9 +3,9 @@ from pathlib import Path
 from ..logger import get_main_logger
 from ..problem import LinearProgrammingProblemStandard as LPS
 from ..problem import LPPreprocessor
-from ..problem.repository import LPRepository
+from ..problem.repository import ILPRepository
 from ..slack.slack import get_slack_api
-from ..solver.repository import SolvedDataRepository
+from ..solver.repository import ISolvedDataRepository
 from ..solver.solved_data import SolvedDetail
 from ..solver.solver import LPSolver
 from ..solver.variables import LPVariables
@@ -14,7 +14,7 @@ logger = get_main_logger()
 aSlack = get_slack_api()
 
 
-def preprocess(problem_name: str, aLPRepository: LPRepository) -> LPS:
+def preprocess(problem_name: str, aLPRepository: ILPRepository) -> LPS:
     """前処理を施し, 標準形となった Netlib LP を csv で書き込む"""
     logger.info(f"Start loading problem '{problem_name}'")
     aLP_origin = aLPRepository.read_raw_LP(problem_name).convert_standard()
@@ -63,7 +63,7 @@ def optimize(aLP: LPS, aLPSolver: LPSolver, v_0: LPVariables | None = None) -> S
     return output
 
 
-def solve(problem_name: str, aLPSolver: LPSolver, aLPRepository: LPRepository) -> SolvedDetail:
+def solve(problem_name: str, aLPSolver: LPSolver, aLPRepository: ILPRepository) -> SolvedDetail:
     """ベンチマークの問題を読み取り, 解く
 
     すでに問題を前処理したファイルが存在する場合, そこから読み取ることで時間を短縮する
@@ -92,8 +92,8 @@ def solve(problem_name: str, aLPSolver: LPSolver, aLPRepository: LPRepository) -
 def solve_and_write(
     filename: str,
     solver: LPSolver,
-    aLPRepository: LPRepository,
-    aSolvedDataRepository: SolvedDataRepository,
+    aLPRepository: ILPRepository,
+    aSolvedDataRepository: ISolvedDataRepository,
     name_result: str,
     path_result: str,
 ) -> SolvedDetail:
