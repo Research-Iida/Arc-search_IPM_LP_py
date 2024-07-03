@@ -2,6 +2,7 @@ import argparse
 import sys
 from datetime import date
 
+from .drawer import Drawer
 from .infra.path_generator import PathGenerator
 from .infra.repository_problem import LPRepository
 from .infra.repository_solved_data import SolvedDataRepository
@@ -10,7 +11,7 @@ from .problem.repository import ILPRepository
 from .profiler.profiler import profile_decorator
 from .run_utils.get_solvers import get_solver, get_solvers
 from .run_utils.solve_problem import solve, solve_and_write
-from .run_utils.write_files import copy_optimization_parameters, write_and_draw_result
+from .run_utils.write_files import copy_optimization_parameters
 from .slack.slack import get_slack_api
 from .utils import config_utils, str_util
 
@@ -168,7 +169,14 @@ def main(
             aSolvedDetail = solve_and_write(
                 filename, solver, aLPRepository, aSolvedDataRepository, name_result, path_result
             )
-            write_and_draw_result(aSolvedDetail, aSolvedDataRepository, path_generator)
+            # write_and_draw_result(aSolvedDetail, aSolvedDataRepository, path_generator)
+            aSolvedDataRepository.write_variables_by_iteration(aSolvedDetail)
+
+            summary = aSolvedDetail.aSolvedSummary
+            path_result_by_problem_solver_config = path_generator.generate_path_result_by_date_problem_solver_config(
+                summary.problem_name, summary.solver_name, summary.config_section
+            )
+            Drawer(path_result_by_problem_solver_config).run(aSolvedDetail)
 
         # 並列処理: メモリが爆発して逆に遅くなるためやらないほうがいい
         # from multiprocessing import Process

@@ -26,7 +26,6 @@ def copy_optimization_parameters(path_result: Path, config_section: str = config
     shutil.copyfile(origin_config_opt, destination_config_opt)
 
 
-# TODO: それぞれやっていること分ける
 def write_and_draw_result(
     aSolvedDetail: SolvedDetail, repository: ISolvedDataRepository, path_generator: PathGenerator
 ):
