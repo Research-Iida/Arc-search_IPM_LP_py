@@ -2,7 +2,7 @@
 # See https://pre-commit.com/hooks.html for more hooks
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.2.0
+    rev: v4.6.0
     hooks:
     -   id: trailing-whitespace
         types: [python]
@@ -13,26 +13,25 @@ repos:
     -   id: detect-private-key
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.1.8
+    rev: v0.5.0
     hooks:
       - id: ruff
         args: [--fix]
       - id: ruff-format
 
-  - repo: local
-    hooks:
-    -   id: pdoc
-        name: Create documents for python
-        description: 'pdoc: Auto-generate API documentation for Python projects'
-        # いちいち docstring が変わるたびに pdoc を実行したくないので, 自動で add
-        entry: poetry run pdoc src --html -o docs --force && git add docs/src/*
-        language: system
-        types: [python]
-        require_serial: true
-        pass_filenames: false
+  # - repo: local
+  #   hooks:
+  #   -   id: pdoc
+  #       name: Create documents for python
+  #       description: 'pdoc: Auto-generate API documentation for Python projects'
+  #       entry: poetry run pdoc src --html -o docs --force && git add docs/src/*
+  #       language: system
+  #       types: [python]
+  #       require_serial: true
+  #       pass_filenames: false
 
   - repo: https://github.com/python-poetry/poetry
-    rev: ''  # add version here
+    rev: '1.8.0'  # add version here
     hooks:
     -   id: poetry-check
     -   id: poetry-lock
