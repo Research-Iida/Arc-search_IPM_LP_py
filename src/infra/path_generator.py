@@ -1,11 +1,8 @@
 from datetime import date
 from pathlib import Path
 
-from ..logger import get_main_logger
 from ..utils.config_utils import read_config
 from ..utils.file_util import create_dir_if_not_exists
-
-logger = get_main_logger()
 
 
 class PathGenerator:
@@ -37,7 +34,6 @@ class PathGenerator:
         """
         str_today = date.today().strftime("%Y%m%d")
         result = self.generate_path_result().joinpath(str_today)
-        logger.info(f"Results will be written to {result}")
         create_dir_if_not_exists(result)
         return result
 
@@ -48,7 +44,6 @@ class PathGenerator:
             path_result (Path): ベースとなる書き込み先
         """
         result = self.generate_path_result_by_date().joinpath(problem_name)
-        logger.info(f"Results will be written to {result}")
         create_dir_if_not_exists(result)
         return result
 
@@ -61,6 +56,5 @@ class PathGenerator:
             path_result (Path): ベースとなる書き込み先. 日付ごとにディレクトリが変化しても大丈夫
         """
         result = self.generate_path_result_by_date_problem(problem_name).joinpath(solver_name, config_section)
-        logger.info(f"Results will be written to {result}")
         create_dir_if_not_exists(result)
         return result
