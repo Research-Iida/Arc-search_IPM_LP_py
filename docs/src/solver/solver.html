@@ -252,8 +252,9 @@ logging にも使用するので文字列で取得しておく</dd>
 
         logger.info(f&#34;{indent}Condition number: {problem_0.condition_number_A}&#34;)
         if not problem_0.is_full_row_rank():
-            rank = np.linalg.matrix_rank(problem_0.A)
-            logger.warning(f&#34;{indent}Constraint matrix is not full row rank! m: {problem_0.m}, rank: {rank}&#34;)
+            logger.warning(
+                f&#34;{indent}Constraint matrix is not full row rank! m: {problem_0.m}, rank: {problem_0.row_rank}&#34;
+            )
 
     def log_initial_situation(self, v_0: LPVariables, problem_0: LPS):
         &#34;&#34;&#34;最初の段階での変数に関するロギングの実行&#34;&#34;&#34;

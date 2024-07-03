@@ -1,5 +1,6 @@
 import glob
 import os
+from pathlib import Path
 
 import pytest
 
@@ -45,7 +46,7 @@ def test_main(remove_written_file):
         start_problem_number=start_problem_number,
     )
 
-    path_result = path_solved_result_by_date(config.get("PATH_RESULT"))
-    assert os.path.exists(f"{path_result}{name_result}")
+    path_result = path_solved_result_by_date(Path(config.get("PATH_RESULT")))
+    assert os.path.exists(path_result.joinpath(name_result))
     target_problem_name = decide_solved_problems(aLPRepository, num_problem, start_problem_number)[0]
-    assert os.path.exists(f"{path_result}{target_problem_name}/")
+    assert os.path.exists(path_result.joinpath(target_problem_name))
