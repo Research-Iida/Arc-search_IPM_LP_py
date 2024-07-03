@@ -215,8 +215,9 @@ class LPSolver(metaclass=ABCMeta):
 
         logger.info(f"{indent}Condition number: {problem_0.condition_number_A}")
         if not problem_0.is_full_row_rank():
-            rank = np.linalg.matrix_rank(problem_0.A)
-            logger.warning(f"{indent}Constraint matrix is not full row rank! m: {problem_0.m}, rank: {rank}")
+            logger.warning(
+                f"{indent}Constraint matrix is not full row rank! m: {problem_0.m}, rank: {problem_0.row_rank}"
+            )
 
     def log_initial_situation(self, v_0: LPVariables, problem_0: LPS):
         """最初の段階での変数に関するロギングの実行"""

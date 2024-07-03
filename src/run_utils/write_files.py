@@ -10,6 +10,7 @@ from .define_paths import path_solved_result_by_problem, path_solved_result_by_s
 logger = get_main_logger()
 
 
+# TODO: Path型に変更
 def copy_optimization_parameters(path_result: str, config_section: str = config_utils.default_section):
     """`config_optimizer.ini` を結果を格納するディレクトリにコピー
 

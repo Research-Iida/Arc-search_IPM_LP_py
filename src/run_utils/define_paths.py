@@ -7,6 +7,7 @@ from ..utils.file_util import create_dir_if_not_exists
 logger = get_main_logger()
 
 
+# TODO: PathGenerator クラスを作った方がよさそう？
 def path_solved_result_by_date(path_result: Path) -> Path:
     """最適化の結果を格納するディレクトリを日付ごとに変えるため, 対応するためのルール
 

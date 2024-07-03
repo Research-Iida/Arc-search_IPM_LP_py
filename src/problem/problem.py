@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import dataclasses
+from functools import cached_property
 
 import numpy as np
 import scipy
@@ -102,13 +103,22 @@ class LinearProgrammingProblemStandard:
         # scipy.sparce.linalg.inv にかける時は csc_matrix の方が効率よい
         return inv((self.A @ self.A.T).tocsc())
 
+    @cached_property
+    def row_rank(self) -> int:
+        """Aの行ランク. 計算には時間がかかるのでキャッシュ
+
+        Returns:
+            int: Aの行ランク
+        """
+        return np.linalg.matrix_rank(self.A.todense())
+
     def is_full_row_rank(self) -> bool:
         """制約行列 A が full row rank かを出力
 
         Returns:
             bool: A が full row rank であれば true
         """
-        return np.linalg.matrix_rank(self.A.todense()) == self.m
+        return self.row_rank == self.m
 
     def objective_main(self, x: np.ndarray) -> float:
         """主問題の目的関数値の出力"""
