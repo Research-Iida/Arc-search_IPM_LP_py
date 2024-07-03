@@ -1,14 +1,13 @@
 import argparse
 import sys
 from datetime import date
-from pathlib import Path
 
+from .infra.path_generator import PathGenerator
 from .infra.repository_problem import LPRepository
 from .infra.repository_solved_data import SolvedDataRepository
 from .logger import get_main_logger, setup_logger
 from .problem.repository import ILPRepository
 from .profiler.profiler import profile_decorator
-from .run_utils.define_paths import path_solved_result_by_date
 from .run_utils.get_solvers import get_solver, get_solvers
 from .run_utils.solve_problem import solve, solve_and_write
 from .run_utils.write_files import copy_optimization_parameters, write_and_draw_result
@@ -133,7 +132,6 @@ def main(
     aSlack.notify(msg)
 
     # 各種インスタンスの用意
-    config = config_utils.read_config(section=config_section)
     aLPRepository = LPRepository(config_section)
     aSolvedDataRepository = SolvedDataRepository()
 
@@ -143,12 +141,13 @@ def main(
     logger.info(f"Target problems number: {target_problem_number}")
 
     # 書き込み先のディレクトリを作成
-    path_result = path_solved_result_by_date(Path(config.get("PATH_RESULT")))
+    path_generator = PathGenerator(config_section=config_section)
+    path_result = path_generator.generate_path_result_by_date()
     # パラメータもコピーしておく
     copy_optimization_parameters(path_result, config_section)
 
     # csvのヘッダーを書き出す
-    aSolvedDataRepository.write_SolvedSummary([], name_result, path=Path(path_result))
+    aSolvedDataRepository.write_SolvedSummary([], name_result, path=path_result)
 
     # 並列処理の設定
     # max_cpu_core = os.cpu_count() - 1
@@ -169,7 +168,7 @@ def main(
             aSolvedDetail = solve_and_write(
                 filename, solver, aLPRepository, aSolvedDataRepository, name_result, path_result
             )
-            write_and_draw_result(aSolvedDetail, aSolvedDataRepository, path_result)
+            write_and_draw_result(aSolvedDetail, aSolvedDataRepository, path_generator)
 
         # 並列処理: メモリが爆発して逆に遅くなるためやらないほうがいい
         # from multiprocessing import Process

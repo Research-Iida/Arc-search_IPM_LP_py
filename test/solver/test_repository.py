@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from src.solver.repository import SolvedDataRepository
+from src.infra.repository_solved_data import SolvedDataRepository
 from src.solver.solver import SolvedSummary
 from src.utils.config_utils import read_config, test_section
 
