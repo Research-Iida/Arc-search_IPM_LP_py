@@ -3,7 +3,7 @@ import sys
 
 from .infra.repository_problem import LPRepository
 from .logger import get_main_logger, setup_logger
-from .run_utils.solve_problem import preprocess
+from .solver.solve_problem import preprocess
 
 logger = get_main_logger()
 

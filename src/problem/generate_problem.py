@@ -1,9 +1,8 @@
-
 import numpy as np
 from scipy.linalg import toeplitz
 
 from ..solver.variables import LPVariables
-from ..problem.problem import LinearProgrammingProblemStandard as LPS
+from .problem import LinearProgrammingProblemStandard as LPS
 
 
 def generate_problem(n: int, m: int) -> tuple[LPS, LPVariables]:
@@ -31,7 +30,10 @@ def generate_problem(n: int, m: int) -> tuple[LPS, LPVariables]:
     # A = np.random.rand(m, n) - 0.5
     n_nonzero = int(np.log2(m))
     nonzero_elements = np.random.rand(n_nonzero) - 0.5
-    A = toeplitz(np.concatenate([[nonzero_elements[0]], np.zeros(m - 1)]), np.concatenate([nonzero_elements, np.zeros(n - n_nonzero)]))
+    A = toeplitz(
+        np.concatenate([[nonzero_elements[0]], np.zeros(m - 1)]),
+        np.concatenate([nonzero_elements, np.zeros(n - n_nonzero)]),
+    )
     b = A @ opt_x
     c = A.T @ opt_y + opt_s
 
