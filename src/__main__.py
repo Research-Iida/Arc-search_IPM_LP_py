@@ -1,6 +1,8 @@
 import argparse
+import shutil
 import sys
 from datetime import date
+from pathlib import Path
 
 from .drawer import Drawer
 from .infra.path_generator import PathGenerator
@@ -11,7 +13,6 @@ from .problem.repository import ILPRepository
 from .profiler.profiler import profile_decorator
 from .run_utils.get_solvers import get_solver, get_solvers
 from .run_utils.solve_problem import solve, solve_and_write
-from .run_utils.write_files import copy_optimization_parameters
 from .slack.slack import get_slack_api
 from .utils import config_utils, str_util
 
@@ -106,6 +107,21 @@ def decide_solved_problems(
     return problem_files[start_problem_number:end_problem_number]
 
 
+def copy_optimization_parameters(path_result: Path, config_section: str):
+    """`config_optimizer.ini` を結果を格納するディレクトリにコピー
+
+    Args:
+        path_result (Path): 結果を書き込む先のディレクトリ
+    """
+    config = config_utils.read_config(section=config_section)
+    path_config = config.get("PATH_CONFIG")
+    name_config_opt = config.get("CONFIG_OPTIMIZER")
+    origin_config_opt = f"{path_config}{name_config_opt}"
+    destination_config_opt = path_result.joinpath(name_config_opt)
+    logger.info(f"Write {origin_config_opt} to {destination_config_opt}")
+    shutil.copyfile(origin_config_opt, destination_config_opt)
+
+
 def main(
     num_problem: int | None,
     name_solver: str | None,
@@ -169,7 +185,6 @@ def main(
             aSolvedDetail = solve_and_write(
                 filename, solver, aLPRepository, aSolvedDataRepository, name_result, path_result
             )
-            # write_and_draw_result(aSolvedDetail, aSolvedDataRepository, path_generator)
             aSolvedDataRepository.write_variables_by_iteration(aSolvedDetail)
 
             summary = aSolvedDetail.aSolvedSummary
