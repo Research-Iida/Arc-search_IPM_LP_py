@@ -222,26 +222,8 @@ class LinearProgrammingProblem:
         """
         return self.c.shape[0]
 
-    def __eq__(self, other: object) -> bool:
-        """要素が `np.array` なので, 標準の __eq__ メソッドだとエラーになる
-
-        TODO:
-            * LB, UB でも判定するようにする
-        """
-        is_same_A_E = np.array_equal(self.A_E, other.A_E)
-        is_same_b_E = np.array_equal(self.b_E, other.b_E)
-        is_same_A_G = np.array_equal(self.A_G, other.A_G)
-        is_same_b_G = np.array_equal(self.b_G, other.b_G)
-        is_same_A_L = np.array_equal(self.A_L, other.A_L)
-        is_same_b_L = np.array_equal(self.b_L, other.b_L)
-        is_same_A = is_same_A_E and is_same_A_G and is_same_A_L
-        is_same_b = is_same_b_E and is_same_b_G and is_same_b_L
-        is_same_c = np.array_equal(self.c, other.c)
-        return is_same_A and is_same_b and is_same_c
-
     # 以下、標準系に修正するための処理
     # データが入っていなくても実行可能なため classmethod
-    # TODO: LP クラスが標準形に直す方法を知っているのは知識の分散. Preprocessor に統一すべき？
     @classmethod
     def reverse_non_lower_bound(
         cls, lb: np.ndarray, ub: np.ndarray, A: Lil, c: np.ndarray
