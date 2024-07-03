@@ -1,10 +1,8 @@
 import shutil
 
-import numpy as np
-
 from ..drawer import Drawer
 from ..logger import get_main_logger
-from ..problem.repository import LPRepository
+from ..solver.repository import SolvedDataRepository
 from ..solver.solved_data import SolvedDetail
 from ..utils import config_utils
 from .define_paths import path_solved_result_by_problem, path_solved_result_by_solver_with_config
@@ -27,7 +25,7 @@ def copy_optimization_parameters(path_result: str, config_section: str = config_
     shutil.copyfile(origin_config_opt, destination_config_opt)
 
 
-def write_result_by_problem_solver_config(aSolvedDetail: SolvedDetail, path_result: str):
+def write_and_draw_result(aSolvedDetail: SolvedDetail, path_result: str):
     """計算に関わるいろいろな設定を書き込む
 
     Args:
@@ -39,10 +37,7 @@ def write_result_by_problem_solver_config(aSolvedDetail: SolvedDetail, path_resu
         path_result_by_problem, summary.solver_name, summary.config_section
     )
 
-    # 変数の反復列をcsvで出力
-    if len(aSolvedDetail.lst_variables_by_iter) > 0:
-        variables = np.stack([np.concatenate([v.x, v.y, v.s]) for v in aSolvedDetail.lst_variables_by_iter])
-        LPRepository().write_numpy("variables", variables, path_result_by_problem_solver_config)
+    SolvedDataRepository().write_variables_by_iteration(aSolvedDetail, path_result_by_problem_solver_config)
 
     # グラフ描画
     Drawer(path_result_by_problem_solver_config).run(aSolvedDetail)

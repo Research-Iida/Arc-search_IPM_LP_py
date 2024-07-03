@@ -34,40 +34,40 @@ hljs.highlightAll();
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="src.run_utils.define_paths.path_solved_result_by_date"><code class="name flex">
-<span>def <span class="ident">path_solved_result_by_date</span></span>(<span>path_result: str) ‑> str</span>
+<span>def <span class="ident">path_solved_result_by_date</span></span>(<span>path_result: pathlib.Path) ‑> pathlib.Path</span>
 </code></dt>
 <dd>
 <div class="desc"><p>最適化の結果を格納するディレクトリを日付ごとに変えるため, 対応するためのルール</p>
 <h2 id="args">Args</h2>
 <dl>
-<dt><strong><code>path_result</code></strong> :&ensp;<code>str</code></dt>
+<dt><strong><code>path_result</code></strong> :&ensp;<code>Path</code></dt>
 <dd>ベースとなる書き込み先</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><code>str</code></dt>
+<dt><code>Path</code></dt>
 <dd><code>{path_result}{実行日の日付, YYYYMMDD}</code>. 対応するディレクトリが作成された状態になる</dd>
 </dl></div>
 </dd>
 <dt id="src.run_utils.define_paths.path_solved_result_by_problem"><code class="name flex">
-<span>def <span class="ident">path_solved_result_by_problem</span></span>(<span>path_result: str, problem_name: str) ‑> str</span>
+<span>def <span class="ident">path_solved_result_by_problem</span></span>(<span>path_result: pathlib.Path, problem_name: str) ‑> pathlib.Path</span>
 </code></dt>
 <dd>
 <div class="desc"><p>最適化の結果を問題ごとに変えるため, 対応するためのルール</p>
 <h2 id="args">Args</h2>
 <dl>
-<dt><strong><code>path_result</code></strong> :&ensp;<code>str</code></dt>
+<dt><strong><code>path_result</code></strong> :&ensp;<code>Path</code></dt>
 <dd>ベースとなる書き込み先</dd>
 </dl></div>
 </dd>
 <dt id="src.run_utils.define_paths.path_solved_result_by_solver_with_config"><code class="name flex">
-<span>def <span class="ident">path_solved_result_by_solver_with_config</span></span>(<span>path_result: str, solver_name: str, config_section: str) ‑> str</span>
+<span>def <span class="ident">path_solved_result_by_solver_with_config</span></span>(<span>path_result: pathlib.Path, solver_name: str, config_section: str) ‑> pathlib.Path</span>
 </code></dt>
 <dd>
 <div class="desc"><p>最適化の結果をソルバーごとに書き込み先を変えるため, 対応するためのルール</p>
 <h2 id="args">Args</h2>
 <dl>
-<dt><strong><code>path_result</code></strong> :&ensp;<code>str</code></dt>
+<dt><strong><code>path_result</code></strong> :&ensp;<code>Path</code></dt>
 <dd>ベースとなる書き込み先. 日付ごとにディレクトリが変化しても大丈夫</dd>
 </dl></div>
 </dd>

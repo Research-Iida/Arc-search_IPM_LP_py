@@ -9,7 +9,7 @@ from .profiler.profiler import profile_decorator
 from .run_utils.define_paths import path_solved_result_by_date, path_solved_result_by_problem
 from .run_utils.get_solvers import get_solvers
 from .run_utils.solve_problem import solve_and_write
-from .run_utils.write_files import write_result_by_problem_solver_config
+from .run_utils.write_files import write_and_draw_result
 from .slack.slack import get_slack_api
 from .solver.repository import SolvedDataRepository
 from .utils import config_utils, str_util
@@ -29,7 +29,7 @@ def main(problem_name: str, solver_name: str | None, config_section: str | None)
     setup_logger(log_file_name)
 
     config = config_utils.read_config(section=config_section)
-    path_result = path_solved_result_by_date(config.get("PATH_RESULT"))
+    path_result = path_solved_result_by_date(Path(config.get("PATH_RESULT")))
     path_result_by_problem = path_solved_result_by_problem(path_result, problem_name)
     repository = LPRepository(config_section)
     aSolvedDataRepository = SolvedDataRepository()
@@ -45,7 +45,7 @@ def main(problem_name: str, solver_name: str | None, config_section: str | None)
         aSolvedDetail = solve_and_write(
             problem_name, solver, repository, aSolvedDataRepository, name_result, path_result_by_problem
         )
-        write_result_by_problem_solver_config(aSolvedDetail, path_result)
+        write_and_draw_result(aSolvedDetail, path_result)
 
 
 if __name__ == "__main__":

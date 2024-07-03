@@ -1,23 +1,22 @@
-import sys
 import argparse
+import sys
+from pathlib import Path
 
 import numpy as np
 
-from .utils import config_utils
 from .logger import get_main_logger, setup_logger
-from .run_utils.get_solvers import get_solvers
-
 from .run_utils.define_paths import path_solved_result_by_date
 from .run_utils.generate_problem import generate_problem
+from .run_utils.get_solvers import get_solvers
 from .run_utils.solve_problem import optimize
-from .run_utils.write_files import write_result_by_problem_solver_config
+from .run_utils.write_files import write_and_draw_result
+from .utils import config_utils
 
 logger = get_main_logger()
 
 
 def main(n: int, m: int, solver_name: str | None, config_section: str | None, random_seed: int | None):
-    """main 関数
-    """
+    """main 関数"""
     postfix_random_seed = ""
     if random_seed is not None:
         np.random.seed(random_seed)
@@ -32,16 +31,16 @@ def main(n: int, m: int, solver_name: str | None, config_section: str | None, ra
     setup_logger(log_file_name)
 
     config = config_utils.read_config(section=config_section)
-    path_result = path_solved_result_by_date(config.get("PATH_RESULT"))
+    path_result = path_solved_result_by_date(Path(config.get("PATH_RESULT")))
 
     problem, opt_sol = generate_problem(n, m)
 
     # ソルバーごとに解く
     for solver in get_solvers(solver_name, config_section):
         aSolvedDetail = optimize(problem, solver)
-        if not aSolvedDetail.v.isclose(opt_sol, threshold=10**(-3)):
+        if not aSolvedDetail.v.isclose(opt_sol, threshold=10 ** (-3)):
             logger.warning(f"Isn't close solution! opt: {opt_sol}, sol: {aSolvedDetail.v}")
-        write_result_by_problem_solver_config(aSolvedDetail, path_result)
+        write_and_draw_result(aSolvedDetail, path_result)
 
 
 if __name__ == "__main__":
@@ -55,5 +54,5 @@ if __name__ == "__main__":
 
     try:
         main(args.n, args.m, args.solver, args.config_section, args.random_seed)
-    except: # NOQA
+    except:  # NOQA
         logger.exception(sys.exc_info())

@@ -9,7 +9,7 @@ from .profiler.profiler import profile_decorator
 from .run_utils.define_paths import path_solved_result_by_date
 from .run_utils.get_solvers import get_solver, get_solvers
 from .run_utils.solve_problem import solve, solve_and_write
-from .run_utils.write_files import copy_optimization_parameters, write_result_by_problem_solver_config
+from .run_utils.write_files import copy_optimization_parameters, write_and_draw_result
 from .slack.slack import get_slack_api
 from .solver.repository import SolvedDataRepository
 from .utils import config_utils, str_util
@@ -142,7 +142,7 @@ def main(
     logger.info(f"Target problems number: {target_problem_number}")
 
     # 書き込み先のディレクトリを作成
-    path_result = path_solved_result_by_date(config.get("PATH_RESULT"))
+    path_result = path_solved_result_by_date(Path(config.get("PATH_RESULT")))
     # パラメータもコピーしておく
     copy_optimization_parameters(path_result, config_section)
 
@@ -168,7 +168,7 @@ def main(
             aSolvedDetail = solve_and_write(
                 filename, solver, aLPRepository, aSolvedDataRepository, name_result, path_result
             )
-            write_result_by_problem_solver_config(aSolvedDetail, path_result)
+            write_and_draw_result(aSolvedDetail, path_result)
 
         # 並列処理: メモリが爆発して逆に遅くなるためやらないほうがいい
         # from multiprocessing import Process

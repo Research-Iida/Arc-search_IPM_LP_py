@@ -492,7 +492,7 @@ hljs.highlightAll();
         # A, b, c = self.fix_singleton_by_two_rows(A, b, c)
 
         # A, b, c について変更されているか確認し, もしされていなければ出力
-        logger.info(&#34;Checking changing...&#34;)
+        logger.info(&#34;Checking change...&#34;)
         # まずは次元の確認から. 一致していることがわかった後に要素の確認をしないとサイズ違いでエラーとなる
         logger.debug(f&#34;{A.shape}, {b.shape}, {c.shape}&#34;)
         if A.shape == problem.A.shape and b.shape == problem.b.shape and c.shape == problem.c.shape:
