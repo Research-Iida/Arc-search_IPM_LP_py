@@ -10,7 +10,7 @@ import scipy
 from scipy.sparse import csr_matrix as Csr
 from scipy.sparse import hstack, vstack
 from scipy.sparse import lil_matrix as Lil
-from scipy.sparse.linalg import eigsh
+from scipy.sparse.linalg import eigsh, inv
 
 
 class SettingProblemError(Exception):
@@ -91,6 +91,17 @@ class LinearProgrammingProblemStandard:
         min_eig_val = eigsh(self.A @ self.A.T, k=1, which="SM", return_eigenvectors=False)
         return np.sqrt(min_eig_val[0])
 
+    @property
+    def AA_T_inv(self) -> Csr:
+        """inv(A @ A.T).
+        A が csr_matrix であるため, 知識の集約のためにメソッド化
+
+        Returns:
+            Csr: inv(A @ A.T)
+        """
+        # scipy.sparce.linalg.inv にかける時は csc_matrix の方が効率よい
+        return inv((self.A @ self.A.T).tocsc())
+
     def is_full_row_rank(self) -> bool:
         """制約行列 A が full row rank かを出力
 
@@ -113,7 +124,7 @@ class LinearProgrammingProblemStandard:
 
     def residual_dual_constraint(self, y: np.ndarray, s: np.ndarray) -> np.ndarray:
         """双対問題の制約に対する残渣ベクトルの出力"""
-        return self.A.T @ y + s - self.c
+        return self.A.T.tocsr() @ y + s - self.c
 
     # このメソッドは最適解自体を変えてしまうので削除
     # def create_A_row_normalized(self) -> LinearProgrammingProblemStandard:
@@ -220,6 +231,7 @@ class LinearProgrammingProblem:
 
     # 以下、標準系に修正するための処理
     # データが入っていなくても実行可能なため classmethod
+    # TODO: LP クラスが標準形に直す方法を知っているのは知識の分散. Preprocessor に統一すべき？
     @classmethod
     def reverse_non_lower_bound(
         cls, lb: np.ndarray, ub: np.ndarray, A: Lil, c: np.ndarray

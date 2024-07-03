@@ -114,7 +114,7 @@ Strategy パターン採用.</p>
 
         # もし A が前に使ったものと同じでなければ前処理を施す
         if self.prev_coef_matrix_preprocessed is not None and self.prev_A.shape == A.shape:
-            if np.all(self.prev_A == A):
+            if (self.prev_A - A).nnz == 0:
                 logger.info(&#34;Use prev_A information.&#34;)
                 coef_matrix = self.prev_coef_matrix_preprocessed.toarray()
 
@@ -124,7 +124,7 @@ Strategy パターン採用.</p>
             right_hand_side,
             rtol=0,
             atol=tolerance,
-            M=np.diag(1 / np.diag(coef_matrix)),
+            M=diags(1 / coef_matrix.diagonal()),
             maxiter=100 * coef_matrix.shape[0],
         )
         logger.info(f&#34;{self.method_name} end.&#34;)
@@ -210,7 +210,7 @@ Strategy パターン採用.</p>
         right_hand_side = b.copy()
 
         if self.prev_coef_matrix_preprocessed is not None and self.prev_A.shape == A.shape:
-            if np.all(self.prev_A == A):
+            if (self.prev_A - A).nnz == 0:
                 logger.info(&#34;Use prev_A information.&#34;)
                 coef_matrix = self.prev_coef_matrix_preprocessed.toarray()
 
@@ -220,7 +220,7 @@ Strategy パターン採用.</p>
             right_hand_side,
             rtol=0,
             atol=tolerance,
-            M=np.diag(1 / np.diag(coef_matrix)),
+            M=diags(1 / coef_matrix.diagonal()),
             maxiter=100 * coef_matrix.shape[0],
         )
         logger.info(f&#34;{self.method_name} end.&#34;)
@@ -293,23 +293,23 @@ Strategy パターン採用.</p>
     prev_coef_matrix_preprocessed: Csr = None
     method_name: str = &#34;Conjugate Gradient method&#34;
 
-    def solve(self, A: np.ndarray, b: np.ndarray, tolerance: float = 10**-7, *args) -&gt; np.ndarray:
+    def solve(self, A: Csr, b: np.ndarray, tolerance: float = 10**-7, *args) -&gt; np.ndarray:
         &#34;&#34;&#34;線形方程式 Ax=b を共役勾配法によって解く
 
         Args:
-            A (np.ndarray): 係数行列. CG法の入力となるので正定値対称行列である必要あり
+            A (Csr): 係数行列. CG法の入力となるので正定値対称行列である必要あり
             b (np.ndarray): 右辺のベクトル
             tolerance (float): 絶対誤差での許容度なので, ||Ax-b||&lt;=tolerance となる
         &#34;&#34;&#34;
         # 数値誤差により係数行列が対称にならない場合があるため, 少し修正
-        coef_matrix = (A + A.T) / 2
+        coef_matrix: Csr = (A + A.T) / 2
         right_hand_side = b.copy()
 
         # もし A が前に使ったものと同じでなければ前処理を施す
-        if self.prev_coef_matrix_preprocessed is not None and self.prev_A.shape == A.shape:
-            if np.all(self.prev_A == A):
+        if self.prev_A is not None and self.prev_A.shape == A.shape:
+            if (self.prev_A - A).nnz == 0:
                 logger.info(&#34;Use prev_A information.&#34;)
-                coef_matrix = self.prev_coef_matrix_preprocessed.toarray()
+                coef_matrix = self.prev_coef_matrix_preprocessed
 
         logger.info(f&#34;{self.method_name} start.&#34;)
         result, info = spla.cg(
@@ -317,7 +317,7 @@ Strategy パターン採用.</p>
             right_hand_side,
             rtol=0,
             atol=tolerance,
-            M=np.diag(1 / np.diag(coef_matrix)),
+            M=diags(1 / coef_matrix.diagonal()),
             maxiter=100 * coef_matrix.shape[0],
         )
         logger.info(f&#34;{self.method_name} end.&#34;)
@@ -326,20 +326,19 @@ Strategy パターン採用.</p>
         # その場合だけ, 最小固有値分摂動を行って再度解く（毎回固有値を求めるのはコストが大きいので回数は少なくしたい）
         if np.linalg.norm(coef_matrix @ result - right_hand_side) &gt; tolerance:
             logger.warning(f&#34;{self.method_name} cannot solve within the tolerance!&#34;)
-            eigen_value, _ = np.linalg.eig(coef_matrix)
-            if not np.all(eigen_value &gt; 0):
-                min_eig = min(eigen_value)
-                logger.warning(f&#34;Coefficient matrix of the LSS is not positive definite! min eigen value: {min_eig}&#34;)
-                coef_perturbation = np.abs(min_eig) + 10 ** (-3)
+            max_eigen_value = spla.eigsh(coef_matrix, k=1, which=&#34;LM&#34;, return_eigenvectors=False)
+            if not max_eigen_value &gt; 0:
+                logger.warning(&#34;Coefficient matrix of the LSS is not positive definite!&#34;)
+                coef_perturbation = 10 ** (-3)
                 logger.info(f&#34;Perturbation coefficient matrix by {coef_perturbation}.&#34;)
-                coef_matrix += coef_perturbation * np.eye(coef_matrix.shape[0])
+                coef_matrix += coef_perturbation * eye(coef_matrix.shape[0])
 
                 result, info = spla.cg(
                     coef_matrix,
                     right_hand_side,
                     tol=0,
                     atol=tolerance,
-                    M=np.diag(1 / np.diag(coef_matrix)),
+                    M=diags(1 / coef_matrix.diagonal()),
                     maxiter=100 * coef_matrix.shape[0],
                 )
 
@@ -373,13 +372,13 @@ Strategy パターン採用.</p>
 <h3>Methods</h3>
 <dl>
 <dt id="src.linear_system_solver.inexact_linear_system_solver.CGLinearSystemSolver.solve"><code class="name flex">
-<span>def <span class="ident">solve</span></span>(<span>self, A: numpy.ndarray, b: numpy.ndarray, tolerance: float = 1e-07, *args) ‑> numpy.ndarray</span>
+<span>def <span class="ident">solve</span></span>(<span>self, A: scipy.sparse._csr.csr_matrix, b: numpy.ndarray, tolerance: float = 1e-07, *args) ‑> numpy.ndarray</span>
 </code></dt>
 <dd>
 <div class="desc"><p>線形方程式 Ax=b を共役勾配法によって解く</p>
 <h2 id="args">Args</h2>
 <dl>
-<dt><strong><code>A</code></strong> :&ensp;<code>np.ndarray</code></dt>
+<dt><strong><code>A</code></strong> :&ensp;<code>Csr</code></dt>
 <dd>係数行列. CG法の入力となるので正定値対称行列である必要あり</dd>
 <dt><strong><code>b</code></strong> :&ensp;<code>np.ndarray</code></dt>
 <dd>右辺のベクトル</dd>
@@ -425,7 +424,7 @@ Strategy パターン採用.</p>
         right_hand_side = b.copy()
 
         if self.prev_coef_matrix_preprocessed is not None and self.prev_A.shape == A.shape:
-            if np.all(self.prev_A == A):
+            if (self.prev_A - A).nnz == 0:
                 logger.info(&#34;Use prev_A information.&#34;)
                 coef_matrix = self.prev_coef_matrix_preprocessed.toarray()
 
@@ -435,7 +434,7 @@ Strategy パターン採用.</p>
             right_hand_side,
             rtol=0,
             atol=tolerance,
-            M=np.diag(1 / np.diag(coef_matrix)),
+            M=diags(1 / coef_matrix.diagonal()),
             maxiter=100 * coef_matrix.shape[0],
         )
         logger.info(f&#34;{self.method_name} end.&#34;)
@@ -520,7 +519,7 @@ Strategy パターン採用.</p>
         right_hand_side = b.copy()
 
         if self.prev_coef_matrix_preprocessed is not None and self.prev_A.shape == A.shape:
-            if np.all(self.prev_A == A):
+            if (self.prev_A - A).nnz == 0:
                 logger.info(&#34;Use prev_A information.&#34;)
                 coef_matrix = self.prev_coef_matrix_preprocessed.toarray()
 
@@ -530,7 +529,7 @@ Strategy パターン採用.</p>
             right_hand_side,
             rtol=0,
             atol=tolerance,
-            # M1=np.diag(1 / np.diag(coef_matrix)),
+            # M1=diags(1 / coef_matrix.diagonal()),
             maxiter=100 * coef_matrix.shape[0],
         )
         logger.info(f&#34;{self.method_name} end.&#34;)
@@ -615,7 +614,7 @@ Strategy パターン採用.</p>
         right_hand_side = b.copy()
 
         if self.prev_coef_matrix_preprocessed is not None and self.prev_A.shape == A.shape:
-            if np.all(self.prev_A == A):
+            if (self.prev_A - A).nnz == 0:
                 logger.info(&#34;Use prev_A information.&#34;)
                 coef_matrix = self.prev_coef_matrix_preprocessed.toarray()
 
@@ -625,7 +624,7 @@ Strategy パターン採用.</p>
             right_hand_side,
             rtol=0,
             atol=tolerance,
-            # M=np.diag(1 / np.diag(coef_matrix)),
+            # M=diags(1 / coef_matrix.diagonal()),
             maxiter=100 * coef_matrix.shape[0],
         )
         logger.info(f&#34;{self.method_name} end.&#34;)

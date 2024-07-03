@@ -62,7 +62,7 @@ Strategy パターン採用.</p>
             再び同じ前処理をしなくて済むように持っておく
     &#34;&#34;&#34;
 
-    prev_A: Csr = None
+    prev_A: Csr | None = None
 
     @abstractmethod
     def solve(self, A: Csr, b: np.ndarray, tolerance: float | None, *args) -&gt; np.ndarray:
@@ -75,6 +75,9 @@ Strategy パターン採用.</p>
 
         Returns:
             np.ndarray: 解
+
+        TODO:
+            * tolerance は必要なクラスとそうでないクラスがあるので, Attribute に移す
         &#34;&#34;&#34;
         pass</code></pre>
 </details>
@@ -85,7 +88,7 @@ Strategy パターン採用.</p>
 </ul>
 <h3>Class variables</h3>
 <dl>
-<dt id="src.linear_system_solver.exact_linear_system_solver.AbstractLinearSystemSolver.prev_A"><code class="name">var <span class="ident">prev_A</span> : scipy.sparse._csr.csr_matrix</code></dt>
+<dt id="src.linear_system_solver.exact_linear_system_solver.AbstractLinearSystemSolver.prev_A"><code class="name">var <span class="ident">prev_A</span> : scipy.sparse._csr.csr_matrix | None</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -110,7 +113,11 @@ Strategy パターン採用.</p>
 <dl>
 <dt><code>np.ndarray</code></dt>
 <dd>解</dd>
-</dl></div>
+</dl>
+<h2 id="todo">Todo</h2>
+<ul>
+<li>tolerance は必要なクラスとそうでないクラスがあるので, Attribute に移す</li>
+</ul></div>
 </dd>
 </dl>
 </dd>
@@ -119,11 +126,11 @@ Strategy パターン採用.</p>
 </code></dt>
 <dd>
 <div class="desc"><p>線形方程式を正確に解くクラス
-シンプルに numpy で解く</p>
+シンプルにLU分解で解く</p>
 <h2 id="attributes">Attributes</h2>
 <dl>
-<dt><strong><code>prev_lu_factor</code></strong></dt>
-<dd><code>prev_A</code> を <code>scipy.linalg.lu_factor</code> にかけて求めたLU分解.</dd>
+<dt><strong><code>prev_factorized</code></strong></dt>
+<dd><code>prev_A</code> をLU分解した結果. 前回使ったものと同じであれば同様のものを使いまわせる</dd>
 </dl></div>
 <details class="source">
 <summary>
@@ -131,27 +138,26 @@ Strategy パターン採用.</p>
 </summary>
 <pre><code class="python">class ExactLinearSystemSolver(AbstractLinearSystemSolver):
     &#34;&#34;&#34;線形方程式を正確に解くクラス
-    シンプルに numpy で解く
+    シンプルにLU分解で解く
 
     Attributes:
-        prev_lu_factor: `prev_A` を `scipy.linalg.lu_factor` にかけて求めたLU分解.
+        prev_factorized: `prev_A` をLU分解した結果. 前回使ったものと同じであれば同様のものを使いまわせる
     &#34;&#34;&#34;
 
-    prev_lu_factor = None
+    prev_factorized: Callable | None = None
 
     def solve(self, A: Csr, b: np.ndarray, tolerance: float | None = None) -&gt; np.ndarray:
         &#34;&#34;&#34;線形方程式 Ax=b を numpy によるLU分解によって解く&#34;&#34;&#34;
-        if self.prev_lu_factor is not None:
-            if self.prev_A.shape == A.shape and len((self.prev_A != A).data) == 0:
+        if self.prev_factorized is not None:
+            if self.prev_A.shape == A.shape and (self.prev_A - A).nnz == 0:
                 logger.info(&#34;Use prev_A information.&#34;)
-                return lu_solve(self.prev_lu_factor, b)
-
-        LU_factor = lu_factor(A)
+                return self.prev_factorized(b)
 
         self.prev_A = A.copy()
-        self.prev_lu_factor = LU_factor
+        # scipy.sparse.linalg.factorized は csc_matrix を引数に取らないと warning を出す
+        self.prev_factorized = factorized(A.tocsc())
 
-        return lu_solve(LU_factor, b)</code></pre>
+        return self.prev_factorized(b)</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -159,7 +165,7 @@ Strategy パターン採用.</p>
 </ul>
 <h3>Class variables</h3>
 <dl>
-<dt id="src.linear_system_solver.exact_linear_system_solver.ExactLinearSystemSolver.prev_lu_factor"><code class="name">var <span class="ident">prev_lu_factor</span></code></dt>
+<dt id="src.linear_system_solver.exact_linear_system_solver.ExactLinearSystemSolver.prev_factorized"><code class="name">var <span class="ident">prev_factorized</span> : Optional[Callable]</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -199,7 +205,7 @@ Strategy パターン採用.</p>
 <li>
 <h4><code><a title="src.linear_system_solver.exact_linear_system_solver.ExactLinearSystemSolver" href="#src.linear_system_solver.exact_linear_system_solver.ExactLinearSystemSolver">ExactLinearSystemSolver</a></code></h4>
 <ul class="">
-<li><code><a title="src.linear_system_solver.exact_linear_system_solver.ExactLinearSystemSolver.prev_lu_factor" href="#src.linear_system_solver.exact_linear_system_solver.ExactLinearSystemSolver.prev_lu_factor">prev_lu_factor</a></code></li>
+<li><code><a title="src.linear_system_solver.exact_linear_system_solver.ExactLinearSystemSolver.prev_factorized" href="#src.linear_system_solver.exact_linear_system_solver.ExactLinearSystemSolver.prev_factorized">prev_factorized</a></code></li>
 <li><code><a title="src.linear_system_solver.exact_linear_system_solver.ExactLinearSystemSolver.solve" href="#src.linear_system_solver.exact_linear_system_solver.ExactLinearSystemSolver.solve">solve</a></code></li>
 </ul>
 </li>

@@ -5,6 +5,8 @@ from abc import ABCMeta, abstractmethod
 
 import numpy as np
 from scipy.sparse import csr_matrix as Csr
+from scipy.sparse import diags
+from scipy.sparse.linalg import inv
 
 from ..linear_system_solver.exact_linear_system_solver import AbstractLinearSystemSolver
 from ..logger import get_main_logger, indent
@@ -77,12 +79,12 @@ class NESSearchDirectionCalculator(AbstractSearchDirectionCalculator):
         n = problem.n
         A: Csr = problem.A
         x_divided_s = v.x / v.s
-        AXS_inv = A @ np.diag(x_divided_s)
+        AXS_inv = A @ diags(x_divided_s)
 
         # NES に変形
         if self.pre_x_divided_s is None or np.any(self.pre_x_divided_s != x_divided_s):
             logger.info("Update coefficient matrix.")
-            coef_matrix = AXS_inv @ A.T
+            coef_matrix: Csr = AXS_inv @ A.T
             # logger.debug(f"{indent}NES coef matrix condition number: {np.linalg.cond(coef_matrix)}")
 
             self.pre_x_divided_s = x_divided_s
@@ -98,7 +100,7 @@ class NESSearchDirectionCalculator(AbstractSearchDirectionCalculator):
 
         # 解から復元
         sol_y = sol_NES
-        sol_s = right_hand_side[m : n + m] - A.T @ sol_y
+        sol_s = right_hand_side[m : n + m] - (A.T).tocsr() @ sol_y
         sol_x = -(v.x * sol_s / v.s) + right_hand_side[n + m :] / v.s
         return sol_x, sol_y, sol_s, np.linalg.norm(residual_sol)
 
@@ -221,7 +223,7 @@ class MNESSearchDirectionCalculator(AbstractSearchDirectionCalculator):
         # MNES に変形
         hat_B = self.select_base_indexes(problem)
         D_B = np.diag(np.sqrt(x_divided_s[hat_B]))
-        D_B_inv_A_B_inv = np.linalg.inv(D_B) @ np.linalg.inv(A[:, hat_B])
+        D_B_inv_A_B_inv = np.linalg.inv(D_B) @ inv(A[:, hat_B].tocsc())
 
         if self.pre_x_divided_s is None or np.any(self.pre_x_divided_s != x_divided_s):
             logger.info("Update coefficient matrix.")

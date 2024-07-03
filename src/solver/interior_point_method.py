@@ -1,25 +1,25 @@
-
 import time
 from abc import ABCMeta, abstractmethod
 
 import numpy as np
 
-from ..utils import config_utils
+from ..linear_system_solver.exact_linear_system_solver import ExactLinearSystemSolver
 from ..logger import get_main_logger, indent
 from ..problem import LinearProgrammingProblemStandard as LPS
-from ..linear_system_solver.exact_linear_system_solver import ExactLinearSystemSolver
-from .variable_updater import VariableUpdater, LineVariableUpdater, ArcVariableUpdater
-from .variables import LPVariables
-from .solved_checker import SolvedChecker
+from ..utils import config_utils
 from .search_direction_calculator import AbstractSearchDirectionCalculator, NESSearchDirectionCalculator
+from .solved_checker import SolvedChecker
 from .solved_data import SolvedDetail
 from .solver import LPSolver
+from .variable_updater import ArcVariableUpdater, LineVariableUpdater, VariableUpdater
+from .variables import LPVariables
 
 logger = get_main_logger()
 
 
 class InteriorPointMethod(LPSolver, metaclass=ABCMeta):
     """LPを内点法で解く際のインターフェース"""
+
     variable_updater: VariableUpdater
 
     @property
@@ -42,8 +42,7 @@ class InteriorPointMethod(LPSolver, metaclass=ABCMeta):
         pass
 
     def is_not_decrease_residuals(
-        self, pre_r_b: np.ndarray, pre_r_c: np.ndarray,
-        post_r_b: np.ndarray, post_r_c: np.ndarray
+        self, pre_r_b: np.ndarray, pre_r_c: np.ndarray, post_r_b: np.ndarray, post_r_c: np.ndarray
     ) -> bool:
         """制約の残渣においていずれかが減少せず, 加えて前の反復点より10倍以上小さくなった制約が存在しないか確認
 
@@ -64,10 +63,16 @@ class InteriorPointMethod(LPSolver, metaclass=ABCMeta):
 
     def is_terminate(
         self,
-        is_solved: bool, iter_num: int, problem: LPS, elapsed_time: float,
-        alpha_x: float = None, alpha_s: float = None,
-        pre_r_b: np.ndarray = None, pre_r_c: np.ndarray = None,
-        r_b: np.ndarray = None, r_c: np.ndarray = None,
+        is_solved: bool,
+        iter_num: int,
+        problem: LPS,
+        elapsed_time: float,
+        alpha_x: float = None,
+        alpha_s: float = None,
+        pre_r_b: np.ndarray = None,
+        pre_r_c: np.ndarray = None,
+        r_b: np.ndarray = None,
+        r_c: np.ndarray = None,
     ) -> bool:
         """アルゴリズムが停止条件を満たしたか否か
 
@@ -112,8 +117,8 @@ class InteriorPointMethod(LPSolver, metaclass=ABCMeta):
 
 
 class ExactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
-    """線形方程式を正確に解くことを前提とした内点法
-    """
+    """線形方程式を正確に解くことを前提とした内点法"""
+
     search_direction_calculator: AbstractSearchDirectionCalculator
 
     def __init__(
@@ -132,10 +137,13 @@ class ExactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
         self.search_direction_calculator = NESSearchDirectionCalculator(ExactLinearSystemSolver())
 
     def calc_first_derivatives(
-        self, v: LPVariables, problem: LPS,
+        self,
+        v: LPVariables,
+        problem: LPS,
         coef_matrix: np.ndarray | None = None,
         right_hand_side: np.ndarray | None = None,
-        *args, **kwargs,
+        *args,
+        **kwargs,
     ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """一次微分の値を出力
 
@@ -148,20 +156,15 @@ class ExactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
             np.ndarray: y の一次微分
             np.ndarray: s の一次微分
         """
-        right_hand_side = np.concatenate([
-            problem.residual_main_constraint(v.x),
-            problem.residual_dual_constraint(v.y, v.s),
-            v.x * v.s
-        ])
+        right_hand_side = np.concatenate(
+            [problem.residual_main_constraint(v.x), problem.residual_dual_constraint(v.y, v.s), v.x * v.s]
+        )
 
         # 求解
         x_dot, y_dot, s_dot, _ = self.search_direction_calculator.run(v, problem, right_hand_side)
         return x_dot, y_dot, s_dot
 
-    def centering_parameter(
-        self, v: LPVariables, x_dot: np.ndarray, s_dot: np.ndarray,
-        mu: float = None
-    ) -> float:
+    def centering_parameter(self, v: LPVariables, x_dot: np.ndarray, s_dot: np.ndarray, mu: float = None) -> float:
         """centering parameter sigma の出力
 
         Args:
@@ -178,13 +181,17 @@ class ExactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
         s_minus_alpha_s_dot = v.s - alpha_s * s_dot
         mu_a = x_minus_alpha_x_dot.T @ s_minus_alpha_s_dot / dim
 
-        return (mu_a / mu)**3
+        return (mu_a / mu) ** 3
 
     def calc_second_derivative(
-        self, v: LPVariables,
-        x_dot: np.ndarray, y_dot: np.ndarray, s_dot: np.ndarray,
+        self,
+        v: LPVariables,
+        x_dot: np.ndarray,
+        y_dot: np.ndarray,
+        s_dot: np.ndarray,
         problem: LPS,
-        *args, **kwargs,
+        *args,
+        **kwargs,
     ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """二次微分の値を出力
 
@@ -222,6 +229,7 @@ class MehrotraTypeIPM(ExactInteriorPointMethod, metaclass=ABCMeta):
     """Mehrotra と同じ種類のIPM
     アルゴリズムが異なってくるので別にした
     """
+
     def run_algorithm(self, problem_0: LPS, v_0: LPVariables) -> SolvedDetail:
         """反復で解く内点法の実行
         アルゴリズムは基本的に異なるため abstractmethod.
@@ -276,10 +284,12 @@ class MehrotraTypeIPM(ExactInteriorPointMethod, metaclass=ABCMeta):
             v_max_step = LPVariables(
                 self.variable_updater.run(v.x, x_dot, x_ddot, alpha_x_max),
                 self.variable_updater.run(v.y, y_dot, y_ddot, alpha_s_max),
-                self.variable_updater.run(v.s, s_dot, s_ddot, alpha_s_max)
+                self.variable_updater.run(v.s, s_dot, s_ddot, alpha_s_max),
             )
             is_solved = self.solved_checker.run(v_max_step, problem, mu_0=mu_0, r_b_0=r_b_0, r_c_0=r_c_0)
-            if self.is_terminate(is_solved, iter_num, problem, time.time() - start_time, alpha_x=alpha_x_max, alpha_s=alpha_s_max):
+            if self.is_terminate(
+                is_solved, iter_num, problem, time.time() - start_time, alpha_x=alpha_x_max, alpha_s=alpha_s_max
+            ):
                 # break しないが, while最後の is_terminate が True になるので問題ない
                 logger.info(f"{indent}Variables satisfy terminate criteria with max step size.")
                 alpha_x = alpha_x_max
@@ -292,7 +302,7 @@ class MehrotraTypeIPM(ExactInteriorPointMethod, metaclass=ABCMeta):
                 v = LPVariables(
                     self.variable_updater.run(v.x, x_dot, x_ddot, alpha_x),
                     self.variable_updater.run(v.y, y_dot, y_ddot, alpha_s),
-                    self.variable_updater.run(v.s, s_dot, s_ddot, alpha_s)
+                    self.variable_updater.run(v.s, s_dot, s_ddot, alpha_s),
                 )
 
             logger.info(f"{indent}Step size:")
@@ -316,7 +326,7 @@ class MehrotraTypeIPM(ExactInteriorPointMethod, metaclass=ABCMeta):
             r_b = problem.residual_main_constraint(x)
             r_c = problem.residual_dual_constraint(v.y, s)
             # 制約残差がどうなっているかlogging
-            rate_reduce = (1 - np.sin(alpha_x))
+            rate_reduce = 1 - np.sin(alpha_x)
             logger.debug(f"{indent}1 - sin(alpha_x) = {rate_reduce}")
             mu = v.mu
 
@@ -330,10 +340,16 @@ class MehrotraTypeIPM(ExactInteriorPointMethod, metaclass=ABCMeta):
 
             is_solved = self.solved_checker.run(v, problem, mu_0=mu_0, r_b_0=r_b_0, r_c_0=r_c_0)
             is_terminated = self.is_terminate(
-                is_solved, iter_num, problem, time.time() - start_time,
-                alpha_x, alpha_s,
-                pre_r_b=pre_r_b, pre_r_c=pre_r_c,
-                r_b=r_b, r_c=r_c,
+                is_solved,
+                iter_num,
+                problem,
+                time.time() - start_time,
+                alpha_x,
+                alpha_s,
+                pre_r_b=pre_r_b,
+                pre_r_c=pre_r_c,
+                r_b=r_b,
+                r_c=r_c,
             )
 
         # 時間計測終了
@@ -341,12 +357,14 @@ class MehrotraTypeIPM(ExactInteriorPointMethod, metaclass=ABCMeta):
 
         # 出力の作成
         aSolvedSummary = self.make_SolvedSummary(
-            v, problem, is_solved,
-            iter_num, self.is_iteration_number_reached_upper(iter_num, problem),
-            elapsed_time
+            v, problem, is_solved, iter_num, self.is_iteration_number_reached_upper(iter_num, problem), elapsed_time
         )
         output = SolvedDetail(
-            aSolvedSummary, v, problem, v_0, problem_0,
+            aSolvedSummary,
+            v,
+            problem,
+            v_0,
+            problem_0,
             lst_variables_by_iter=lst_variables,
             lst_main_step_size_by_iter=lst_alpha_x,
             lst_dual_step_size_by_iter=lst_alpha_s,
@@ -361,6 +379,7 @@ class MehrotraTypeIPM(ExactInteriorPointMethod, metaclass=ABCMeta):
 
 class LineSearchIPM(MehrotraTypeIPM):
     """LPを解く line search アルゴリズムの実装"""
+
     def __init__(
         self,
         config_section: str = config_utils.default_section,
@@ -385,6 +404,7 @@ class LineSearchIPM(MehrotraTypeIPM):
 
 class ArcSearchIPM(MehrotraTypeIPM):
     """LPを解く arc-search アルゴリズムの実装"""
+
     def __init__(
         self,
         config_section: str = config_utils.default_section,

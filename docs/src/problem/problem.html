@@ -132,6 +132,7 @@ class LinearProgrammingProblem:
 
     # 以下、標準系に修正するための処理
     # データが入っていなくても実行可能なため classmethod
+    # TODO: LP クラスが標準形に直す方法を知っているのは知識の分散. Preprocessor に統一すべき？
     @classmethod
     def reverse_non_lower_bound(
         cls, lb: np.ndarray, ub: np.ndarray, A: Lil, c: np.ndarray
@@ -597,6 +598,17 @@ class LinearProgrammingProblemStandard:
         min_eig_val = eigsh(self.A @ self.A.T, k=1, which=&#34;SM&#34;, return_eigenvectors=False)
         return np.sqrt(min_eig_val[0])
 
+    @property
+    def AA_T_inv(self) -&gt; Csr:
+        &#34;&#34;&#34;inv(A @ A.T).
+        A が csr_matrix であるため, 知識の集約のためにメソッド化
+
+        Returns:
+            Csr: inv(A @ A.T)
+        &#34;&#34;&#34;
+        # scipy.sparce.linalg.inv にかける時は csc_matrix の方が効率よい
+        return inv((self.A @ self.A.T).tocsc())
+
     def is_full_row_rank(self) -&gt; bool:
         &#34;&#34;&#34;制約行列 A が full row rank かを出力
 
@@ -619,7 +631,7 @@ class LinearProgrammingProblemStandard:
 
     def residual_dual_constraint(self, y: np.ndarray, s: np.ndarray) -&gt; np.ndarray:
         &#34;&#34;&#34;双対問題の制約に対する残渣ベクトルの出力&#34;&#34;&#34;
-        return self.A.T @ y + s - self.c
+        return self.A.T.tocsr() @ y + s - self.c
 
     # このメソッドは最適解自体を変えてしまうので削除
     # def create_A_row_normalized(self) -&gt; LinearProgrammingProblemStandard:
@@ -683,6 +695,31 @@ class LinearProgrammingProblemStandard:
 </dl>
 <h3>Instance variables</h3>
 <dl>
+<dt id="src.problem.problem.LinearProgrammingProblemStandard.AA_T_inv"><code class="name">prop <span class="ident">AA_T_inv</span> : Csr</code></dt>
+<dd>
+<div class="desc"><p>inv(A @ A.T).
+A が csr_matrix であるため, 知識の集約のためにメソッド化</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Csr</code></dt>
+<dd>inv(A @ A.T)</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def AA_T_inv(self) -&gt; Csr:
+    &#34;&#34;&#34;inv(A @ A.T).
+    A が csr_matrix であるため, 知識の集約のためにメソッド化
+
+    Returns:
+        Csr: inv(A @ A.T)
+    &#34;&#34;&#34;
+    # scipy.sparce.linalg.inv にかける時は csc_matrix の方が効率よい
+    return inv((self.A @ self.A.T).tocsc())</code></pre>
+</details>
+</dd>
 <dt id="src.problem.problem.LinearProgrammingProblemStandard.condition_number_A"><code class="name">prop <span class="ident">condition_number_A</span> : float</code></dt>
 <dd>
 <div class="desc"></div>
@@ -894,6 +931,7 @@ U の対角成分が0の行は抜いてある</dd>
 <h4><code><a title="src.problem.problem.LinearProgrammingProblemStandard" href="#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a></code></h4>
 <ul class="">
 <li><code><a title="src.problem.problem.LinearProgrammingProblemStandard.A" href="#src.problem.problem.LinearProgrammingProblemStandard.A">A</a></code></li>
+<li><code><a title="src.problem.problem.LinearProgrammingProblemStandard.AA_T_inv" href="#src.problem.problem.LinearProgrammingProblemStandard.AA_T_inv">AA_T_inv</a></code></li>
 <li><code><a title="src.problem.problem.LinearProgrammingProblemStandard.b" href="#src.problem.problem.LinearProgrammingProblemStandard.b">b</a></code></li>
 <li><code><a title="src.problem.problem.LinearProgrammingProblemStandard.c" href="#src.problem.problem.LinearProgrammingProblemStandard.c">c</a></code></li>
 <li><code><a title="src.problem.problem.LinearProgrammingProblemStandard.condition_number_A" href="#src.problem.problem.LinearProgrammingProblemStandard.condition_number_A">condition_number_A</a></code></li>
