@@ -3,7 +3,6 @@ import sys
 from datetime import date
 from typing import Optional
 
-from .data_access import CsvHandler
 from .logger import get_main_logger, setup_logger
 from .problem.repository import LPRepository
 from .profiler.profiler import profile_decorator
@@ -12,6 +11,7 @@ from .run_utils.get_solvers import get_solvers
 from .run_utils.solve_problem import solve_and_write
 from .run_utils.write_files import write_result_by_problem_solver_config
 from .slack.slack import get_slack_api
+from .solver.repository import SolvedDataRepository
 from .utils import config_utils, str_util
 
 logger = get_main_logger()
@@ -32,18 +32,18 @@ def main(problem_name: str, solver_name: Optional[str], config_section: Optional
     path_result = path_solved_result_by_date(config.get("PATH_RESULT"))
     path_result_by_problem = path_solved_result_by_problem(path_result, problem_name)
     repository = LPRepository(config_section)
-    aCsvHandler = CsvHandler(config_section)
+    aSolvedDataRepository = SolvedDataRepository()
 
     # 出力されるファイル名
     str_today = date.today().strftime("%Y%m%d")
     name_result = str_util.add_suffix_csv(f"{str_today}_result")
     # csvのヘッダーを書き出す
-    aCsvHandler.write_SolvedSummary([], name_result, path=path_result_by_problem)
+    aSolvedDataRepository.write_SolvedSummary([], name_result, path=path_result_by_problem)
 
     # ソルバーごとに解く
     for solver in get_solvers(solver_name, config_section):
         aSolvedDetail = solve_and_write(
-            problem_name, solver, repository, aCsvHandler, name_result, path_result_by_problem
+            problem_name, solver, repository, aSolvedDataRepository, name_result, path_result_by_problem
         )
         write_result_by_problem_solver_config(aSolvedDetail, path_result)
 

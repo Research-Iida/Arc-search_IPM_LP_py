@@ -77,7 +77,7 @@ hljs.highlightAll();
 </dl></div>
 </dd>
 <dt id="src.run_utils.solve_problem.solve_and_write"><code class="name flex">
-<span>def <span class="ident">solve_and_write</span></span>(<span>filename: str, solver: <a title="src.solver.solver.LPSolver" href="../solver/solver.html#src.solver.solver.LPSolver">LPSolver</a>, aLPRepository: <a title="src.problem.repository.LPRepository" href="../problem/repository.html#src.problem.repository.LPRepository">LPRepository</a>, aCsvHandler: <a title="src.data_access.csv_handler.CsvHandler" href="../data_access/csv_handler.html#src.data_access.csv_handler.CsvHandler">CsvHandler</a>, name_result: str, path_result: str) ‑> <a title="src.solver.solved_data.SolvedDetail" href="../solver/solved_data.html#src.solver.solved_data.SolvedDetail">SolvedDetail</a></span>
+<span>def <span class="ident">solve_and_write</span></span>(<span>filename: str, solver: <a title="src.solver.solver.LPSolver" href="../solver/solver.html#src.solver.solver.LPSolver">LPSolver</a>, aLPRepository: <a title="src.problem.repository.LPRepository" href="../problem/repository.html#src.problem.repository.LPRepository">LPRepository</a>, aSolvedDataRepository: <a title="src.solver.repository.SolvedDataRepository" href="../solver/repository.html#src.solver.repository.SolvedDataRepository">SolvedDataRepository</a>, name_result: str, path_result: str) ‑> <a title="src.solver.solved_data.SolvedDetail" href="../solver/solved_data.html#src.solver.solved_data.SolvedDetail">SolvedDetail</a></span>
 </code></dt>
 <dd>
 <div class="desc"><p>問題を解き, 結果を格納する. <code>__main__.py</code> で使用するので書き出しておく</p></div>

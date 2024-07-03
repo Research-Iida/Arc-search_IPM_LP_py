@@ -172,6 +172,9 @@ hljs.highlightAll();
             filename: ファイル名. `.csv` がなくともメソッドの中でつけるので問題ない
             data: 書き込み対象の numpy データ
             path: 書き込み先のpath. 指定がなければ `self._path_data` 直下に置く
+
+        TODO:
+            * SolvedDetail を書き込む際も使用しており, 責務が滅茶苦茶
         &#34;&#34;&#34;
         # 書き込み先の決定
         if path is None:
@@ -299,7 +302,11 @@ hljs.highlightAll();
 <dd>書き込み対象の numpy データ</dd>
 <dt><strong><code>path</code></strong></dt>
 <dd>書き込み先のpath. 指定がなければ <code>self._path_data</code> 直下に置く</dd>
-</dl></div>
+</dl>
+<h2 id="todo">Todo</h2>
+<ul>
+<li>SolvedDetail を書き込む際も使用しており, 責務が滅茶苦茶</li>
+</ul></div>
 </dd>
 </dl>
 </dd>

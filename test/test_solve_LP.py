@@ -1,8 +1,10 @@
+import glob
+
 import pytest
 
+from src import solve_netlib
 from src.utils.config_utils import read_config
 from src.utils.file_util import remove_files_and_dirs
-from src import solve_netlib
 
 config_section = "TEST"
 # テスト対象のアルゴリズム一覧
@@ -23,14 +25,11 @@ class TestSolveKB2:
 
     @pytest.fixture(scope="class")
     def remove_KB2_processed(self):
-        """KB2を解いた後に `data/test/processed` ディレクトリに作成されるファイルを削除
-        読み込みが processed の csv からになってしまうため
-        """
-        yield
-
+        """KB2を解く前に `data/test/processed` ディレクトリに作成されるファイルを削除"""
         path_processed = config.get("PATH_PROCESSED")
-        for name_file in [f"{path_processed}{self.name_problem}_{i}.csv" for i in ["A", "b", "c"]]:
-            remove_files_and_dirs([name_file])
+        remove_files_and_dirs(glob.glob(f"{path_processed}{self.name_problem}*"))
+
+        yield
 
     @pytest.mark.parametrize("algorithm", target_algorithms)
     def test_solve_KB2_with_all_algorithms(self, algorithm, remove_KB2_processed):
