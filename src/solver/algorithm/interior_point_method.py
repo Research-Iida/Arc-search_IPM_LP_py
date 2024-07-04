@@ -307,7 +307,7 @@ class MehrotraTypeIPM(ExactInteriorPointMethod, metaclass=abc.ABCMeta):
             lst_norm_vdot.append(np.linalg.norm(np.concatenate([x_dot, y_dot, s_dot])))
 
             x_ddot, y_ddot, s_ddot = self.calc_second_derivative(v, x_dot, y_dot, s_dot, problem)
-            lst_norm_vdot.append(np.linalg.norm(np.concatenate([x_ddot, y_ddot, s_ddot])))
+            lst_norm_vddot.append(np.linalg.norm(np.concatenate([x_ddot, y_ddot, s_ddot])))
 
             # step size の決定
             alpha_x_max = self.variable_updater.max_step_size_guarantee_positive(v.x, x_dot, x_ddot)

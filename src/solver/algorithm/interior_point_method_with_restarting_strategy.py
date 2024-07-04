@@ -131,6 +131,7 @@ class ArcSearchIPMWithRestartingStrategy(IPMWithRestartingStrategyBase, Mehrotra
 
         # 初期点の設定
         v_0 = self.make_initial_point(problem_0, v_0)
+        self.log_initial_situation(problem_0, v_0)
         # 初期点時点で最適解だった場合, そのまま出力
         if self.solved_checker.run(v_0, problem_0):
             logger.info("Initial point satisfies solved condition.")
