@@ -1,7 +1,7 @@
 import numpy as np
 from julia import Julia
 
-from ..logger import get_main_logger
+from ...logger import get_main_logger
 from .inexact_linear_system_solver import AbstractInexactLinearSystemSolver
 
 # サーバー環境で実行するためのおまじない

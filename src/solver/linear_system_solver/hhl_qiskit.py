@@ -1,20 +1,17 @@
 import numpy as np
-from qiskit.quantum_info import Statevector
 from qiskit.algorithms.linear_solvers.hhl import HHL
+from qiskit.quantum_info import Statevector
 
-from ..logger import get_main_logger
+from ...logger import get_main_logger
 from .inexact_linear_system_solver import AbstractInexactLinearSystemSolver
 
 logger = get_main_logger()
 
 
 class HHLLinearSystemSolver(AbstractInexactLinearSystemSolver):
-    """HHL アルゴリズムによる求解
-    """
-    def solve(
-        self, A: np.ndarray, b: np.ndarray,
-        tolerance: float = 10**-7, *args
-    ) -> np.ndarray:
+    """HHL アルゴリズムによる求解"""
+
+    def solve(self, A: np.ndarray, b: np.ndarray, tolerance: float = 10**-7, *args) -> np.ndarray:
         # 係数行列の行数は2のべき乗でなければならないらしい. 拡張
         m = A.shape[0]
         state_vector_digits = int(np.log2(m))
@@ -34,7 +31,7 @@ class HHLLinearSystemSolver(AbstractInexactLinearSystemSolver):
         # 解の復元
         naive_sv = Statevector(sol_hhl.state).data
         start_index = pow(2, state_vector_digits - 1)  # remove ancilla bit
-        naive_full_vector = np.array(naive_sv[start_index:start_index + dim_for_hhl])
+        naive_full_vector = np.array(naive_sv[start_index : start_index + dim_for_hhl])
 
         sol_vector = sol_hhl.euclidean_norm * np.real(naive_full_vector) / np.linalg.norm(naive_full_vector)
         return sol_vector[0:m]
