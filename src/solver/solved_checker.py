@@ -48,26 +48,6 @@ class SolvedChecker(metaclass=ABCMeta):
             result = False
         return result
 
-    def is_relative_solved(self, v: LPVariables, problem: LPS) -> bool:
-        """Merotra の手法である, relative な終了条件で確認する
-        参考: ``Arc-Search Techniques for Interior-Point Methods'' Section 7.3.10
-        """
-        # x, s のどちらかが0未満だった場合実行不可能となる
-        if not self.is_xs_positive(v):
-            return False
-
-        r_b = problem.residual_main_constraint(v.x)
-        r_c = problem.residual_dual_constraint(v.y, v.s)
-        criteria_main_resi = np.linalg.norm(r_b) / max(1, np.linalg.norm(problem.b))
-        criteria_dual_resi = np.linalg.norm(r_c) / max(1, np.linalg.norm(problem.c))
-
-        obj_main_norm = np.linalg.norm(problem.objective_main(v.x))
-        obj_dual_norm = np.linalg.norm(problem.objective_dual(v.y))
-        denominator = max(1, obj_main_norm, obj_dual_norm)
-        criteria_duality = v.mu / denominator
-        criteria = max(criteria_main_resi, criteria_dual_resi, criteria_duality)
-        return criteria < self.stop_criteria_threshold
-
     @abstractmethod
     def run(
         self,
@@ -92,12 +72,34 @@ class RelativeSolvedChecker(SolvedChecker):
         *args,
         **kwargs,
     ) -> bool:
-        """アルゴリズムが最適性を満たし, 最適解にたどり着いたかを確認"""
-        return self.is_relative_solved(v, problem)
+        """Merotra の手法である, relative な終了条件で確認する
+        参考: ``Arc-Search Techniques for Interior-Point Methods'' Section 7.3.10
+        """
+        # x, s のどちらかが0未満だった場合実行不可能となる
+        if not self.is_xs_positive(v):
+            return False
+
+        r_b = problem.residual_main_constraint(v.x)
+        r_c = problem.residual_dual_constraint(v.y, v.s)
+        criteria_main_resi = np.linalg.norm(r_b) / max(1, np.linalg.norm(problem.b))
+        criteria_dual_resi = np.linalg.norm(r_c) / max(1, np.linalg.norm(problem.c))
+
+        obj_main_norm = np.linalg.norm(problem.objective_main(v.x))
+        obj_dual_norm = np.linalg.norm(problem.objective_dual(v.y))
+        denominator = max(1, obj_main_norm, obj_dual_norm)
+        criteria_duality = v.mu / denominator
+        criteria = max(criteria_main_resi, criteria_dual_resi, criteria_duality)
+        return criteria < self.stop_criteria_threshold
 
 
 class AbsoluteSolvedChecker(SolvedChecker):
     """自分の論文での停止条件で確認する"""
+
+    relative_checker: RelativeSolvedChecker
+
+    def __init__(self, stop_criteria_threshold: float, threshold_xs_negative: float):
+        super().__init__(stop_criteria_threshold, threshold_xs_negative)
+        self.relative_checker = RelativeSolvedChecker(stop_criteria_threshold, threshold_xs_negative)
 
     def run(
         self,
@@ -109,7 +111,7 @@ class AbsoluteSolvedChecker(SolvedChecker):
         """アルゴリズムが最適性を満たし, 最適解にたどり着いたかを確認"""
         if "mu_0" not in kwargs or "r_b_0" not in kwargs or "r_c_0" not in kwargs:
             logger.info("Input doesn't have mu_0, r_b_0 and r_c_0. We use relative solved checker.")
-            return self.is_relative_solved(v, problem)
+            return self.relative_checker.run(v, problem)
         mu_0 = kwargs["mu_0"]
 
         # x, s のどちらかが0未満だった場合実行不可能となる
@@ -137,11 +139,13 @@ class InexactSolvedChecker(SolvedChecker):
     """
 
     check_relative_solved: bool
+    relative_checker: RelativeSolvedChecker
 
     def __init__(
         self, stop_criteria_threshold: float, threshold_xs_negative: float, check_relative_solved: bool = True
     ):
         super().__init__(stop_criteria_threshold, threshold_xs_negative)
+        self.relative_checker = RelativeSolvedChecker(stop_criteria_threshold, threshold_xs_negative)
         self.check_relative_solved = check_relative_solved
 
     def run(
@@ -157,7 +161,7 @@ class InexactSolvedChecker(SolvedChecker):
             return False
 
         if self.check_relative_solved:
-            if self.is_relative_solved(v, problem):
+            if self.relative_checker.run(v, problem):
                 return True
 
         is_small_mu = v.mu <= self.stop_criteria_threshold
@@ -168,6 +172,24 @@ class InexactSolvedChecker(SolvedChecker):
 
 
 class IterativeRefinementSolvedChecker(SolvedChecker):
+    relative_checker: RelativeSolvedChecker
+
+    def __init__(self, stop_criteria_threshold: float, threshold_xs_negative: float):
+        super().__init__(stop_criteria_threshold, threshold_xs_negative)
+        self.relative_checker = RelativeSolvedChecker(stop_criteria_threshold, threshold_xs_negative)
+
+    def is_relative_solved(self, v: LPVariables, problem: LPS) -> bool:
+        """relative な収束条件で終わっているかを確認する
+
+        Args:
+            v (LPVariables): 変数
+            problem (LPS): 問題
+
+        Returns:
+            bool: 解けていれば True
+        """
+        return self.relative_checker.run(v, problem)
+
     def run(
         self,
         v: LPVariables,
