@@ -23,19 +23,19 @@ aSlack = get_slack_api()
 # スキップする問題群. 基本的にサイズがでかすぎて解けなかったもの
 skip_problems = {
     "BLEND",  # SIFファイルに問題があり読み込みできなかった
-    "CRE-B",
-    "CRE-D",
-    "DEGEN2",  # 山下研のサーバーだと実行できなかった
-    "DFL001",  # SIF ファイルに問題があり読み込みできなかった
+    "CRE-B",  # Mps から読み込むのが時間かかりすぎ
+    "CRE-D",  # Mps から読み込むのが時間かかりすぎ
+    "DFL001",  # Mps から読み込むのが時間かかりすぎ
     "E226",  # SIF ファイルに問題があり読み込みできなかった
     "FORPLAN",  # SIFファイルに問題があり読み込みできなかった
-    "GFRD-PNC",
-    "GROW7",
-    "GROW15",
+    "GFRD-PNC",  # SIFファイルに問題があり読み込みできなかった
+    "GREENBEB",  # CGだと永遠に終わらない
+    "GROW7",  # SIFファイルに問題があり読み込みできなかった
+    "GROW15",  # SIFファイルに問題があり読み込みできなかった
     "GROW22",  # SIFファイルに問題があり読み込みできなかった
     "KEN-11",  # 前処理の途中で落ちた
-    "KEN-13",
-    "KEN-18",
+    "KEN-13",  # Mps から読み込めない（サイズが大きい）
+    "KEN-18",  # Mps から読み込めない（サイズが大きい）
     "NESM",  # 前処理で実行不可能と判断
     "OSA-30",  # Mps から読み込むのが時間かかりすぎ
     "OSA-60",  # Mps から読み込むのが時間かかりすぎ
@@ -47,14 +47,14 @@ skip_problems = {
     "STOCFOR3",  # 詳細は netlib の README 参照
 }
 # 解けるサイズではあるものの時間がかかるもの
-skip_problems = skip_problems | {
-    "80BAU3B",
-    "FIT2D",
-    "FIT2P",
-    "OSA-07",
-    "OSA-14",
-    "QAP15",
-}
+# skip_problems = skip_problems | {
+#     "80BAU3B",
+#     "FIT2D",
+#     "FIT2P",
+#     "OSA-07",
+#     "OSA-14",
+#     "QAP15",
+# }
 
 # 出力されるファイル名
 str_today = date.today().strftime("%Y%m%d")
