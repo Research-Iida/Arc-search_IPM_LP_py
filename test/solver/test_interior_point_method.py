@@ -3,7 +3,7 @@ import pytest
 from scipy.sparse import csr_matrix as Csr
 
 from src.problem import LinearProgrammingProblemStandard as LPS
-from src.solver.interior_point_method import ArcSearchIPM, LineSearchIPM
+from src.solver.algorithm.interior_point_method import ArcSearchIPM, LineSearchIPM
 from src.solver.variables import LPVariables
 
 from .utils import solver_by_test_LP

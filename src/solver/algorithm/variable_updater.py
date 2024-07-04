@@ -1,6 +1,7 @@
 """変数の更新方法について管理するモジュール
 arc-search, line-search の2通り
 """
+
 from abc import ABCMeta, abstractmethod
 
 import numpy as np
@@ -54,18 +55,14 @@ class VariableUpdater(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def max_step_size_guarantee_positive(
-        self, xs: np.ndarray, xs_dot: np.ndarray, xs_ddot: np.ndarray
-    ) -> float:
+    def max_step_size_guarantee_positive(self, xs: np.ndarray, xs_dot: np.ndarray, xs_ddot: np.ndarray) -> float:
         pass
 
 
 class LineVariableUpdater(VariableUpdater):
     max_step_size: float = 1
 
-    def max_step_size_guarantee_positive(
-        self, xs: np.ndarray, xs_dot: np.ndarray, xs_ddot: np.ndarray
-    ) -> float:
+    def max_step_size_guarantee_positive(self, xs: np.ndarray, xs_dot: np.ndarray, xs_ddot: np.ndarray) -> float:
         """line search の更新で x, s が非負になる最大のステップサイズの取得
 
         xs は負の値になってはいけないため, 少量分の割合を差し引いてからstep size を決定する
@@ -105,9 +102,7 @@ class LineVariableUpdater(VariableUpdater):
 class ArcVariableUpdater(VariableUpdater):
     max_step_size: float = np.pi / 2
 
-    def max_step_size_guarantee_positive(
-        self, xs: np.ndarray, xs_dot: np.ndarray, xs_ddot: np.ndarray
-    ) -> float:
+    def max_step_size_guarantee_positive(self, xs: np.ndarray, xs_dot: np.ndarray, xs_ddot: np.ndarray) -> float:
         """arc-search の更新で x, s が非負になる最大の alpha の出力
 
         xs は負の値になってはいけないため, 少量分の割合を差し引いてからstep size を決定する
