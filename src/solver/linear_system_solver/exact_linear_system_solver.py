@@ -12,7 +12,7 @@ import numpy as np
 from scipy.sparse import csr_matrix as Csr
 from scipy.sparse.linalg import factorized
 
-from ..logger import get_main_logger
+from ...logger import get_main_logger
 
 logger = get_main_logger()
 

@@ -12,7 +12,7 @@ import scipy.sparse.linalg as spla
 from scipy.sparse import csr_matrix as Csr
 from scipy.sparse import diags, eye
 
-from ..logger import get_main_logger
+from ...logger import get_main_logger
 from .exact_linear_system_solver import AbstractLinearSystemSolver
 
 logger = get_main_logger()

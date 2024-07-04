@@ -3,14 +3,14 @@ from abc import ABCMeta
 
 import numpy as np
 
-from ...linear_system_solver import inexact_linear_system_solver as ilss
-from ...linear_system_solver.exact_linear_system_solver import (
+from ...logger import get_main_logger, indent
+from ...problem import LinearProgrammingProblemStandard as LPS
+from ..linear_system_solver import inexact_linear_system_solver as ilss
+from ..linear_system_solver.exact_linear_system_solver import (
     AbstractLinearSystemSolver,
     ExactLinearSystemSolver,
 )
-from ...linear_system_solver.hhl_qiskit import HHLLinearSystemSolver
-from ...logger import get_main_logger, indent
-from ...problem import LinearProgrammingProblemStandard as LPS
+from ..linear_system_solver.hhl_qiskit import HHLLinearSystemSolver
 from ..optimization_parameters import OptimizationParameters
 from ..solved_checker import SolvedChecker
 from ..solved_data import SolvedDetail
@@ -67,7 +67,7 @@ class InexactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
                 return HHLLinearSystemSolver()
             case "HHLJulia":
                 # いちいち import すると Julia のコンパイルに時間がかかるので指定されたときだけ
-                from ...linear_system_solver.hhl_julia import HHLJuliaLinearSystemSolver
+                from ..linear_system_solver.hhl_julia import HHLJuliaLinearSystemSolver
 
                 return HHLJuliaLinearSystemSolver(self.parameters.INEXACT_HHL_NUM_PHASE_ESTIMATOR_QUBITS)
             case "exact":
