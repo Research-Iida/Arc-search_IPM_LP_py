@@ -281,6 +281,5 @@ class Drawer:
         for func_name in dir(self):
             if func_name.startswith("_draw_"):
                 eval(f"self.{func_name}(data)", {}, {"self": self, "data": aSolvedDetail})
-
-        plt.clf()
-        plt.close()
+                plt.clf()
+                plt.close()
