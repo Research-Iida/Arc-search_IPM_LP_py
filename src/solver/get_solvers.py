@@ -1,13 +1,7 @@
 from collections.abc import Iterator
 
 from ..utils.config_utils import default_section
-from .algorithm.inexact_interior_point_method import InexactArcSearchIPM, InexactLineSearchIPM
-from .algorithm.interior_point_method import ArcSearchIPM, LineSearchIPM
-from .algorithm.interior_point_method_with_restarting_strategy import (
-    ArcSearchIPMWithRestartingStrategy,
-    ArcSearchIPMWithRestartingStrategyProven,
-)
-from .algorithm.iterative_refinement import IterativeRefinementMethod
+from .algorithm.algorithm_builder import AlgorithmBuilder
 from .solver import LPSolver
 
 # 計算対象のアルゴリズム一覧
@@ -89,25 +83,7 @@ def get_solver(algorithm: str, config_section: str) -> LPSolver:
         solver: 取得したいソルバーの種類名
         config_section: 使用する config のセクション名
     """
-    match algorithm:
-        case "arc":
-            algorithm = ArcSearchIPM(config_section)
-        case "line":
-            algorithm = LineSearchIPM(config_section)
-        case "arc_restarting":
-            algorithm = ArcSearchIPMWithRestartingStrategy(config_section)
-        case "arc_restarting_proven":
-            algorithm = ArcSearchIPMWithRestartingStrategyProven(config_section)
-        case "inexact_arc":
-            algorithm = InexactArcSearchIPM(config_section)
-        case "inexact_line":
-            algorithm = InexactLineSearchIPM(config_section)
-        case "iterative_refinement":
-            algorithm = IterativeRefinementMethod(config_section)
-        case _:
-            raise SolverSelectionError("指定されたアルゴリズムが存在しません")
-
-    return LPSolver(config_section, algorithm)
+    return LPSolver(AlgorithmBuilder(config_section).build(algorithm))
 
 
 def get_solvers(name_solver: str | None, config_section: str | None) -> Iterator[LPSolver]:

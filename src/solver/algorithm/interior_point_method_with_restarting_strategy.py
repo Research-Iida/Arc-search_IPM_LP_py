@@ -5,10 +5,11 @@ import numpy as np
 
 from ...logger import get_main_logger, indent
 from ...problem import LinearProgrammingProblemStandard as LPS
+from ..optimization_parameters import OptimizationParameters
 from ..solved_checker import SolvedChecker
 from ..solved_data import SolvedDetail
 from ..variables import LPVariables
-from .initial_point_maker import ConstantInitialPointMaker
+from .initial_point_maker import ConstantInitialPointMaker, IInitialPointMaker
 from .interior_point_method import ExactInteriorPointMethod, MehrotraTypeIPM
 from .variable_updater import ArcVariableUpdater
 
@@ -85,8 +86,14 @@ class IPMWithRestartingStrategyBase(ExactInteriorPointMethod, metaclass=ABCMeta)
 
 
 class ArcSearchIPMWithRestartingStrategy(IPMWithRestartingStrategyBase, MehrotraTypeIPM):
-    def __init__(self, config_section: str, solved_checker: SolvedChecker | None = None):
-        super().__init__(config_section, solved_checker)
+    def __init__(
+        self,
+        config_section: str,
+        parameters: OptimizationParameters,
+        solved_checker: SolvedChecker,
+        initial_point_maker: IInitialPointMaker,
+    ):
+        super().__init__(config_section, parameters, solved_checker, initial_point_maker)
         self.variable_updater = ArcVariableUpdater(self._delta_xs)
 
     def is_iteration_number_reached_upper(self, iter_num: int, problem: LPS) -> bool:
@@ -292,8 +299,14 @@ class ArcSearchIPMWithRestartingStrategyProven(IPMWithRestartingStrategyBase):
         return False
         # return super().is_stopping_criteria_relative
 
-    def __init__(self, config_section: str, solved_checker: SolvedChecker | None = None):
-        super().__init__(config_section, solved_checker)
+    def __init__(
+        self,
+        config_section: str,
+        parameters: OptimizationParameters,
+        solved_checker: SolvedChecker,
+        initial_point_maker: IInitialPointMaker,
+    ):
+        super().__init__(config_section, parameters, solved_checker, initial_point_maker)
         self.variable_updater = ArcVariableUpdater(self._delta_xs)
 
     @property
@@ -331,7 +344,6 @@ class ArcSearchIPMWithRestartingStrategyProven(IPMWithRestartingStrategyBase):
             logger.info("Initial point is not in neighborhood! Start with general initial point.")
             result = ConstantInitialPointMaker(self.parameters.INITIAL_POINT_SCALE).make_initial_point(problem)
 
-        self.log_initial_situation(result, problem)
         return result
 
     def run(self, problem_0: LPS, v_0: LPVariables | None) -> SolvedDetail:
@@ -349,6 +361,7 @@ class ArcSearchIPMWithRestartingStrategyProven(IPMWithRestartingStrategyBase):
 
         # 初期点の設定
         v_0 = self.make_initial_point(problem_0, v_0)
+        self.log_initial_situation(problem_0, v_0)
         # 初期点時点で最適解だった場合, そのまま出力
         if self.solved_checker.run(v_0, problem_0):
             logger.info("Initial point satisfies solved condition.")

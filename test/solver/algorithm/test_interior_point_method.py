@@ -3,21 +3,17 @@ import pytest
 from scipy.sparse import csr_matrix as Csr
 
 from src.problem import LinearProgrammingProblemStandard as LPS
-from src.solver.algorithm.interior_point_method import ArcSearchIPM, LineSearchIPM
+from src.solver.algorithm.algorithm_builder import AlgorithmBuilder
+from src.solver.solver import LPSolver
 from src.solver.variables import LPVariables
+from src.utils.config_utils import test_section
 
 from .utils import solver_by_test_LP
 
-config_section = "TEST"
-
 
 @pytest.fixture
-def anAlgorithm():
-    """初期設定でのアルゴリズムインスタンスは使用頻度が高いので fixture
-
-    arc search のほうが使用率が高いため arc search とする
-    """
-    return ArcSearchIPM(config_section)
+def algorithm():
+    return AlgorithmBuilder(test_section).build("arc")
 
 
 def test_mu():
@@ -45,17 +41,17 @@ def test_residual_constraint():
     np.testing.assert_array_equal(test_vector, [0, 1])
 
 
-def test_calc_first_derivatives(anAlgorithm):
+def test_calc_first_derivatives(algorithm):
     """一次微分の出力を確認"""
     problem = LPS(Csr(np.eye(2)), np.array([0, 1]), np.array([1, 0]))
     v = LPVariables(np.ones(2), np.zeros(2), np.ones(2))
-    x_dot, y_dot, s_dot = anAlgorithm.calc_first_derivatives(v, problem)
+    x_dot, y_dot, s_dot = algorithm.calc_first_derivatives(v, problem)
     np.testing.assert_array_equal(y_dot, [0, 0])
     np.testing.assert_array_equal(s_dot, [0, 1])
     np.testing.assert_array_equal(x_dot, [1, 0])
 
 
-def test_centering_parameter(anAlgorithm):
+def test_centering_parameter(algorithm):
     """sigma が正しく出力されているか確認
 
     mu^a は計算すると3になる
@@ -64,11 +60,11 @@ def test_centering_parameter(anAlgorithm):
     x_dot = np.array([2, 1])
     s_dot = np.array([2, 1])
 
-    sigma = anAlgorithm.centering_parameter(v, x_dot, s_dot)
+    sigma = algorithm.centering_parameter(v, x_dot, s_dot)
     assert sigma == (1 / 8) ** 3
 
 
-def test_calc_second_derivative(anAlgorithm):
+def test_calc_second_derivative(algorithm):
     """二次微分の値が計算されているか確認
 
     Note:
@@ -77,7 +73,7 @@ def test_calc_second_derivative(anAlgorithm):
     """
     problem = LPS(Csr(np.eye(2)), np.array([0, 1]), np.array([1, 0]))
     v = LPVariables(np.ones(2), np.zeros(2), np.ones(2))
-    x_ddot, y_ddot, s_ddot = anAlgorithm.calc_second_derivative(
+    x_ddot, y_ddot, s_ddot = algorithm.calc_second_derivative(
         v, np.ones(2), np.ones(2), np.ones(2), problem, mu=1, sigma=8
     )
     np.testing.assert_array_equal(y_ddot, [-6, -6])
@@ -87,12 +83,21 @@ def test_calc_second_derivative(anAlgorithm):
 
 def test_run_line():
     """line search で求解できるか確認"""
-    solver_by_test_LP(LineSearchIPM(config_section))
+    solver_by_test_LP(LPSolver(AlgorithmBuilder(test_section).build("line")))
 
 
-def test_run_arc(anAlgorithm):
+@pytest.fixture
+def solver(algorithm):
+    """初期設定でのアルゴリズムインスタンスは使用頻度が高いので fixture
+
+    arc search のほうが使用率が高いため arc search とする
+    """
+    return LPSolver(algorithm)
+
+
+def test_run_arc(solver):
     """求解できるか確認
 
     x の出力で0に近いものは削除される
     """
-    solver_by_test_LP(anAlgorithm)
+    solver_by_test_LP(solver)

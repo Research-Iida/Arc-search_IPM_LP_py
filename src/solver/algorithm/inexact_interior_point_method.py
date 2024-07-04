@@ -11,11 +11,11 @@ from ...linear_system_solver.exact_linear_system_solver import (
 from ...linear_system_solver.hhl_qiskit import HHLLinearSystemSolver
 from ...logger import get_main_logger, indent
 from ...problem import LinearProgrammingProblemStandard as LPS
-from ...utils import config_utils
-from ..solved_checker import InexactSolvedChecker, SolvedChecker
+from ..optimization_parameters import OptimizationParameters
+from ..solved_checker import SolvedChecker
 from ..solved_data import SolvedDetail
 from ..variables import LPVariables
-from .initial_point_maker import ConstantInitialPointMaker
+from .initial_point_maker import ConstantInitialPointMaker, IInitialPointMaker
 from .interior_point_method import InteriorPointMethod
 from .search_direction_calculator import (
     AbstractSearchDirectionCalculator,
@@ -92,21 +92,14 @@ class InexactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
     def __init__(
         self,
         config_section: str,
-        solved_checker: SolvedChecker | None,
-        linear_system_solver: AbstractLinearSystemSolver | None,
+        parameters: OptimizationParameters,
+        solved_checker: SolvedChecker,
+        initial_point_maker: IInitialPointMaker,
     ):
-        self._set_config_and_parameters(config_section)
+        # TODO: solved_checker は Inexact 用でないといけない
+        super().__init__(config_section, parameters, solved_checker, initial_point_maker)
 
-        if solved_checker is None:
-            self.solved_checker = InexactSolvedChecker(
-                self.parameters.STOP_CRITERIA_PARAMETER,
-                self.parameters.THRESHOLD_XS_NEGATIVE,
-            )
-        else:
-            self.solved_checker = solved_checker
-
-        if linear_system_solver is None:
-            linear_system_solver = self._get_linear_system_solver(self.parameters.INEXACT_LINEAR_SYSTEM_SOLVER)
+        linear_system_solver = self._get_linear_system_solver(self.parameters.INEXACT_LINEAR_SYSTEM_SOLVER)
         logger.info(f"Linear system solver is {linear_system_solver.__class__.__name__}.")
 
         self.search_direction_calculator = self._get_search_direction_calculator(
@@ -149,7 +142,6 @@ class InexactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
             logger.info("Initial points is not in neighborhood! Start with general initial point.")
             result = ConstantInitialPointMaker(self.parameters.INITIAL_POINT_SCALE).make_initial_point(problem)
 
-        self.log_initial_situation(result, problem)
         return result
 
     # def initial_problem_and_point(self, problem_0: LPS, v_0: LPVariables | None) -> tuple[LPS, LPVariables, list[int]]:
@@ -358,11 +350,12 @@ class InexactLineSearchIPM(InexactInteriorPointMethod):
 
     def __init__(
         self,
-        config_section: str = config_utils.default_section,
-        solved_checker: SolvedChecker | None = None,
-        linear_system_solver: AbstractLinearSystemSolver | None = None,
+        config_section: str,
+        parameters: OptimizationParameters,
+        solved_checker: SolvedChecker,
+        initial_point_maker: IInitialPointMaker,
     ):
-        super().__init__(config_section, solved_checker, linear_system_solver)
+        super().__init__(config_section, parameters, solved_checker, initial_point_maker)
         self.variable_updater = LineVariableUpdater(self._delta_xs)
         self._validate()
 
@@ -396,6 +389,7 @@ class InexactLineSearchIPM(InexactInteriorPointMethod):
 
         # 初期点の設定
         v_0 = self.make_initial_point(problem_0, v_0)
+        self.log_initial_situation(problem_0, v_0)
         # 初期点時点で最適解だった場合, そのまま出力
         if self.solved_checker.run(v_0, problem_0):
             logger.info("Initial point satisfies solved condition.")
@@ -564,11 +558,12 @@ class InexactArcSearchIPM(InexactInteriorPointMethod):
 
     def __init__(
         self,
-        config_section: str = config_utils.default_section,
-        solved_checker: SolvedChecker | None = None,
-        linear_system_solver: AbstractLinearSystemSolver | None = None,
+        config_section: str,
+        parameters: OptimizationParameters,
+        solved_checker: SolvedChecker,
+        initial_point_maker: IInitialPointMaker,
     ):
-        super().__init__(config_section, solved_checker, linear_system_solver)
+        super().__init__(config_section, parameters, solved_checker, initial_point_maker)
         self.variable_updater = ArcVariableUpdater(self._delta_xs)
         self._validate()
 

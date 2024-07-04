@@ -5,10 +5,10 @@ import numpy as np
 from ...logger import get_main_logger, indent
 from ...problem import LinearProgrammingProblemStandard as LPS
 from ..optimization_parameters import OptimizationParameters
-from ..solved_checker import AbsoluteSolvedChecker, RelativeSolvedChecker, SolvedChecker
+from ..solved_checker import SolvedChecker
 from ..solved_data import SolvedDetail, SolvedSummary
 from ..variables import LPVariables
-from .initial_point_maker import IInitialPointMaker, YangInitialPointMaker
+from .initial_point_maker import IInitialPointMaker
 
 logger = get_main_logger()
 
@@ -16,20 +16,17 @@ logger = get_main_logger()
 class ILPSolvingAlgoritm(abc.ABC):
     """LP を解くアルゴリズムのインターフェース. IPM などが実装にあたる"""
 
-    solved_checker: SolvedChecker
+    config_section: str
     parameters: OptimizationParameters
+    solved_checker: SolvedChecker
     initial_point_maker: IInitialPointMaker
-
-    def _set_config_and_parameters(self, config_section: str):
-        self.config_section = config_section
-        self.parameters = OptimizationParameters.import_(config_section)
-        # TODO: 初期点決定方法は builder で初期化するときに決める
-        self.initial_point_maker = YangInitialPointMaker()
 
     def __init__(
         self,
         config_section: str,
-        solved_checker: SolvedChecker | None,
+        parameters: OptimizationParameters,
+        solved_checker: SolvedChecker,
+        initial_point_maker: IInitialPointMaker,
     ):
         """インスタンス初期化
 
@@ -37,17 +34,10 @@ class ILPSolvingAlgoritm(abc.ABC):
             config_section (str): 設定ファイルのセクション名.
                 logging にも使用するので文字列で取得しておく
         """
-        self._set_config_and_parameters(config_section)
-
-        # TODO: ややこしい設定は builder クラスへ委譲
-        if solved_checker is None:
-            threshold = self.parameters.STOP_CRITERIA_PARAMETER
-            if self.parameters.IS_STOPPING_CRITERIA_RELATIVE:
-                self.solved_checker = RelativeSolvedChecker(threshold, self.parameters.THRESHOLD_XS_NEGATIVE)
-            else:
-                self.solved_checker = AbsoluteSolvedChecker(threshold, self.parameters.THRESHOLD_XS_NEGATIVE)
-        else:
-            self.solved_checker = solved_checker
+        self.config_section = config_section
+        self.parameters = parameters
+        self.solved_checker = solved_checker
+        self.initial_point_maker = initial_point_maker
 
     @property
     def is_stopping_criteria_relative(self) -> bool:
@@ -85,18 +75,6 @@ class ILPSolvingAlgoritm(abc.ABC):
                 f"{indent}Constraint matrix is not full row rank! m: {problem_0.m}, rank: {problem_0.row_rank}"
             )
 
-    def log_initial_situation(self, v_0: LPVariables, problem_0: LPS):
-        """最初の段階での変数に関するロギングの実行"""
-        logger.info("Logging initial situation.")
-        self.log_positive_variables_negativity(v_0)
-        logger.info(f"{indent}Objective function: {problem_0.objective_main(v_0.x):.2f}")
-
-        logger.info(f"{indent}Duality parameter: {v_0.mu}")
-
-        logger.info(f"{indent}Max constraint violation:")
-        logger.info(f"{indent*2}main: {np.linalg.norm(problem_0.residual_main_constraint(v_0.x), np.inf)}")
-        logger.info(f"{indent*2}dual: {np.linalg.norm(problem_0.residual_dual_constraint(v_0.y, v_0.s), np.inf)}")
-
     def log_positive_variables_negativity(self, v: LPVariables):
         """もし x, s が負になってしまった場合アルゴリズムが狂うので, 負になっていないか確認"""
         logger.info("Check x and s negativity.")
@@ -109,6 +87,21 @@ class ILPSolvingAlgoritm(abc.ABC):
         if min_s < 0:
             idx_ = np.where(v.s < 0)[0]
             logger.warning(f"s is negative! Negative index: {idx_}")
+
+    def log_initial_situation(self, problem_0: LPS, v_0: LPVariables):
+        """最初の段階での問題, 変数に関するロギングの実行"""
+        logger.info("Logging initial situation.")
+
+        self.log_initial_problem_information(problem_0)
+        self.log_positive_variables_negativity(v_0)
+
+        logger.info(f"{indent}Objective function: {problem_0.objective_main(v_0.x):.2f}")
+
+        logger.info(f"{indent}Duality parameter: {v_0.mu}")
+
+        logger.info(f"{indent}Max constraint violation:")
+        logger.info(f"{indent*2}main: {np.linalg.norm(problem_0.residual_main_constraint(v_0.x), np.inf)}")
+        logger.info(f"{indent*2}dual: {np.linalg.norm(problem_0.residual_dual_constraint(v_0.y, v_0.s), np.inf)}")
 
     def is_calculation_time_reached_upper(self, elapsed_time: float) -> bool:
         """計算時間が上限に達したか.

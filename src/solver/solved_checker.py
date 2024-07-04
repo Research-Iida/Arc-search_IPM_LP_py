@@ -1,5 +1,5 @@
-"""ソルバーが問題を解くことができたかを確認するクラス
-"""
+"""ソルバーが問題を解くことができたかを確認するクラス"""
+
 from abc import ABCMeta, abstractmethod
 
 import numpy as np
@@ -18,6 +18,7 @@ class SolvedChecker(metaclass=ABCMeta):
         stop_criteria_threshold: どれだけ最適解に肉薄していればアルゴリズムを停止するかの threshold.
             ソルバーによって停止条件は異なるため, 使われ方はソルバーごとに異なる
     """
+
     stop_criteria_threshold: float
     threshold_xs_negative: float
 
@@ -69,8 +70,11 @@ class SolvedChecker(metaclass=ABCMeta):
 
     @abstractmethod
     def run(
-        self, v: LPVariables, problem: LPS,
-        *args, **kwargs,
+        self,
+        v: LPVariables,
+        problem: LPS,
+        *args,
+        **kwargs,
     ) -> bool:
         """アルゴリズムが最適性を満たし, 最適解にたどり着いたかを確認
         アルゴリズムごとに求解条件が異なるため, 実装は具象クラスへ移譲
@@ -79,26 +83,30 @@ class SolvedChecker(metaclass=ABCMeta):
 
 
 class RelativeSolvedChecker(SolvedChecker):
-    """Merotra の手法で確認する
-    """
+    """Merotra の手法で確認する"""
+
     def run(
-        self, v: LPVariables, problem: LPS,
-        *args, **kwargs,
+        self,
+        v: LPVariables,
+        problem: LPS,
+        *args,
+        **kwargs,
     ) -> bool:
-        """アルゴリズムが最適性を満たし, 最適解にたどり着いたかを確認
-        """
+        """アルゴリズムが最適性を満たし, 最適解にたどり着いたかを確認"""
         return self.is_relative_solved(v, problem)
 
 
 class AbsoluteSolvedChecker(SolvedChecker):
-    """自分の論文での停止条件で確認する
-    """
+    """自分の論文での停止条件で確認する"""
+
     def run(
-        self, v: LPVariables, problem: LPS,
-        *args, **kwargs,
+        self,
+        v: LPVariables,
+        problem: LPS,
+        *args,
+        **kwargs,
     ) -> bool:
-        """アルゴリズムが最適性を満たし, 最適解にたどり着いたかを確認
-        """
+        """アルゴリズムが最適性を満たし, 最適解にたどり着いたかを確認"""
         if "mu_0" not in kwargs or "r_b_0" not in kwargs or "r_c_0" not in kwargs:
             logger.info("Input doesn't have mu_0, r_b_0 and r_c_0. We use relative solved checker.")
             return self.is_relative_solved(v, problem)
@@ -110,9 +118,13 @@ class AbsoluteSolvedChecker(SolvedChecker):
 
         is_small_mu = v.mu < self.stop_criteria_threshold
         r_b = problem.residual_main_constraint(v.x)
-        is_small_residual_main = np.linalg.norm(r_b) < self.stop_criteria_threshold * np.linalg.norm(kwargs["r_b_0"]) / mu_0
+        is_small_residual_main = (
+            np.linalg.norm(r_b) < self.stop_criteria_threshold * np.linalg.norm(kwargs["r_b_0"]) / mu_0
+        )
         r_c = problem.residual_dual_constraint(v.y, v.s)
-        is_small_residual_dual = np.linalg.norm(r_c) < self.stop_criteria_threshold * np.linalg.norm(kwargs["r_c_0"]) / mu_0
+        is_small_residual_dual = (
+            np.linalg.norm(r_c) < self.stop_criteria_threshold * np.linalg.norm(kwargs["r_c_0"]) / mu_0
+        )
         return is_small_mu and is_small_residual_main and is_small_residual_dual
 
 
@@ -123,15 +135,21 @@ class InexactSolvedChecker(SolvedChecker):
         check_relative_solved(bool) : relative な求解条件で判定するか否か
             inexact IPM の時は判定したい, iterative refinement の時は判定したくないため分ける必要あり
     """
+
     check_relative_solved: bool
 
-    def __init__(self, stop_criteria_threshold: float, threshold_xs_negative: float, check_relative_solved: bool = True):
+    def __init__(
+        self, stop_criteria_threshold: float, threshold_xs_negative: float, check_relative_solved: bool = True
+    ):
         super().__init__(stop_criteria_threshold, threshold_xs_negative)
         self.check_relative_solved = check_relative_solved
 
     def run(
-        self, v: LPVariables, problem: LPS,
-        *args, **kwargs,
+        self,
+        v: LPVariables,
+        problem: LPS,
+        *args,
+        **kwargs,
     ) -> bool:
         """アルゴリズムが最適性を満たし, 最適解にたどり着いたか"""
         # x, s のどちらかが0未満だった場合実行不可能となる
@@ -147,3 +165,29 @@ class InexactSolvedChecker(SolvedChecker):
         r_c = problem.residual_dual_constraint(v.y, v.s)
         is_small_residual = np.linalg.norm(np.concatenate([r_b, r_c]), ord=np.inf) <= self.stop_criteria_threshold
         return is_small_mu and is_small_residual
+
+
+class IterativeRefinementSolvedChecker(SolvedChecker):
+    def run(
+        self,
+        v: LPVariables,
+        problem: LPS,
+        *args,
+        **kwargs,
+    ) -> bool:
+        """Iterative Refinement が最適性を満たし, 最適解にたどり着いたかを確認
+
+        アルゴリズム実行中は delta_k が存在するので, relative に加えてそちらでも判定を行う.
+        もしなければ（LPSolver で SolvedSummary 作るときとか）は relative のみで判定
+        """
+        if "delta_p_k" in kwargs or "delta_d_k" in kwargs:
+            delta_p_k = kwargs["delta_p_k"]
+            delta_d_k = kwargs["delta_d_k"]
+            if (
+                delta_p_k <= self.stop_criteria_threshold
+                and delta_d_k <= self.stop_criteria_threshold
+                and v.mu <= self.stop_criteria_threshold
+            ):
+                return True
+
+        return self.is_relative_solved(v, problem)

@@ -5,13 +5,14 @@ import numpy as np
 
 from ...logger import get_main_logger, indent
 from ...problem import LinearProgrammingProblemStandard as LPS
-from ...utils import config_utils
-from ..solved_checker import InexactSolvedChecker, SolvedChecker
+from ..optimization_parameters import OptimizationParameters
+from ..solved_checker import InexactSolvedChecker, IterativeRefinementSolvedChecker, SolvedChecker
 from ..solved_data import SolvedDetail
 from ..variables import LPVariables
 from .algorithm import ILPSolvingAlgoritm
 from .inexact_interior_point_method import InexactArcSearchIPM, InexactLineSearchIPM
-from .interior_point_method import ArcSearchIPM, InteriorPointMethod, LineSearchIPM
+from .initial_point_maker import IInitialPointMaker
+from .interior_point_method import ArcSearchIPM, LineSearchIPM
 
 logger = get_main_logger()
 
@@ -22,30 +23,10 @@ class InnerSolverSelectionError(Exception):
     pass
 
 
-class IterativeRefinementSolvedChecker(SolvedChecker):
-    def run(
-        self,
-        v: LPVariables,
-        problem: LPS,
-        *args,
-        **kwargs,
-    ) -> bool:
-        """Iterative Refinement が最適性を満たし, 最適解にたどり着いたかを確認
+class AlgorithmSettingError(Exception):
+    """アルゴリズムの設定が想定と異なる場合に発生するエラー"""
 
-        アルゴリズム実行中は delta_k が存在するので, relative に加えてそちらでも判定を行う.
-        もしなければ（LPSolver で SolvedSummary 作るときとか）は relative のみで判定
-        """
-        if "delta_p_k" in kwargs or "delta_d_k" in kwargs:
-            delta_p_k = kwargs["delta_p_k"]
-            delta_d_k = kwargs["delta_d_k"]
-            if (
-                delta_p_k <= self.stop_criteria_threshold
-                and delta_d_k <= self.stop_criteria_threshold
-                and v.mu <= self.stop_criteria_threshold
-            ):
-                return True
-
-        return self.is_relative_solved(v, problem)
+    pass
 
 
 class IterativeRefinementMethod(ILPSolvingAlgoritm):
@@ -63,21 +44,26 @@ class IterativeRefinementMethod(ILPSolvingAlgoritm):
         solved_checker = InexactSolvedChecker(self.hat_zeta, self.parameters.THRESHOLD_XS_NEGATIVE, False)
         match str_solver:
             case "inexact_arc":
-                return InexactArcSearchIPM(self.config_section, solved_checker)
+                return InexactArcSearchIPM(
+                    self.config_section, self.parameters, solved_checker, self.initial_point_maker
+                )
             case "inexact_line":
-                return InexactLineSearchIPM(self.config_section, solved_checker)
+                return InexactLineSearchIPM(
+                    self.config_section, self.parameters, solved_checker, self.initial_point_maker
+                )
             case "arc":
-                return ArcSearchIPM(self.config_section, solved_checker)
+                return ArcSearchIPM(self.config_section, self.parameters, solved_checker, self.initial_point_maker)
             case "line":
-                return LineSearchIPM(self.config_section, solved_checker)
+                return LineSearchIPM(self.config_section, self.parameters, solved_checker, self.initial_point_maker)
             case _:
                 raise InnerSolverSelectionError(f"Don't match solver for {str_solver}")
 
     def __init__(
         self,
-        config_section: str = config_utils.default_section,
-        stop_criteria_parameter: float | None = None,
-        inner_algorithm: InteriorPointMethod | None = None,
+        config_section: str,
+        parameters: OptimizationParameters,
+        solved_checker: SolvedChecker,
+        initial_point_maker: IInitialPointMaker,
     ):
         """初期化
 
@@ -86,15 +72,13 @@ class IterativeRefinementMethod(ILPSolvingAlgoritm):
             inner_algorithm (InteriorPointMethod | None, optional): 内部で使用するソルバー.
                 インスタンス化されているので設定も含む. Defaults to None.
         """
-        self._set_config_and_parameters(config_section)
-        self.solved_checker = IterativeRefinementSolvedChecker(
-            self.parameters.STOP_CRITERIA_PARAMETER, self.parameters.THRESHOLD_XS_NEGATIVE
-        )
+        super().__init__(config_section, parameters, solved_checker, initial_point_maker)
+        if not isinstance(self.solved_checker, IterativeRefinementSolvedChecker):
+            raise AlgorithmSettingError(
+                f"IterativeRefinement must have IterativeRefinementSolvedChecker. You got '{self.solved_checker.__class__.__name__}'"
+            )
 
-        if inner_algorithm is None:
-            self.inner_algorithm = self._get_inner_algorithm()
-        else:
-            self.inner_algorithm = inner_algorithm
+        self.inner_algorithm = self._get_inner_algorithm()
         logger.info(f"Inner solver is {self.inner_algorithm.__class__.__name__}.")
 
     @property

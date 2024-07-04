@@ -6,11 +6,12 @@ import numpy as np
 from ...linear_system_solver.exact_linear_system_solver import ExactLinearSystemSolver
 from ...logger import get_main_logger, indent
 from ...problem import LinearProgrammingProblemStandard as LPS
-from ...utils import config_utils
+from ..optimization_parameters import OptimizationParameters
 from ..solved_checker import SolvedChecker
 from ..solved_data import SolvedDetail
 from ..variables import LPVariables
 from .algorithm import ILPSolvingAlgoritm
+from .initial_point_maker import IInitialPointMaker
 from .search_direction_calculator import AbstractSearchDirectionCalculator, NESSearchDirectionCalculator
 from .variable_updater import ArcVariableUpdater, LineVariableUpdater, VariableUpdater
 
@@ -137,7 +138,9 @@ class ExactInteriorPointMethod(InteriorPointMethod, metaclass=abc.ABCMeta):
     def __init__(
         self,
         config_section: str,
-        solved_checker: SolvedChecker | None,
+        parameters: OptimizationParameters,
+        solved_checker: SolvedChecker,
+        initial_point_maker: IInitialPointMaker,
     ):
         """インスタンス初期化
 
@@ -145,7 +148,7 @@ class ExactInteriorPointMethod(InteriorPointMethod, metaclass=abc.ABCMeta):
             config_section (str): 設定ファイルのセクション名.
                 logging にも使用するので文字列で取得しておく
         """
-        super().__init__(config_section, solved_checker)
+        super().__init__(config_section, parameters, solved_checker, initial_point_maker)
 
         self.search_direction_calculator = NESSearchDirectionCalculator(ExactLinearSystemSolver())
 
@@ -155,7 +158,6 @@ class ExactInteriorPointMethod(InteriorPointMethod, metaclass=abc.ABCMeta):
         else:
             result = self.initial_point_maker.make_initial_point(problem)
 
-        self.log_initial_situation(result, problem)
         return result
 
     def calc_first_derivatives(
@@ -263,6 +265,7 @@ class MehrotraTypeIPM(ExactInteriorPointMethod, metaclass=abc.ABCMeta):
 
         # 初期点の設定
         v_0 = self.make_initial_point(problem_0, v_0)
+        self.log_initial_situation(problem_0, v_0)
         # 初期点時点で最適解だった場合, そのまま出力
         if self.solved_checker.run(v_0, problem_0):
             logger.info("Initial point satisfies solved condition.")
@@ -412,10 +415,12 @@ class LineSearchIPM(MehrotraTypeIPM):
 
     def __init__(
         self,
-        config_section: str = config_utils.default_section,
-        solved_checker: SolvedChecker | None = None,
+        config_section: str,
+        parameters: OptimizationParameters,
+        solved_checker: SolvedChecker,
+        initial_point_maker: IInitialPointMaker,
     ):
-        super().__init__(config_section, solved_checker)
+        super().__init__(config_section, parameters, solved_checker, initial_point_maker)
 
         self.variable_updater = LineVariableUpdater(self._delta_xs)
 
@@ -437,10 +442,12 @@ class ArcSearchIPM(MehrotraTypeIPM):
 
     def __init__(
         self,
-        config_section: str = config_utils.default_section,
-        solved_checker: SolvedChecker | None = None,
+        config_section: str,
+        parameters: OptimizationParameters,
+        solved_checker: SolvedChecker,
+        initial_point_maker: IInitialPointMaker,
     ):
-        super().__init__(config_section, solved_checker)
+        super().__init__(config_section, parameters, solved_checker, initial_point_maker)
 
         self.variable_updater = ArcVariableUpdater(self._delta_xs)
 
