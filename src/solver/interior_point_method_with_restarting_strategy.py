@@ -1,4 +1,3 @@
-
 import time
 from abc import ABCMeta, abstractmethod
 
@@ -6,11 +5,12 @@ import numpy as np
 
 from ..logger import get_main_logger, indent
 from ..problem import LinearProgrammingProblemStandard as LPS
-from .variable_updater import ArcVariableUpdater
-from .solved_checker import SolvedChecker
-from .variables import LPVariables
-from .solved_data import SolvedDetail
+from .initial_point_maker import ConstantInitialPointMaker
 from .interior_point_method import ExactInteriorPointMethod, MehrotraTypeIPM
+from .solved_checker import SolvedChecker
+from .solved_data import SolvedDetail
+from .variable_updater import ArcVariableUpdater
+from .variables import LPVariables
 
 logger = get_main_logger()
 
@@ -29,8 +29,11 @@ class IPMWithRestartingStrategyBase(ExactInteriorPointMethod, metaclass=ABCMeta)
         return self.parameters.RESTART_IS_GUARANTEEING_MAIN_RESIDUAL_DECREASING
 
     def beta_k(
-        self, current_point: np.ndarray, previous_point: np.ndarray, problem: LPS,
-        is_guaranteeing_main_residual_decreasing: bool
+        self,
+        current_point: np.ndarray,
+        previous_point: np.ndarray,
+        problem: LPS,
+        is_guaranteeing_main_residual_decreasing: bool,
     ) -> float:
         """restarting parameter に対象の値をかけ合わせたものを出力
 
@@ -46,17 +49,17 @@ class IPMWithRestartingStrategyBase(ExactInteriorPointMethod, metaclass=ABCMeta)
             logger.debug(f"{indent}beta_k guarantees main residual decreasing")
             current_residual = problem.residual_main_constraint(current_point)
             diff_residual = current_residual - problem.residual_main_constraint(previous_point)
-            idx_nonzero_diff = np.where(np.abs(diff_residual) > 10**(-6))
+            idx_nonzero_diff = np.where(np.abs(diff_residual) > 10 ** (-6))
             if len(idx_nonzero_diff[0]):
-                min_guaranteed_main_residual_decreasing_beta = min(np.abs(current_residual[idx_nonzero_diff] / diff_residual[idx_nonzero_diff]))
+                min_guaranteed_main_residual_decreasing_beta = min(
+                    np.abs(current_residual[idx_nonzero_diff] / diff_residual[idx_nonzero_diff])
+                )
                 result = min(result, min_guaranteed_main_residual_decreasing_beta)
 
         return result
 
     @abstractmethod
-    def restart_variable(
-        self, v_current: LPVariables, problem: LPS, v_previous: LPVariables = None
-    ) -> LPVariables:
+    def restart_variable(self, v_current: LPVariables, problem: LPS, v_previous: LPVariables = None) -> LPVariables:
         """Nesterov restarting strategy を適用して, 変数の更新を行う
 
         Args:
@@ -94,9 +97,7 @@ class ArcSearchIPMWithRestartingStrategy(IPMWithRestartingStrategyBase, Mehrotra
         """
         return iter_num >= max(self.parameters.ITER_UPPER_COEF * problem.n, self.parameters.ITER_UPPER)
 
-    def restart_variable(
-        self, v_current: LPVariables, problem: LPS, v_previous: LPVariables = None
-    ) -> LPVariables:
+    def restart_variable(self, v_current: LPVariables, problem: LPS, v_previous: LPVariables = None) -> LPVariables:
         """Nesterov restarting strategy を適用して, 変数の更新を行う
 
         Args:
@@ -169,10 +170,12 @@ class ArcSearchIPMWithRestartingStrategy(IPMWithRestartingStrategyBase, Mehrotra
             v_max_step = LPVariables(
                 self.variable_updater.run(v_restarted.x, z_dot, z_ddot, alpha_z_max),
                 self.variable_updater.run(v_restarted.y, y_dot, y_ddot, alpha_s_max),
-                self.variable_updater.run(v_restarted.s, s_dot, s_ddot, alpha_s_max)
+                self.variable_updater.run(v_restarted.s, s_dot, s_ddot, alpha_s_max),
             )
             is_solved = self.solved_checker.run(v_max_step, problem, mu_0=mu_0, r_b_0=r_b_0, r_c_0=r_c_0)
-            if self.is_terminate(is_solved, iter_num, problem, time.time() - start_time, alpha_x=alpha_z_max, alpha_s=alpha_s_max):
+            if self.is_terminate(
+                is_solved, iter_num, problem, time.time() - start_time, alpha_x=alpha_z_max, alpha_s=alpha_s_max
+            ):
                 # break しないが, while最後の is_terminate が True になるので問題ない
                 logger.info(f"{indent}Variables satisfy terminate criteria with max step size.")
                 alpha_z = alpha_z_max
@@ -185,7 +188,7 @@ class ArcSearchIPMWithRestartingStrategy(IPMWithRestartingStrategyBase, Mehrotra
                 v_next = LPVariables(
                     self.variable_updater.run(v_restarted.x, z_dot, z_ddot, alpha_z),
                     self.variable_updater.run(v_restarted.y, y_dot, y_ddot, alpha_s),
-                    self.variable_updater.run(v_restarted.s, s_dot, s_ddot, alpha_s)
+                    self.variable_updater.run(v_restarted.s, s_dot, s_ddot, alpha_s),
                 )
 
             logger.info(f"{indent}Step size:")
@@ -204,17 +207,17 @@ class ArcSearchIPMWithRestartingStrategy(IPMWithRestartingStrategyBase, Mehrotra
             r_b = problem.residual_main_constraint(v.x)
             r_c = problem.residual_dual_constraint(v.y, v.s)
             # 制約残差がどうなっているかlogging
-            rate_reduce = (1 - np.sin(alpha_z))
+            rate_reduce = 1 - np.sin(alpha_z)
             logger.debug(f"{indent}1 - sin(alpha_z) = {rate_reduce}")
             for idx, (r_b_j, pre_r_b_j) in enumerate(zip(r_b, pre_r_b)):
                 logger.debug(f"{indent}main residual {idx}: {pre_r_b_j} -> {r_b_j}")
                 # 残渣が減っているか確認
-                tolerance = 10**(-8)
+                tolerance = 10 ** (-8)
                 if not abs(r_b_j) < abs(pre_r_b_j) + tolerance:
                     logger.debug(f"{indent*2}norm of main residual is not decreasing with numerical error!")
 
                 # 1 - sin(alpha_z) 以下に残差が減っているか確認
-                is_theoretical = (abs(abs(r_b_j) - abs(pre_r_b_j) * rate_reduce) <= tolerance)
+                is_theoretical = abs(abs(r_b_j) - abs(pre_r_b_j) * rate_reduce) <= tolerance
                 logger.debug(f"{indent*2}||r_b(x^k+1)| - |r_b(x^k)| * (1 - sin(alpha))| <= 10^-8: {is_theoretical}")
                 logger.debug(f"{indent*2}sign(r_b(x^k+1)) = sign(r_b(x^k)): {np.sign(r_b_j) == np.sign(pre_r_b_j)}")
 
@@ -232,10 +235,16 @@ class ArcSearchIPMWithRestartingStrategy(IPMWithRestartingStrategyBase, Mehrotra
 
             is_solved = self.solved_checker.run(v, problem, mu_0=mu_0, r_b_0=r_b_0, r_c_0=r_c_0)
             is_terminated = self.is_terminate(
-                is_solved, iter_num, problem, time.time() - start_time,
-                alpha_x=alpha_z, alpha_s=alpha_s,
-                pre_r_b=pre_r_b, pre_r_c=pre_r_c,
-                r_b=r_b, r_c=r_c,
+                is_solved,
+                iter_num,
+                problem,
+                time.time() - start_time,
+                alpha_x=alpha_z,
+                alpha_s=alpha_s,
+                pre_r_b=pre_r_b,
+                pre_r_c=pre_r_c,
+                r_b=r_b,
+                r_c=r_c,
             )
 
         # 時間計測終了
@@ -243,12 +252,14 @@ class ArcSearchIPMWithRestartingStrategy(IPMWithRestartingStrategyBase, Mehrotra
 
         # 出力の作成
         aSolvedSummary = self.make_SolvedSummary(
-            v, problem, is_solved,
-            iter_num, self.is_iteration_number_reached_upper(iter_num, problem),
-            elapsed_time
+            v, problem, is_solved, iter_num, self.is_iteration_number_reached_upper(iter_num, problem), elapsed_time
         )
         output = SolvedDetail(
-            aSolvedSummary, v, problem, v_0, problem_0,
+            aSolvedSummary,
+            v,
+            problem,
+            v_0,
+            problem_0,
             lst_variables_by_iter=lst_variables,
             # lst_merit_function_by_iter=lst_phi,
             lst_main_step_size_by_iter=lst_alpha_z,
@@ -263,6 +274,7 @@ class ArcSearchIPMWithRestartingStrategy(IPMWithRestartingStrategyBase, Mehrotra
 
 class ArcSearchIPMWithRestartingStrategyProven(IPMWithRestartingStrategyBase):
     """arc search restarting strategy の論文で収束することを証明したアルゴリズム"""
+
     @property
     def is_stopping_criteria_relative(self) -> bool:
         """停止条件を relative なもの（数値実験上は効率がよいとされている）に設定するか
@@ -313,7 +325,7 @@ class ArcSearchIPMWithRestartingStrategyProven(IPMWithRestartingStrategyBase):
         # 初期点が近傍に入っていなければ, 新しく近傍に入る初期点を作成
         if not self.is_in_center_path_neighborhood(v_0):
             logger.info("Initial points is not in neighborhood! Start with general initial point.")
-            v_0 = self._initial_variables_constant(problem_0)
+            v_0 = ConstantInitialPointMaker(self.parameters.INITIAL_POINT_SCALE).make_initial_point(problem_0)
             self.log_initial_situation(v_0, problem_0)
 
         # 実行時間記録開始
@@ -365,10 +377,7 @@ class ArcSearchIPMWithRestartingStrategyProven(IPMWithRestartingStrategyBase):
             # 探索方向の決定
             z_dot, y_dot, s_dot = self.calc_first_derivatives(v_restarted, problem)
             # 二階微分における計算は sigma などは不要
-            z_ddot, y_ddot, s_ddot = self.calc_second_derivative(
-                v_restarted, z_dot, y_dot, s_dot, problem,
-                sigma=0
-            )
+            z_ddot, y_ddot, s_ddot = self.calc_second_derivative(v_restarted, z_dot, y_dot, s_dot, problem, sigma=0)
 
             # step size の決定, scaling は近傍に入るようにすれば正の値になるので不要
             alpha_z = self.variable_updater.max_step_size_guarantee_positive(z, z_dot, z_ddot)
@@ -380,7 +389,7 @@ class ArcSearchIPMWithRestartingStrategyProven(IPMWithRestartingStrategyBase):
                 v_alpha = LPVariables(
                     self.variable_updater.run(z, z_dot, z_ddot, alpha),
                     self.variable_updater.run(v_restarted.y, y_dot, y_ddot, alpha),
-                    self.variable_updater.run(v_restarted.s, s_dot, s_ddot, alpha)
+                    self.variable_updater.run(v_restarted.s, s_dot, s_ddot, alpha),
                 )
                 if self.is_in_center_path_neighborhood_on_next_point(v_alpha, alpha, mu_z):
                     break
@@ -408,7 +417,9 @@ class ArcSearchIPMWithRestartingStrategyProven(IPMWithRestartingStrategyBase):
                 logger.debug(f"{indent}main constraint residual {i}: {pre_r_b_i} -> {r_b_i}")
                 if pre_r_b_i != 0:
                     logger.debug(f"{indent}r_b(x^k)_{i} / r_b(x^k-1)_{i} : {r_b_i / pre_r_b_i}")
-                    logger.debug(f"{indent*2}sign(r_b(x^k+1)) = sign(r_b(x^k)): {np.sign(r_b_i) == np.sign(pre_r_b_i)}")
+                    logger.debug(
+                        f"{indent*2}sign(r_b(x^k+1)) = sign(r_b(x^k)): {np.sign(r_b_i) == np.sign(pre_r_b_i)}"
+                    )
 
             mu = v.mu
 
@@ -422,10 +433,16 @@ class ArcSearchIPMWithRestartingStrategyProven(IPMWithRestartingStrategyBase):
             # 停止条件更新
             is_solved = self.solved_checker.run(v, problem, mu_0=mu_0, r_b_0=r_b_0, r_c_0=r_c_0)
             is_terminated = self.is_terminate(
-                is_solved, iter_num, problem, time.time() - start_time,
-                alpha_x=alpha, alpha_s=alpha,
-                pre_r_b=pre_r_b, pre_r_c=pre_r_c,
-                r_b=r_b, r_c=r_c,
+                is_solved,
+                iter_num,
+                problem,
+                time.time() - start_time,
+                alpha_x=alpha,
+                alpha_s=alpha,
+                pre_r_b=pre_r_b,
+                pre_r_c=pre_r_c,
+                r_b=r_b,
+                r_c=r_c,
             )
 
         # 時間計測終了
@@ -437,12 +454,14 @@ class ArcSearchIPMWithRestartingStrategyProven(IPMWithRestartingStrategyBase):
 
         # 出力の作成
         aSolvedSummary = self.make_SolvedSummary(
-            v, problem, is_solved,
-            iter_num, self.is_iteration_number_reached_upper(iter_num, problem),
-            elapsed_time
+            v, problem, is_solved, iter_num, self.is_iteration_number_reached_upper(iter_num, problem), elapsed_time
         )
         output = SolvedDetail(
-            aSolvedSummary, v, problem, v_0, problem_0,
+            aSolvedSummary,
+            v,
+            problem,
+            v_0,
+            problem_0,
             lst_variables_by_iter=lst_variables,
             # lst_merit_function_by_iter=lst_phi,
             lst_main_step_size_by_iter=lst_alpha,
@@ -454,9 +473,7 @@ class ArcSearchIPMWithRestartingStrategyProven(IPMWithRestartingStrategyBase):
         )
         return output
 
-    def restart_variable(
-        self, v_current: LPVariables, problem: LPS, v_previous: LPVariables = None
-    ) -> LPVariables:
+    def restart_variable(self, v_current: LPVariables, problem: LPS, v_previous: LPVariables = None) -> LPVariables:
         """Nesterov restarting strategy を適用して, 変数の更新を行う
 
         Args:
@@ -480,8 +497,12 @@ class ArcSearchIPMWithRestartingStrategyProven(IPMWithRestartingStrategyBase):
         base_mu = (1 - np.sin(alpha)) * mu_z
         return np.linalg.norm(v_alpha.x * v_alpha.s - base_mu) <= 2 * self.theta * base_mu
 
-    def next_iteration_point_with_mu_decreasing(self, v_alpha: LPVariables, problem: LPS, alpha: float, mu: float) -> LPVariables:
+    def next_iteration_point_with_mu_decreasing(
+        self, v_alpha: LPVariables, problem: LPS, alpha: float, mu: float
+    ) -> LPVariables:
         """step size alpha で移動させた後に mu が減少することを保証するために移動させた点"""
-        right_hand_side = np.concatenate([np.zeros(problem.m + problem.n), ((1 - np.sin(alpha)) * mu - v_alpha.x * v_alpha.s)])
+        right_hand_side = np.concatenate(
+            [np.zeros(problem.m + problem.n), ((1 - np.sin(alpha)) * mu - v_alpha.x * v_alpha.s)]
+        )
         delta_x, delta_lambda, delta_s, _ = self.search_direction_calculator.run(v_alpha, problem, right_hand_side)
         return LPVariables(v_alpha.x + delta_x, v_alpha.y + delta_lambda, v_alpha.s + delta_s)

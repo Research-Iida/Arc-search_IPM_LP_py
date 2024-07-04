@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pydantic
 
 from ..utils import config_utils
@@ -36,8 +38,9 @@ class OptimizationParameters:
     ITERATIVE_REFINEMENT_SCALING_MULTIPLIER: float
     ITERATIVE_REFINEMENT_ITER_UPPER: int
 
+    # TODO: クラス自体が読み込みに責務を持つのはおかしい. repository があるべき
     @classmethod
-    def import_(cls, config_section: str) -> 'OptimizationParameters':
+    def import_(cls, config_section: str) -> OptimizationParameters:
         config = config_utils.read_config(section=config_section)
         filename_config_opt = config.get("PATH_CONFIG") + config.get("CONFIG_OPTIMIZER")
         config_opt = config_utils.read_config(filename_config_opt, section=config_section)
