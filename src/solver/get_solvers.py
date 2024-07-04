@@ -1,13 +1,13 @@
 from collections.abc import Iterator
 
 from ..utils.config_utils import default_section
-from .inexact_interior_point_method import InexactArcSearchIPM, InexactLineSearchIPM
-from .interior_point_method import ArcSearchIPM, LineSearchIPM
-from .interior_point_method_with_restarting_strategy import (
+from .algorithm.inexact_interior_point_method import InexactArcSearchIPM, InexactLineSearchIPM
+from .algorithm.interior_point_method import ArcSearchIPM, LineSearchIPM
+from .algorithm.interior_point_method_with_restarting_strategy import (
     ArcSearchIPMWithRestartingStrategy,
     ArcSearchIPMWithRestartingStrategyProven,
 )
-from .iterative_refinement import IterativeRefinementMethod
+from .algorithm.iterative_refinement import IterativeRefinementMethod
 from .solver import LPSolver
 
 # 計算対象のアルゴリズム一覧
@@ -82,32 +82,32 @@ class SolverSelectionError(Exception):
     pass
 
 
-def get_solver(solver: str, config_section: str) -> LPSolver:
+def get_solver(algorithm: str, config_section: str) -> LPSolver:
     """線形計画問題のソルバー取得
 
     Args:
         solver: 取得したいソルバーの種類名
         config_section: 使用する config のセクション名
     """
-    match solver:
+    match algorithm:
         case "arc":
-            anLPSolver = ArcSearchIPM(config_section)
+            algorithm = ArcSearchIPM(config_section)
         case "line":
-            anLPSolver = LineSearchIPM(config_section)
+            algorithm = LineSearchIPM(config_section)
         case "arc_restarting":
-            anLPSolver = ArcSearchIPMWithRestartingStrategy(config_section)
+            algorithm = ArcSearchIPMWithRestartingStrategy(config_section)
         case "arc_restarting_proven":
-            anLPSolver = ArcSearchIPMWithRestartingStrategyProven(config_section)
+            algorithm = ArcSearchIPMWithRestartingStrategyProven(config_section)
         case "inexact_arc":
-            anLPSolver = InexactArcSearchIPM(config_section)
+            algorithm = InexactArcSearchIPM(config_section)
         case "inexact_line":
-            anLPSolver = InexactLineSearchIPM(config_section)
+            algorithm = InexactLineSearchIPM(config_section)
         case "iterative_refinement":
-            anLPSolver = IterativeRefinementMethod(config_section)
+            algorithm = IterativeRefinementMethod(config_section)
         case _:
-            raise SolverSelectionError("指定されたソルバーが存在しません")
+            raise SolverSelectionError("指定されたアルゴリズムが存在しません")
 
-    return anLPSolver
+    return LPSolver(config_section, algorithm)
 
 
 def get_solvers(name_solver: str | None, config_section: str | None) -> Iterator[LPSolver]:

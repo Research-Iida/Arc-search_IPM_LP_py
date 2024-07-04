@@ -1,30 +1,34 @@
-import time
 import copy
+import time
 
 import numpy as np
 
-from ..utils import config_utils
-from ..logger import get_main_logger, indent
-from ..problem import LinearProgrammingProblemStandard as LPS
-from .variables import LPVariables
-from .solved_checker import SolvedChecker, InexactSolvedChecker
-from .solved_data import SolvedDetail
-from .solver import LPSolver
-from .interior_point_method import InteriorPointMethod, ArcSearchIPM, LineSearchIPM
+from ...logger import get_main_logger, indent
+from ...problem import LinearProgrammingProblemStandard as LPS
+from ...utils import config_utils
+from ..solved_checker import InexactSolvedChecker, SolvedChecker
+from ..solved_data import SolvedDetail
+from ..variables import LPVariables
+from .algorithm import ILPSolvingAlgoritm
 from .inexact_interior_point_method import InexactArcSearchIPM, InexactLineSearchIPM
+from .interior_point_method import ArcSearchIPM, InteriorPointMethod, LineSearchIPM
 
 logger = get_main_logger()
 
 
 class InnerSolverSelectionError(Exception):
     """solver の選択に失敗したときに発生するエラー"""
+
     pass
 
 
 class IterativeRefinementSolvedChecker(SolvedChecker):
     def run(
-        self, v: LPVariables, problem: LPS,
-        *args, **kwargs,
+        self,
+        v: LPVariables,
+        problem: LPS,
+        *args,
+        **kwargs,
     ) -> bool:
         """Iterative Refinement が最適性を満たし, 最適解にたどり着いたかを確認
 
@@ -34,22 +38,27 @@ class IterativeRefinementSolvedChecker(SolvedChecker):
         if "delta_p_k" in kwargs or "delta_d_k" in kwargs:
             delta_p_k = kwargs["delta_p_k"]
             delta_d_k = kwargs["delta_d_k"]
-            if delta_p_k <= self.stop_criteria_threshold and delta_d_k <= self.stop_criteria_threshold and v.mu <= self.stop_criteria_threshold:
+            if (
+                delta_p_k <= self.stop_criteria_threshold
+                and delta_d_k <= self.stop_criteria_threshold
+                and v.mu <= self.stop_criteria_threshold
+            ):
                 return True
 
         return self.is_relative_solved(v, problem)
 
 
-class IterativeRefinementMethod(LPSolver):
-    """Iterative Refinement によって問題を都度更新してLPを求解するクラス
-    """
+class IterativeRefinementMethod(ILPSolvingAlgoritm):
+    """Iterative Refinement によって問題を都度更新してLPを求解するクラス"""
+
+    inner_algorithm: ILPSolvingAlgoritm
+
     @property
     def hat_zeta(self) -> float:
         return self.parameters.ITERATIVE_REFINEMENT_OPTIMAL_THRESHOLD_OF_SOLVER
 
-    def _get_inner_solver(self) -> InteriorPointMethod:
-        """Iterative Refinement 内部で実行する inexact solver の取得
-        """
+    def _get_inner_algorithm(self) -> ILPSolvingAlgoritm:
+        """Iterative Refinement 内部で実行する inexact solver の取得"""
         str_solver = self.parameters.ITERATIVE_REFINEMENT_INNER_SOLVER
         solved_checker = InexactSolvedChecker(self.hat_zeta, self.parameters.THRESHOLD_XS_NEGATIVE, False)
         match str_solver:
@@ -68,40 +77,52 @@ class IterativeRefinementMethod(LPSolver):
         self,
         config_section: str = config_utils.default_section,
         stop_criteria_parameter: float | None = None,
-        inner_solver: InteriorPointMethod | None = None,
+        inner_algorithm: InteriorPointMethod | None = None,
     ):
         """初期化
 
         Args:
             config_section (str, optional): 使用するconfig. Defaults to config_utils.default_section.
-            inner_solver (InteriorPointMethod | None, optional): 内部で使用するソルバー.
+            inner_algorithm (InteriorPointMethod | None, optional): 内部で使用するソルバー.
                 インスタンス化されているので設定も含む. Defaults to None.
         """
         self._set_config_and_parameters(config_section)
-        self.solved_checker = IterativeRefinementSolvedChecker(self.parameters.STOP_CRITERIA_PARAMETER, self.parameters.THRESHOLD_XS_NEGATIVE)
+        self.solved_checker = IterativeRefinementSolvedChecker(
+            self.parameters.STOP_CRITERIA_PARAMETER, self.parameters.THRESHOLD_XS_NEGATIVE
+        )
 
-        if inner_solver is None:
-            self.inner_solver = self._get_inner_solver()
+        if inner_algorithm is None:
+            self.inner_algorithm = self._get_inner_algorithm()
         else:
-            self.inner_solver = inner_solver
-        logger.info(f"Inner solver is {self.inner_solver.__class__.__name__}.")
+            self.inner_algorithm = inner_algorithm
+        logger.info(f"Inner solver is {self.inner_algorithm.__class__.__name__}.")
 
     @property
     def zeta(self) -> float:
-        return self.stop_criteria_parameter
+        return self.parameters.STOP_CRITERIA_PARAMETER
 
     @property
     def rho(self) -> float:
         return self.parameters.ITERATIVE_REFINEMENT_SCALING_MULTIPLIER
 
-    def run_inner_solver(self, problem: LPS, v: LPVariables | None = None) -> SolvedDetail:
+    def run_inner_algorithm(self, problem: LPS, v_0: LPVariables | None = None) -> SolvedDetail:
+        """内部で設定したアルゴリズムに解かせる.
+
+        Args:
+            problem (LPS): 対象とするLP
+            v_0 (LPVariables | None): 初期点. 1回目以降の refinement では初期点は `inner_algorithm` に作成を任せた方がよいため,
+                None になる
+
+        Returns:
+            SolvedDetail: 解
+        """
         # ログで見やすいように線を入れておく
         logger.info(f"{'-' * 3} inner solver start {'-' * 50}")
-        result = self.inner_solver.run(problem, v)
+        result = self.inner_algorithm.run(problem, v_0)
         logger.info(f"{'-' * 3} inner solver end {'-' * 50}")
         return result
 
-    def run_algorithm(self, problem_0: LPS, v_0: LPVariables) -> SolvedDetail:
+    def run(self, problem_0: LPS, v_0: LPVariables | None) -> SolvedDetail:
         """反復で解くアルゴリズム部分の実行
 
         Returns:
@@ -116,7 +137,7 @@ class IterativeRefinementMethod(LPSolver):
         large_delta_d_k = 1
 
         # 最初の求解
-        aSolvedDetail = self.run_inner_solver(problem_0, v_0)
+        aSolvedDetail = self.run_inner_algorithm(problem_0, v_0)
         v_star = aSolvedDetail.v
         # problem = aSolvedDetail.problem
         iter_num = aSolvedDetail.aSolvedSummary.iter_num
@@ -129,9 +150,13 @@ class IterativeRefinementMethod(LPSolver):
         logger.info(f"delta_p_k: {delta_p_k}, delta_d_k: {delta_d_k}")
 
         is_terminated = self.is_terminate(
-            v_star, problem_0, count_iterative_refinement,
+            v_star,
+            problem_0,
+            count_iterative_refinement,
             time.time() - start_time,
-            delta_p_k, delta_d_k, aSolvedDetail
+            delta_p_k,
+            delta_d_k,
+            aSolvedDetail,
         )
 
         lst_variables = copy.deepcopy(aSolvedDetail.lst_variables_by_iter)
@@ -168,11 +193,11 @@ class IterativeRefinementMethod(LPSolver):
                 problem_0.A,
                 large_delta_p_k * (b_bar + problem_0.A @ v_star.x),
                 large_delta_d_k * c_bar,
-                f"{problem_name_prefix}{count_iterative_refinement}"
+                f"{problem_name_prefix}{count_iterative_refinement}",
             )
 
             # inexact ソルバーで求解
-            aSolvedDetail = self.run_inner_solver(problem)
+            aSolvedDetail = self.run_inner_algorithm(problem)
             v_hat = aSolvedDetail.v
             # problem = aSolvedDetail.problem
             iter_num += aSolvedDetail.aSolvedSummary.iter_num
@@ -213,9 +238,13 @@ class IterativeRefinementMethod(LPSolver):
             logger.info(f"{indent}dual: {max(np.abs(problem_0.residual_dual_constraint(v_star.y, v_star.s)))}")
 
             is_terminated = self.is_terminate(
-                v_star, problem_0, count_iterative_refinement,
+                v_star,
+                problem_0,
+                count_iterative_refinement,
                 time.time() - start_time,
-                delta_p_k, delta_d_k, aSolvedDetail
+                delta_p_k,
+                delta_d_k,
+                aSolvedDetail,
             )
 
         # 時間計測終了
@@ -227,12 +256,19 @@ class IterativeRefinementMethod(LPSolver):
         is_solved = self.solved_checker.is_relative_solved(v_star, problem_0)
         # 反復回数上限に達したかどうかは iterative refinement を何回行ったかで判断
         aSolvedSummary = self.make_SolvedSummary(
-            v_star, problem_0, is_solved,
-            iter_num, self.is_iteration_number_reached_upper(count_iterative_refinement, problem_0),
-            elapsed_time
+            v_star,
+            problem_0,
+            is_solved,
+            iter_num,
+            self.is_iteration_number_reached_upper(count_iterative_refinement, problem_0),
+            elapsed_time,
         )
         output = SolvedDetail(
-            aSolvedSummary, v_star, problem_0, v_0, problem_0,
+            aSolvedSummary,
+            v_star,
+            problem_0,
+            v_0,
+            problem_0,
             lst_variables_by_iter=lst_variables,
             lst_main_step_size_by_iter=lst_alpha_x,
             lst_dual_step_size_by_iter=lst_alpha_s,
@@ -261,9 +297,13 @@ class IterativeRefinementMethod(LPSolver):
         return iter_num >= self.parameters.ITERATIVE_REFINEMENT_ITER_UPPER
 
     def is_terminate(
-        self, v: LPVariables, problem: LPS, count_iterative_refinement: int,
+        self,
+        v: LPVariables,
+        problem: LPS,
+        count_iterative_refinement: int,
         elapsed_time: float,
-        delta_p_k: float, delta_d_k: float,
+        delta_p_k: float,
+        delta_d_k: float,
         inner_solved_data: SolvedDetail,
     ) -> bool:
         if self.solved_checker.run(v, problem, delta_p_k=delta_p_k, delta_d_k=delta_d_k):

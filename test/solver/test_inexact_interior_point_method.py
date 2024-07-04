@@ -1,6 +1,6 @@
 import pytest
 
-from src.solver.inexact_interior_point_method import InexactArcSearchIPM, InexactLineSearchIPM
+from src.solver.algorithm.inexact_interior_point_method import InexactArcSearchIPM, InexactLineSearchIPM
 from src.solver.solved_checker import InexactSolvedChecker
 from src.utils import config_utils
 

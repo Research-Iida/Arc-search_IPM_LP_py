@@ -3,15 +3,18 @@ from abc import ABCMeta
 
 import numpy as np
 
-from ..linear_system_solver import inexact_linear_system_solver as ilss
-from ..linear_system_solver.exact_linear_system_solver import (
+from ...linear_system_solver import inexact_linear_system_solver as ilss
+from ...linear_system_solver.exact_linear_system_solver import (
     AbstractLinearSystemSolver,
     ExactLinearSystemSolver,
 )
-from ..linear_system_solver.hhl_qiskit import HHLLinearSystemSolver
-from ..logger import get_main_logger, indent
-from ..problem import LinearProgrammingProblemStandard as LPS
-from ..utils import config_utils
+from ...linear_system_solver.hhl_qiskit import HHLLinearSystemSolver
+from ...logger import get_main_logger, indent
+from ...problem import LinearProgrammingProblemStandard as LPS
+from ...utils import config_utils
+from ..solved_checker import InexactSolvedChecker, SolvedChecker
+from ..solved_data import SolvedDetail
+from ..variables import LPVariables
 from .initial_point_maker import ConstantInitialPointMaker
 from .interior_point_method import InteriorPointMethod
 from .search_direction_calculator import (
@@ -19,10 +22,7 @@ from .search_direction_calculator import (
     MNESSearchDirectionCalculator,
     NESSearchDirectionCalculator,
 )
-from .solved_checker import InexactSolvedChecker, SolvedChecker
-from .solved_data import SolvedDetail
 from .variable_updater import ArcVariableUpdater, LineVariableUpdater
-from .variables import LPVariables
 
 logger = get_main_logger()
 
@@ -67,7 +67,7 @@ class InexactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
                 return HHLLinearSystemSolver()
             case "HHLJulia":
                 # いちいち import すると Julia のコンパイルに時間がかかるので指定されたときだけ
-                from ..linear_system_solver.hhl_julia import HHLJuliaLinearSystemSolver
+                from ...linear_system_solver.hhl_julia import HHLJuliaLinearSystemSolver
 
                 return HHLJuliaLinearSystemSolver(self.parameters.INEXACT_HHL_NUM_PHASE_ESTIMATOR_QUBITS)
             case "exact":
@@ -138,41 +138,55 @@ class InexactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
     def gamma_1(self) -> float:
         return self.parameters.INEXACT_COEF_NEIGHBORHOOD_DUALITY
 
-    def initial_problem_and_point(self, problem_0: LPS, v_0: LPVariables) -> tuple[LPS, LPVariables, list[int]]:
-        """数値的に安定させるため, 与えられた問題と初期点に改良を加えて出力
-
-        Args:
-            problem_0 (LPS): 与えられた最初の問題
-            v_0 (LPVariables): 初期点
-
-        Returns:
-            LPS: 修正した問題
-            LPVariables: 修正した変数
-            list[int]: 修正の過程で削除された制約の行の index
-        """
-        problem = problem_0
-        v = v_0
-
-        # Aの各行で正規化
-        # 問題の最適解自体を変えてしまうので使用しないこととした
-        # problem = problem.create_A_row_normalized()
-        # logger.info("Problem is normalized for each A row.")
-
-        # A の基底を取る関係で, 数値誤差で rank 落ちするような状況は避けたい.
-        # なのでまず LU分解を施して数値誤差の範囲で0の行になるところは削除する
-        # problem, remove_constraint_rows = problem.create_A_LU_factorized()
-        # logger.info(f"Problem is LU factorized. number of removed rows: {len(remove_constraint_rows)}")
-        # if remove_constraint_rows:
-        #     logger.info(f"Removed constraint rows because of zero row: {remove_constraint_rows}")
-        # v = v.remove_constraint_rows(remove_constraint_rows)
-        remove_constraint_rows = []
+    def make_initial_point(self, problem: LPS, v_0: LPVariables | None) -> LPVariables:
+        if v_0 is not None:
+            result = v_0
+        else:
+            result = self.initial_point_maker.make_initial_point(problem)
 
         # 初期点が近傍に入っていなければ, 新しく近傍に入る初期点を作成
-        if not self.is_in_center_path_neighborhood(v, problem, self.calculate_gamma_2(v, problem)):
+        if not self.is_in_center_path_neighborhood(result, problem, self.calculate_gamma_2(result, problem)):
             logger.info("Initial points is not in neighborhood! Start with general initial point.")
-            v = ConstantInitialPointMaker(self.parameters.INITIAL_POINT_SCALE).make_initial_point(problem)
+            result = ConstantInitialPointMaker(self.parameters.INITIAL_POINT_SCALE).make_initial_point(problem)
 
-        return problem, v, remove_constraint_rows
+        self.log_initial_situation(result, problem)
+        return result
+
+    # def initial_problem_and_point(self, problem_0: LPS, v_0: LPVariables | None) -> tuple[LPS, LPVariables, list[int]]:
+    #     """数値的に安定させるため, 与えられた問題と初期点に改良を加えて出力
+
+    #     Args:
+    #         problem_0 (LPS): 与えられた最初の問題
+    #         v_0 (LPVariables): 初期点
+
+    #     Returns:
+    #         LPS: 修正した問題
+    #         LPVariables: 修正した変数
+    #         list[int]: 修正の過程で削除された制約の行の index
+    #     """
+    #     problem = problem_0
+    #     v = v_0
+
+    #     # Aの各行で正規化
+    #     # 問題の最適解自体を変えてしまうので使用しないこととした
+    #     # problem = problem.create_A_row_normalized()
+    #     # logger.info("Problem is normalized for each A row.")
+
+    #     # A の基底を取る関係で, 数値誤差で rank 落ちするような状況は避けたい.
+    #     # なのでまず LU分解を施して数値誤差の範囲で0の行になるところは削除する
+    #     # problem, remove_constraint_rows = problem.create_A_LU_factorized()
+    #     # logger.info(f"Problem is LU factorized. number of removed rows: {len(remove_constraint_rows)}")
+    #     # if remove_constraint_rows:
+    #     #     logger.info(f"Removed constraint rows because of zero row: {remove_constraint_rows}")
+    #     # v = v.remove_constraint_rows(remove_constraint_rows)
+    #     remove_constraint_rows = []
+
+    #     # 初期点が近傍に入っていなければ, 新しく近傍に入る初期点を作成
+    #     if not self.is_in_center_path_neighborhood(v, problem, self.calculate_gamma_2(v, problem)):
+    #         logger.info("Initial points is not in neighborhood! Start with general initial point.")
+    #         v = ConstantInitialPointMaker(self.parameters.INITIAL_POINT_SCALE).make_initial_point(problem)
+
+    #     return problem, v, remove_constraint_rows
 
     def calc_tolerance_for_inexact_first_derivative(self, v: LPVariables, problem: LPS) -> float:
         """一階微分を inexact に解く際の誤差許容度"""
@@ -367,7 +381,7 @@ class InexactLineSearchIPM(InexactInteriorPointMethod):
         # upper = self.parameters.ITER_UPPER
         return iter_num >= upper
 
-    def run_algorithm(self, problem_0: LPS, v_0: LPVariables) -> SolvedDetail:
+    def run(self, problem_0: LPS, v_0: LPVariables | None) -> SolvedDetail:
         """反復で解く line-saarch の実行, 線形方程式は inexact に解く
 
         Args:
@@ -380,13 +394,17 @@ class InexactLineSearchIPM(InexactInteriorPointMethod):
         # 実行時間記録開始
         start_time = time.time()
 
-        problem, v, remove_constraint_rows = self.initial_problem_and_point(problem_0, v_0)
+        # 初期点の設定
+        v_0 = self.make_initial_point(problem_0, v_0)
+        # 初期点時点で最適解だった場合, そのまま出力
+        if self.solved_checker.run(v_0, problem_0):
+            logger.info("Initial point satisfies solved condition.")
+            aSolvedSummary = self.make_SolvedSummary(v_0, problem_0, True, 0, False, time.time() - start_time)
+            return SolvedDetail(aSolvedSummary, v_0, problem_0, v_0, problem_0)
 
-        # 初期点や問題が変わることで状況が変わるのでログ
-        # logger.info("Logging problem information.")
-        # self.log_initial_problem_information(problem)
-        logger.info("Logging initial situation.")
-        self.log_initial_situation(v, problem)
+        # 初期点を現在の点として初期化
+        v = v_0
+        problem = problem_0
 
         mu = v.mu
         mu_0 = mu
@@ -640,7 +658,7 @@ class InexactArcSearchIPM(InexactInteriorPointMethod):
 
         return x_ddot, y_ddot, s_ddot, norm_residual
 
-    def run_algorithm(self, problem_0: LPS, v_0: LPVariables) -> SolvedDetail:
+    def run(self, problem_0: LPS, v_0: LPVariables | None) -> SolvedDetail:
         """反復で解く arc-saarch の実行, 線形方程式は inexact に解く
 
         Args:
@@ -653,13 +671,17 @@ class InexactArcSearchIPM(InexactInteriorPointMethod):
         # 実行時間記録開始
         start_time = time.time()
 
-        problem, v, remove_constraint_rows = self.initial_problem_and_point(problem_0, v_0)
+        # 初期点の設定
+        v_0 = self.make_initial_point(problem_0, v_0)
+        # 初期点時点で最適解だった場合, そのまま出力
+        if self.solved_checker.run(v_0, problem_0):
+            logger.info("Initial point satisfies solved condition.")
+            aSolvedSummary = self.make_SolvedSummary(v_0, problem_0, True, 0, False, time.time() - start_time)
+            return SolvedDetail(aSolvedSummary, v_0, problem_0, v_0, problem_0)
 
-        # 初期点や問題が変わることで状況が変わるのでログ
-        # logger.info("Logging problem information.")
-        # self.log_initial_problem_information(problem)
-        logger.info("Logging initial situation.")
-        self.log_initial_situation(v, problem)
+        # 初期点を現在の点として初期化
+        v = v_0
+        problem = problem_0
 
         mu = v.mu
         mu_0 = mu

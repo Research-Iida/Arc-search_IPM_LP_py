@@ -3,14 +3,14 @@ from abc import ABCMeta, abstractmethod
 
 import numpy as np
 
-from ..logger import get_main_logger, indent
-from ..problem import LinearProgrammingProblemStandard as LPS
+from ...logger import get_main_logger, indent
+from ...problem import LinearProgrammingProblemStandard as LPS
+from ..solved_checker import SolvedChecker
+from ..solved_data import SolvedDetail
+from ..variables import LPVariables
 from .initial_point_maker import ConstantInitialPointMaker
 from .interior_point_method import ExactInteriorPointMethod, MehrotraTypeIPM
-from .solved_checker import SolvedChecker
-from .solved_data import SolvedDetail
 from .variable_updater import ArcVariableUpdater
-from .variables import LPVariables
 
 logger = get_main_logger()
 
@@ -110,7 +110,7 @@ class ArcSearchIPMWithRestartingStrategy(IPMWithRestartingStrategyBase, Mehrotra
         """
         return super().restart_variable(v_current, problem, v_previous)
 
-    def run_algorithm(self, problem_0: LPS, v_0: LPVariables) -> SolvedDetail:
+    def run(self, problem_0: LPS, v_0: LPVariables | None) -> SolvedDetail:
         """Nesterov の加速法を組み入れた内点法の実行
 
         変数の対応がわかりづらいのでメモ
@@ -121,6 +121,14 @@ class ArcSearchIPMWithRestartingStrategy(IPMWithRestartingStrategyBase, Mehrotra
         """
         # 実行時間記録開始
         start_time = time.time()
+
+        # 初期点の設定
+        v_0 = self.make_initial_point(problem_0, v_0)
+        # 初期点時点で最適解だった場合, そのまま出力
+        if self.solved_checker.run(v_0, problem_0):
+            logger.info("Initial point satisfies solved condition.")
+            aSolvedSummary = self.make_SolvedSummary(v_0, problem_0, True, 0, False, time.time() - start_time)
+            return SolvedDetail(aSolvedSummary, v_0, problem_0, v_0, problem_0)
 
         # 初期点を現在の点として初期化
         v = v_0
@@ -312,7 +320,21 @@ class ArcSearchIPMWithRestartingStrategyProven(IPMWithRestartingStrategyBase):
         """
         return iter_num >= max(self.parameters.ITER_UPPER_COEF * problem.n, self.parameters.ITER_UPPER)
 
-    def run_algorithm(self, problem_0: LPS, v_0: LPVariables) -> SolvedDetail:
+    def make_initial_point(self, problem: LPS, v_0: LPVariables | None) -> LPVariables:
+        if v_0 is None:
+            result = v_0
+        else:
+            result = self.initial_point_maker.make_initial_point(problem)
+
+        # 初期点が近傍に入っていなければ, 理論的収束性を担保できない
+        if not self.is_in_center_path_neighborhood(result):
+            logger.info("Initial point is not in neighborhood! Start with general initial point.")
+            result = ConstantInitialPointMaker(self.parameters.INITIAL_POINT_SCALE).make_initial_point(problem)
+
+        self.log_initial_situation(result, problem)
+        return result
+
+    def run(self, problem_0: LPS, v_0: LPVariables | None) -> SolvedDetail:
         """Nesterov の加速法を組み入れた内点法の実行
         理論的な証明を施したもの
 
@@ -322,14 +344,16 @@ class ArcSearchIPMWithRestartingStrategyProven(IPMWithRestartingStrategyBase):
             v_restarted: (z^k, y^k, s^k)
             v_next: (x^k+1, y^k+1, s^k+1)
         """
-        # 初期点が近傍に入っていなければ, 新しく近傍に入る初期点を作成
-        if not self.is_in_center_path_neighborhood(v_0):
-            logger.info("Initial points is not in neighborhood! Start with general initial point.")
-            v_0 = ConstantInitialPointMaker(self.parameters.INITIAL_POINT_SCALE).make_initial_point(problem_0)
-            self.log_initial_situation(v_0, problem_0)
-
         # 実行時間記録開始
         start_time = time.time()
+
+        # 初期点の設定
+        v_0 = self.make_initial_point(problem_0, v_0)
+        # 初期点時点で最適解だった場合, そのまま出力
+        if self.solved_checker.run(v_0, problem_0):
+            logger.info("Initial point satisfies solved condition.")
+            aSolvedSummary = self.make_SolvedSummary(v_0, problem_0, True, 0, False, time.time() - start_time)
+            return SolvedDetail(aSolvedSummary, v_0, problem_0, v_0, problem_0)
 
         # 初期点を現在の点として初期化
         v = v_0

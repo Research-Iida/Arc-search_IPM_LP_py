@@ -2,8 +2,8 @@ import abc
 
 import numpy as np
 
-from ..problem import LinearProgrammingProblemStandard as LPS
-from .variables import LPVariables
+from ...problem import LinearProgrammingProblemStandard as LPS
+from ..variables import LPVariables
 
 
 class IInitialPointMaker(abc.ABC):

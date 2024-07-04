@@ -1,23 +1,23 @@
+import abc
 import time
-from abc import ABCMeta, abstractmethod
 
 import numpy as np
 
-from ..linear_system_solver.exact_linear_system_solver import ExactLinearSystemSolver
-from ..logger import get_main_logger, indent
-from ..problem import LinearProgrammingProblemStandard as LPS
-from ..utils import config_utils
+from ...linear_system_solver.exact_linear_system_solver import ExactLinearSystemSolver
+from ...logger import get_main_logger, indent
+from ...problem import LinearProgrammingProblemStandard as LPS
+from ...utils import config_utils
+from ..solved_checker import SolvedChecker
+from ..solved_data import SolvedDetail
+from ..variables import LPVariables
+from .algorithm import ILPSolvingAlgoritm
 from .search_direction_calculator import AbstractSearchDirectionCalculator, NESSearchDirectionCalculator
-from .solved_checker import SolvedChecker
-from .solved_data import SolvedDetail
-from .solver import LPSolver
 from .variable_updater import ArcVariableUpdater, LineVariableUpdater, VariableUpdater
-from .variables import LPVariables
 
 logger = get_main_logger()
 
 
-class InteriorPointMethod(LPSolver, metaclass=ABCMeta):
+class InteriorPointMethod(ILPSolvingAlgoritm, metaclass=abc.ABCMeta):
     """LPを内点法で解く際のインターフェース"""
 
     variable_updater: VariableUpdater
@@ -30,7 +30,20 @@ class InteriorPointMethod(LPSolver, metaclass=ABCMeta):
     def _epsilon_x(self) -> float:
         return self.parameters.IPM_LOWER_BOUND_OF_X_TRUNCATION
 
-    @abstractmethod
+    @abc.abstractmethod
+    def make_initial_point(self, problem: LPS, v_0: LPVariables | None) -> LPVariables:
+        """初期点の決定. アルゴリズムによっては複雑な設定が必要になるので, 抽象メソッド
+
+        Args:
+            problem (LPS): 初期点作成対象のLP
+            v_0 (LPVariables): 与えられた場合の初期点. ある場合とない場合で処理が異なる
+
+        Returns:
+            LPVariables: 初期点
+        """
+        pass
+
+    @abc.abstractmethod
     def is_iteration_number_reached_upper(self, iter_num: int, problem: LPS) -> bool:
         """反復回数が上限に達したか. 上限以上の値であれば True の想定
 
@@ -116,7 +129,7 @@ class InteriorPointMethod(LPSolver, metaclass=ABCMeta):
         return False
 
 
-class ExactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
+class ExactInteriorPointMethod(InteriorPointMethod, metaclass=abc.ABCMeta):
     """線形方程式を正確に解くことを前提とした内点法"""
 
     search_direction_calculator: AbstractSearchDirectionCalculator
@@ -135,6 +148,15 @@ class ExactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
         super().__init__(config_section, solved_checker)
 
         self.search_direction_calculator = NESSearchDirectionCalculator(ExactLinearSystemSolver())
+
+    def make_initial_point(self, problem: LPS, v_0: LPVariables | None) -> LPVariables:
+        if v_0 is not None:
+            result = v_0
+        else:
+            result = self.initial_point_maker.make_initial_point(problem)
+
+        self.log_initial_situation(result, problem)
+        return result
 
     def calc_first_derivatives(
         self,
@@ -225,12 +247,12 @@ class ExactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
         return range(len(x))
 
 
-class MehrotraTypeIPM(ExactInteriorPointMethod, metaclass=ABCMeta):
+class MehrotraTypeIPM(ExactInteriorPointMethod, metaclass=abc.ABCMeta):
     """Mehrotra と同じ種類のIPM
     アルゴリズムが異なってくるので別にした
     """
 
-    def run_algorithm(self, problem_0: LPS, v_0: LPVariables) -> SolvedDetail:
+    def run(self, problem_0: LPS, v_0: LPVariables | None) -> SolvedDetail:
         """反復で解く内点法の実行
         アルゴリズムは基本的に異なるため abstractmethod.
         ただし ArcSearchIPM と LineSearchIPM は同じアルゴリズムとなるため,
@@ -238,6 +260,14 @@ class MehrotraTypeIPM(ExactInteriorPointMethod, metaclass=ABCMeta):
         """
         # 実行時間記録開始
         start_time = time.time()
+
+        # 初期点の設定
+        v_0 = self.make_initial_point(problem_0, v_0)
+        # 初期点時点で最適解だった場合, そのまま出力
+        if self.solved_checker.run(v_0, problem_0):
+            logger.info("Initial point satisfies solved condition.")
+            aSolvedSummary = self.make_SolvedSummary(v_0, problem_0, True, 0, False, time.time() - start_time)
+            return SolvedDetail(aSolvedSummary, v_0, problem_0, v_0, problem_0)
 
         # 初期点を現在の点として初期化
         v = v_0

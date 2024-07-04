@@ -1,12 +1,12 @@
+from src.solver.algorithm.iterative_refinement import IterativeRefinementMethod
 from src.utils import config_utils
-from src.solver.iterative_refinement import IterativeRefinementMethod
+
 from .utils import make_test_LP_and_initial_point
 
 config_section = "TEST"
 config_base = config_utils.read_config(section=config_section)
 config_opt = config_utils.read_config(
-    config_base.get("PATH_CONFIG") + config_base.get("CONFIG_OPTIMIZER"),
-    section=config_section
+    config_base.get("PATH_CONFIG") + config_base.get("CONFIG_OPTIMIZER"), section=config_section
 )
 
 

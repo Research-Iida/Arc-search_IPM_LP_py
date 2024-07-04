@@ -8,10 +8,10 @@ from scipy.sparse import csr_matrix as Csr
 from scipy.sparse import diags
 from scipy.sparse.linalg import inv
 
-from ..linear_system_solver.exact_linear_system_solver import AbstractLinearSystemSolver
-from ..logger import get_main_logger, indent
-from ..problem import LinearProgrammingProblemStandard as LPS
-from .variables import LPVariables
+from ...linear_system_solver.exact_linear_system_solver import AbstractLinearSystemSolver
+from ...logger import get_main_logger, indent
+from ...problem import LinearProgrammingProblemStandard as LPS
+from ..variables import LPVariables
 
 logger = get_main_logger()
 
