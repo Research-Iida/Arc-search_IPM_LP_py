@@ -38,6 +38,7 @@ class ILPSolvingAlgoritm(abc.ABC):
         self.parameters = parameters
         self.solved_checker = solved_checker
         self.initial_point_maker = initial_point_maker
+        logger.info(f"Initial points are made by the method of {self.initial_point_maker.__class__.__name__}")
 
     @property
     def is_stopping_criteria_relative(self) -> bool:

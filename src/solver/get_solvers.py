@@ -12,7 +12,7 @@ target_algorithms: list[str] = [
     # "arc_restarting_proven",
     "inexact_arc",
     "inexact_line",
-    # "iterative_refinement",
+    "iterative_refinement",
 ]
 # アルゴリズム別計算対象の config セクション一覧
 # 計算対象にさせたくないアルゴリズムは, すべての config セクションをコメントアウトする
@@ -43,7 +43,9 @@ target_config_sections_by_algorithm: dict[str, list[str]] = {
     "inexact_arc": [
         # "INEXACT_ARC_CG_MNES",
         "INEXACT_ARC_CG_NES",
+        "INEXACT_ARC_CG_NES_LUSTING",
         "INEXACT_ARC_EXACT_NES",
+        "INEXACT_ARC_EXACT_NES_LUSTING",
         # "INEXACT_ARC_BICG_NES",
         # "INEXACT_ARC_BICGSTAB_NES",
         # "INEXACT_ARC_CGS_NES",
@@ -55,15 +57,17 @@ target_config_sections_by_algorithm: dict[str, list[str]] = {
     "inexact_line": [
         # "INEXACT_LINE_CG_MNES",
         "INEXACT_LINE_CG_NES",
+        "INEXACT_LINE_CG_NES_LUSTING",
         # "LINE_EXACT_MNES",
         "LINE_EXACT_NES",
+        "INEXACT_LINE_EXACT_NES_LUSTING",
     ],
     "iterative_refinement": [
         # "INEXACT_ARC_CG_MNES",
         "INEXACT_ARC_CG_NES",
-        # "INEXACT_ARC_EXACT_NES",
+        "INEXACT_ARC_EXACT_NES",
         # "INEXACT_LINE_CG_MNES",
-        # "INEXACT_LINE_CG_NES",
+        "INEXACT_LINE_CG_NES",
         # "INEXACT_ARC_HHLJULIA_NES",
         # "INEXACT_ARC_HHLJULIA_NES_IN_SERVER",
     ],

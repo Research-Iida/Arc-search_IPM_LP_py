@@ -50,9 +50,6 @@ class LPSolver:
         algorithm_config_section = self.algorithm.config_section
         logger.info(f"[{algorithm_name}] [{algorithm_config_section}] Start solving {problem.name}.")
 
-        logger.info("Logging problem information.")
-        self.algorithm.log_initial_problem_information(problem)
-
         # アルゴリズムの実行
         try:
             aSolvedDetail = self.algorithm.run(problem, v_0)
