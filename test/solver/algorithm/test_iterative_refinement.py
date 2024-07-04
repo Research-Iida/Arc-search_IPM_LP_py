@@ -1,13 +1,11 @@
-from src.solver.algorithm.iterative_refinement import IterativeRefinementMethod
-from src.utils import config_utils
+from src.solver.algorithm.algorithm_builder import AlgorithmBuilder
+from src.solver.solver import LPSolver
+from src.utils.config_utils import read_config, test_section
 
 from .utils import make_test_LP_and_initial_point
 
-config_section = "TEST"
-config_base = config_utils.read_config(section=config_section)
-config_opt = config_utils.read_config(
-    config_base.get("PATH_CONFIG") + config_base.get("CONFIG_OPTIMIZER"), section=config_section
-)
+config_base = read_config(section=test_section)
+config_opt = read_config(config_base.get("PATH_CONFIG") + config_base.get("CONFIG_OPTIMIZER"), section=test_section)
 
 
 def test_run__with_inexact_arc():
@@ -15,7 +13,7 @@ def test_run__with_inexact_arc():
     収束条件が `test/utils.py` にある `solver_by_test_LP` とは異なるため,
     別で書き出す
     """
-    solver = IterativeRefinementMethod(config_section)
+    solver = LPSolver(AlgorithmBuilder(test_section).build("iterative_refinement"))
     aLP, v_0 = make_test_LP_and_initial_point()
     aSolvedDetail = solver.run(aLP, v_0)
 

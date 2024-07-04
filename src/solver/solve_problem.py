@@ -41,10 +41,8 @@ def optimize(aLP: LPS, aLPSolver: LPSolver, v_0: LPVariables | None = None) -> S
         求解した結果
     """
     problem_name = aLP.name
-    solver_name = aLPSolver.__class__.__name__
-    config_section = aLPSolver.config_section
 
-    msg_prefix = f"[{solver_name}] [{config_section}]"
+    msg_prefix = f"[{aLPSolver.algorithm.__class__.__name__}] [{aLPSolver.algorithm_config_section}]"
     msg_start = f"{msg_prefix} Start solving {problem_name}."
     logger.info(msg_start)
     aSlack.notify(msg_start)
@@ -57,7 +55,7 @@ def optimize(aLP: LPS, aLPSolver: LPSolver, v_0: LPVariables | None = None) -> S
 
     # 求解できなかったら warning
     if not output.aSolvedSummary.is_solved:
-        msg = f"[{solver_name}] [{aLPSolver.config_section}] Algorithm cannot solve {problem_name}!"
+        msg = f"{msg_prefix} Algorithm cannot solve {problem_name}!"
         logger.warning(msg)
         aSlack.notify(msg)
     return output
