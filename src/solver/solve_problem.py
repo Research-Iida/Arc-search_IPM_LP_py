@@ -17,8 +17,11 @@ aSlack = get_slack_api()
 def preprocess(problem_name: str, aLPRepository: ILPRepository) -> LPS:
     """前処理を施し, 標準形となった Netlib LP を csv で書き込む"""
     logger.info(f"Start loading problem '{problem_name}'")
-    aLP_origin = aLPRepository.read_raw_LP(problem_name).convert_standard()
+    aLP_raw = aLPRepository.read_raw_LP(problem_name)
     logger.info("End loading.")
+    logger.info("Start converting to standard form.")
+    aLP_origin = aLP_raw.convert_standard()
+    logger.info("End converting to standard form.")
     logger.info(f"Origin dimension: n: {aLP_origin.n}, m: {aLP_origin.m}")
     logger.info("Start preprocessing.")
     aLP = LPPreprocessor().run(aLP_origin)

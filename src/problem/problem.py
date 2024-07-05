@@ -13,6 +13,10 @@ from scipy.sparse import hstack, vstack
 from scipy.sparse import lil_matrix as Lil
 from scipy.sparse.linalg import eigsh, inv
 
+from ..logger.logger import get_main_logger
+
+logger = get_main_logger()
+
 
 class SettingProblemError(Exception):
     """問題を設定する際に例外が起こったら起こすエラー"""
@@ -214,6 +218,35 @@ class LinearProgrammingProblem:
     c: np.ndarray
     name: str = ""
 
+    def __eq__(self, other: LinearProgrammingProblem) -> bool:
+        """要素がすべて同じか
+        要素が `np.array` だったり `lil_matrix` だったりするので, 標準の __eq__ メソッドだとエラーになる
+        """
+        is_same_A_E = (self.A_E - other.A_E).nnz == 0
+        is_same_A_G = (self.A_G - other.A_G).nnz == 0
+        is_same_A_L = (self.A_L - other.A_L).nnz == 0
+        if not (is_same_A_E and is_same_A_G and is_same_A_L):
+            return False
+
+        is_same_b_E = np.array_equal(self.b_E, other.b_E)
+        is_same_b_G = np.array_equal(self.b_G, other.b_G)
+        is_same_b_L = np.array_equal(self.b_L, other.b_L)
+        if not (is_same_b_E and is_same_b_G and is_same_b_L):
+            return False
+
+        is_same_index = np.array_equal(self.LB_index, other.LB_index) and np.array_equal(self.UB_index, other.UB_index)
+        if not is_same_index:
+            return False
+
+        is_same_var_bounds = np.array_equal(self.LB, other.LB) and np.array_equal(self.UB, other.UB)
+        if not is_same_var_bounds:
+            return False
+
+        if not np.array_equal(self.c, other.c):
+            return False
+
+        return self.name == other.name
+
     @property
     def n(self):
         """変数の次元数
@@ -379,9 +412,12 @@ class LinearProgrammingProblem:
         ub = np.full(self.n, np.inf)
         ub[self.UB_index] = self.UB
 
-        # 変数すべてに下限を設定
-        lb_tmp, ub_tmp, A_tmp, c_tmp = self.separate_free_variable(*self.reverse_non_lower_bound(lb, ub, A, self.c))
+        logger.info("Set lower bounds by reversing non lower bounds.")
+        tuple_tmp = self.reverse_non_lower_bound(lb, ub, A, self.c)
+        logger.info("Set lower bounds for free variables.")
+        lb_tmp, ub_tmp, A_tmp, c_tmp = self.separate_free_variable(*tuple_tmp)
         # 等式制約に統一するため不等式制約を別々にする
+        logger.info("Separate inequality constraints for unifying to equality const.")
         m_e = self.A_E.shape[0]
         m_g = self.A_G.shape[0]
         m_l = self.A_L.shape[0]
@@ -391,8 +427,12 @@ class LinearProgrammingProblem:
         A_L = A_tmp[range(m_e + m_g, m_e + m_gl), :]
 
         # 変形して標準形式の A, b, c 作成
+        logger.info("Make standard coefficient matrix 'A'.")
         A_out: Csr = self.make_standard_A(A_E, A_G, A_L, ub_tmp)
+        logger.info(f"End making A. shape: {A_out.shape}")
+        logger.info("Make standard right hand side of constraints 'b'.")
         b_out = self.make_standard_b(A_E, A_G, A_L, self.b_E, self.b_G, self.b_L, lb_tmp, ub_tmp)
+        logger.info("Make standard coefficients of objective 'c'.")
         c_out = self.make_standard_c(c_tmp, m_gl, ub_tmp)
 
         return LinearProgrammingProblemStandard(A_out, b_out, c_out, self.name)

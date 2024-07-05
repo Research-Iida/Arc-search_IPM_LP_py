@@ -3,7 +3,6 @@ import os
 
 import numpy as np
 import pytest
-from pysmps import smps_loader as smps
 from scipy.sparse import csr_matrix
 
 from src.infra.path_generator import PathGenerator
@@ -22,45 +21,6 @@ filename_written = "written"
 @pytest.fixture
 def aLPRepository() -> LPRepository:
     return LPRepository(test_section)
-
-
-def test_load_mps_KB2():
-    """`pysmps` モジュールの `load_mps` メソッドがどのような振る舞いをするか確認する"""
-    test_obj = smps.load_mps(path_netlib.joinpath("KB2.SIF"))
-
-    # 制約数の確認
-    m = len(test_obj[2])
-    A = test_obj[7]
-    assert m == A.shape[0]
-
-    # 変数次元数の確認
-    n = len(test_obj[3])
-    c = test_obj[6]
-    assert n == c.shape[0]
-    assert n == A.shape[1]
-
-    # 制約の種類の確認
-    # Equal, Grater than, Lower than
-    types_constraint = test_obj[5]
-    for type_const in types_constraint:
-        assert type_const in {"E", "G", "L"}
-
-    # KB2 は制約が設定されていない. 0以上か0以下か, もしくは0か
-    name_constraints = test_obj[8]
-    assert len(name_constraints) == 0
-
-    # 変数の上下限制約
-    # 同じ変数に2つ以上異なる上下限は設定されないはず
-    name_bounds = test_obj[10]
-    assert len(name_bounds) <= 1
-    # KB2 では下限が設定されていないので, すべて0が下限になる
-    dct_bound = test_obj[11][name_bounds[0]]
-    lst_lb = dct_bound["LO"]
-    assert lst_lb.shape[0] == n
-    for bound in lst_lb:
-        assert bound == 0
-    # 上限は設定されているものとされていないものがあり, 設定されているものは inf
-    assert dct_bound["UP"].shape[0] == n
 
 
 def test_get_problem_names(aLPRepository):
@@ -110,3 +70,16 @@ def test_write_LP(aLPRepository, remove_written_file):
     np.testing.assert_array_equal(test_LP.b, sol_LP.b)
     np.testing.assert_array_equal(test_LP.c, sol_LP.c)
     assert test_LP.name == filename_written
+
+
+@pytest.mark.julia
+def test_same_LP_between_pure_python_and_julia(aLPRepository):
+    """pure python での実装と julia を使った実装が結果同じになることを確認
+    KEN-07 を使用
+    """
+    from src.infra.repository_problem_with_julia import JuliaLPRepository
+
+    problem_name = "KEN-07"
+    sol_LP = aLPRepository.read_raw_LP(problem_name)
+    test_LP = JuliaLPRepository(test_section).read_raw_LP(problem_name)
+    assert test_LP == sol_LP
