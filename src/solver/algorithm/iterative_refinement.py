@@ -33,6 +33,7 @@ class IterativeRefinementMethod(ILPSolvingAlgoritm):
     """Iterative Refinement によって問題を都度更新してLPを求解するクラス"""
 
     inner_algorithm: ILPSolvingAlgoritm
+    solved_checker: IterativeRefinementSolvedChecker
 
     @property
     def hat_zeta(self) -> float:

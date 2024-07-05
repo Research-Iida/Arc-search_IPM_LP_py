@@ -20,7 +20,6 @@ def test_CG_tolerance():
 
 
 @pytest.mark.julia
-@pytest.mark.slow
 def test_HHL_julia():
     """julia による HHL アルゴリズムが正しく解けるか確認"""
     # Julia の compile が入って遅くなるのでこのテストを回すときのみ実行

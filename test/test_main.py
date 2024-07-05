@@ -5,7 +5,7 @@ import pytest
 
 from src.__main__ import decide_solved_problems, main, name_result
 from src.infra.path_generator import PathGenerator
-from src.infra.repository_problem import LPRepository
+from src.infra.python.repository_problem import LPRepository
 from src.utils.config_utils import test_section
 
 num_problem = 1

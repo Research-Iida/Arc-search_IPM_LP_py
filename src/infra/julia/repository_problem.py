@@ -4,8 +4,8 @@ from scipy.sparse import coo_matrix
 
 from src.problem.problem import LinearProgrammingProblem, LinearProgrammingProblemStandard
 
-from ..problem.repository import ILPRepository
-from .repository_problem import LPRepository
+from ...problem.repository import ILPRepository
+from ..python.repository_problem import LPRepository
 
 jl = Julia(compiled_modules=False)
 
@@ -13,7 +13,7 @@ from julia import Main, Pkg  # noqa: E402
 
 Pkg.activate(".")
 Pkg.instantiate()
-Main.include("src/infra/repository_problem.jl")
+Main.include("src/infra/julia/repository_problem.jl")
 
 
 class JuliaLPRepository(ILPRepository):
