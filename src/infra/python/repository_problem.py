@@ -118,6 +118,8 @@ class LPRepository(ILPRepository):
         TODO:
             * 0は書き下すとファイルサイズが大きくなるので, 欠損させるようにしたい
         """
+        main_msg = "writing LP data"
+        logger.info(f"Start {main_msg}.")
         # Aの書き出し, scipy.sparce の型なので別で書き出しする
         save_npz(self._path_processed.joinpath(f"{problem_name}_A.npz"), aLP.A)
 

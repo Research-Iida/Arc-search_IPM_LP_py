@@ -37,15 +37,20 @@ class JuliaLPRepository(ILPRepository):
         """
         problem = Main.load_mps(problem_name)
         n = problem.n
-        A_E = coo_matrix((problem.A_E_vals, (problem.A_E_rows, problem.A_E_cols)))
+        b_E: np.ndarray = problem.b_E
+        A_E_coo = coo_matrix((problem.A_E_vals, (problem.A_E_rows, problem.A_E_cols)), shape=(b_E.shape[0], n))
+        b_G: np.ndarray = problem.b_G
+        A_G_coo = coo_matrix((problem.A_G_vals, (problem.A_G_rows, problem.A_G_cols)), shape=(b_G.shape[0], n))
+        b_L: np.ndarray = problem.b_L
+        A_L_coo = coo_matrix((problem.A_L_vals, (problem.A_L_rows, problem.A_L_cols)), shape=(b_L.shape[0], n))
 
         result = LinearProgrammingProblem(
-            A_E=A_E.tolil(),
-            b_E=problem.b_E,
-            A_G=coo_matrix((0, n)).tolil(),
-            b_G=np.array([]),
-            A_L=coo_matrix((0, n)).tolil(),
-            b_L=np.array([]),
+            A_E=A_E_coo.tolil(),
+            b_E=b_E,
+            A_G=A_G_coo.tolil(),
+            b_G=b_G,
+            A_L=A_L_coo.tolil(),
+            b_L=b_L,
             LB_index=problem.LB_index.tolist(),
             LB=problem.LB,
             UB_index=problem.UB_index,

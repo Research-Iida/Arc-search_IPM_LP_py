@@ -73,13 +73,12 @@ def test_write_LP(aLPRepository, remove_written_file):
 
 
 @pytest.mark.julia
-def test_same_LP_between_pure_python_and_julia(aLPRepository):
-    """pure python での実装と julia を使った実装が結果同じになることを確認
-    KEN-07 を使用
-    """
+@pytest.mark.parametrize("problem_name", ["KEN-07"])
+def test_same_LP_between_pure_python_and_julia(problem_name: str):
+    """pure python での実装と julia を使った実装が結果同じになることを確認"""
+    # TODO: KB2 は全く同じにならないのでテスト項目を変える必要があるかも
     from src.infra.julia.repository_problem import JuliaLPRepository
 
-    problem_name = "KEN-07"
-    sol_LP = aLPRepository.read_raw_LP(problem_name)
+    sol_LP = LPRepository(test_section).read_raw_LP(problem_name)
     test_LP = JuliaLPRepository(test_section).read_raw_LP(problem_name)
     assert test_LP == sol_LP
