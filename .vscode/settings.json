@@ -10,6 +10,7 @@
         "linalg",
         "allclose",
         "qiskit",
-        "sqla"
+        "sqla",
+        "tolil",
     ],
 }
