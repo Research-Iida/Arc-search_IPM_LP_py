@@ -1,5 +1,4 @@
-"""LP の読み込み・書き込みに関する module
-"""
+"""LP の読み込み・書き込みに関する module"""
 
 import os
 from pathlib import Path
@@ -8,12 +7,12 @@ import numpy as np
 from pysmps import smps_loader as smps
 from scipy.sparse import coo_matrix, lil_matrix, load_npz, save_npz
 
-from ..logger import get_main_logger
-from ..problem import LinearProgrammingProblem as LP
-from ..problem import LinearProgrammingProblemStandard as LPS
-from ..problem.repository import CannotReadError, ILPRepository
-from ..utils import config_utils, str_util
-from .path_generator import PathGenerator
+from ...logger import get_main_logger
+from ...problem import LinearProgrammingProblem as LP
+from ...problem import LinearProgrammingProblemStandard as LPS
+from ...problem.repository import CannotReadError, ILPRepository
+from ...utils import config_utils, str_util
+from ..path_generator import PathGenerator
 
 logger = get_main_logger()
 

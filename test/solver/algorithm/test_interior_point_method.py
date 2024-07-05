@@ -101,3 +101,15 @@ def test_run_arc(solver):
     x の出力で0に近いものは削除される
     """
     solver_by_test_LP(solver)
+
+
+def test_run_arc_restarting():
+    solver_by_test_LP(AlgorithmBuilder(test_section).build("arc_restarting"))
+
+
+def test_run_arc_restarting_proven():
+    solver_by_test_LP(AlgorithmBuilder(test_section).build("arc_restarting_proven"))
+
+
+def test_run_arc_restarting_guranteeing_main_residual_decreasing():
+    solver_by_test_LP(AlgorithmBuilder("GUARANTEE_MAIN_RESIDUAL_DECREASING").build("arc_restarting"))

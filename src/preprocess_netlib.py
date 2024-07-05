@@ -1,7 +1,7 @@
 import argparse
 import sys
 
-from .infra.repository_problem import LPRepository
+from .infra.python.repository_problem import LPRepository
 from .logger import get_main_logger, setup_logger
 from .solver.solve_problem import preprocess
 
@@ -20,7 +20,7 @@ def main(problem_name: str, config_section: str | None, with_julia: bool):
         logger.info("Using julia for netlib loading.")
 
         # Julia を使う場合, コンパイルに若干時間がかかるので判定後に import
-        from .infra.repository_problem_with_julia import JuliaLPRepository
+        from .infra.julia.repository_problem import JuliaLPRepository
 
         repository = JuliaLPRepository(config_section)
     else:

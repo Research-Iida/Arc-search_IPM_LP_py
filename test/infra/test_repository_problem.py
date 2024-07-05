@@ -6,7 +6,7 @@ import pytest
 from scipy.sparse import csr_matrix
 
 from src.infra.path_generator import PathGenerator
-from src.infra.repository_problem import LPRepository
+from src.infra.python.repository_problem import LPRepository
 from src.problem import LinearProgrammingProblemStandard as LPS
 from src.problem.repository import CannotReadError
 from src.utils.config_utils import test_section
@@ -77,7 +77,7 @@ def test_same_LP_between_pure_python_and_julia(aLPRepository):
     """pure python での実装と julia を使った実装が結果同じになることを確認
     KEN-07 を使用
     """
-    from src.infra.repository_problem_with_julia import JuliaLPRepository
+    from src.infra.julia.repository_problem import JuliaLPRepository
 
     problem_name = "KEN-07"
     sol_LP = aLPRepository.read_raw_LP(problem_name)

@@ -6,7 +6,7 @@ from pathlib import Path
 
 from .drawer import Drawer
 from .infra.path_generator import PathGenerator
-from .infra.repository_problem import LPRepository
+from .infra.python.repository_problem import LPRepository
 from .infra.repository_solved_data import SolvedDataRepository
 from .logger import get_main_logger, setup_logger
 from .problem.repository import ILPRepository
