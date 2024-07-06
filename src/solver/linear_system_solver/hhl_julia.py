@@ -1,17 +1,8 @@
 import numpy as np
-from julia import Julia
+from julia import Main
 
 from ...logger import get_main_logger
 from .inexact_linear_system_solver import AbstractInexactLinearSystemSolver
-
-# サーバー環境で実行するためのおまじない
-jl = Julia(compiled_modules=False)
-
-from julia import Main, Pkg  # noqa: E402
-
-Pkg.activate(".")
-Pkg.instantiate()
-Main.include("src/linear_system_solver/HHLlib.jl")
 
 logger = get_main_logger()
 
@@ -26,6 +17,8 @@ class HHLJuliaLinearSystemSolver(AbstractInexactLinearSystemSolver):
             n_pe_qubits (int): Phase Estimator に使用する qubit 数.
                 Aの固有値の精度に関わる
         """
+        Main.include("src/solver/linear_system_solver/HHLlib.jl")
+
         self.n_pe_qubits = n_pe_qubits
 
     def solve(self, A: np.ndarray, b: np.ndarray, tolerance: float = 10**-7, *args) -> np.ndarray:
