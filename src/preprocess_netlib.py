@@ -3,13 +3,16 @@ import sys
 
 from .infra.python.repository_problem import LPRepository
 from .logger import get_main_logger, setup_logger
+from .slack.slack import get_slack_api
 from .solver.solve_problem import preprocess
 
 logger = get_main_logger()
+aSlack = get_slack_api()
 
 
 def main(problem_name: str, config_section: str | None, with_julia: bool):
     """main 関数"""
+    aSlack.notify(f"Start preprocessing '{problem_name}'")
     # 直接実行された場合ファイルに起こす必要があるため, 新たにlogger設定
     log_file_name = f"preprocess_{problem_name}"
     if config_section is not None:
@@ -27,6 +30,8 @@ def main(problem_name: str, config_section: str | None, with_julia: bool):
         repository = LPRepository(config_section)
 
     preprocess(problem_name, repository)
+
+    aSlack.notify_mentioned(f"End preprocessing '{problem_name}'")
 
 
 if __name__ == "__main__":
