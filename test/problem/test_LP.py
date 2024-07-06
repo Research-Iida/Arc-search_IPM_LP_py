@@ -48,7 +48,7 @@ def test_separate_free_variable():
 
 
 def test_make_A():
-    """SIF file 形式から係数行列Aが出力されるか"""
+    """LP 形式から係数行列Aが出力されるか"""
     A_E = Lil([[1, 0], [1, 1]])
     A_G = Lil([[2, 3]])
     A_L = Lil([[4, 5], [6, 7], [8, 9]])
@@ -69,7 +69,7 @@ def test_make_A():
             [0, 1] + [0] * (m_g + m_l) + [1],
         ]
     )
-    np.testing.assert_almost_equal(A.todense(), sol_A)
+    np.testing.assert_almost_equal(A.toarray(), sol_A)
 
 
 def test_make_b():

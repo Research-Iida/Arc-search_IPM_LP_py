@@ -218,6 +218,21 @@ class LinearProgrammingProblem:
     c: np.ndarray
     name: str = ""
 
+    def __post_init__(self):
+        num_lb_index = len(self.LB_index)
+        num_lb = len(self.LB)
+        if num_lb_index != num_lb:
+            raise SettingProblemError(
+                f"変数の下限の index 数と変数の下限数が異なります. index数: {num_lb_index}, 下限数: {num_lb}"
+            )
+
+        num_ub_index = len(self.UB_index)
+        num_ub = len(self.UB)
+        if num_ub_index != num_ub:
+            raise SettingProblemError(
+                f"変数の上限の index 数と変数の上限数が異なります. index数: {num_ub_index}, 上限数: {num_ub}"
+            )
+
     def __eq__(self, other: LinearProgrammingProblem) -> bool:
         """要素がすべて同じか
         要素が `np.array` だったり `lil_matrix` だったりするので, 標準の __eq__ メソッドだとエラーになる
@@ -355,7 +370,7 @@ class LinearProgrammingProblem:
         m_b = len(lst_index_up)
 
         # box constraint に関する単位行列を作成
-        A_B = Lil((m_b, n + m_g + m_l + m_b))
+        A_B = Lil((m_b, n))
         for i, index_up in enumerate(lst_index_up):
             A_B[i, index_up] = 1
 
@@ -365,7 +380,7 @@ class LinearProgrammingProblem:
                 hstack([A_E, Lil((m_e, m_g + m_l + m_b))]),
                 hstack([A_G, -eye(m_g), Lil((m_g, m_l + m_b))]),
                 hstack([A_L, Lil((m_l, m_g)), eye(m_l), Lil((m_l, m_b))]),
-                A_B,
+                hstack([A_B, Lil((m_b, m_g + m_l)), eye(m_b)]),
             ]
         )
         return output.tocsr()
