@@ -53,7 +53,7 @@ class JuliaLPRepository(ILPRepository):
             b_L=b_L,
             LB_index=problem.LB_index.tolist(),
             LB=problem.LB,
-            UB_index=problem.UB_index,
+            UB_index=problem.UB_index.tolist(),
             UB=problem.UB,
             c=problem.c,
             name=problem_name,

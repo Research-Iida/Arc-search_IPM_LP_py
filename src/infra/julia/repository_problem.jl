@@ -35,6 +35,7 @@ function extract_elements(qps_data::QPSData, row_type::Int)::Tuple{Vector{Int},V
     target_A_cols = qps_data.acols[target_index_sparce_matrix]
     target_A_vals = qps_data.avals[target_index_sparce_matrix]
 
+    # 制約の種類が LessTHan の場合は b は upper bound, そうでなければ lower bound 参照
     if row_type == 2
         target_b = qps_data.ucon[target_row_number]
     else
@@ -52,17 +53,21 @@ function load_mps(problem_name::String)::LPOnlyEqualityConstraint
     A_L_rows, A_L_cols, A_L_vals, b_L = extract_elements(qps_data, 2)
     A_G_rows, A_G_cols, A_G_vals, b_G = extract_elements(qps_data, 3)
 
-    # julia は1始まりなので python の0始まりに合わせるために -1
-    lb_index = findall(x -> !isinf(x), qps_data.lvar) .- 1
-    ub_index = findall(x -> !isinf(x), qps_data.uvar) .- 1
+    check_is_inf(x) = !isinf(x)
+    lb = filter(check_is_inf, qps_data.lvar)
+    ub = filter(check_is_inf, qps_data.uvar)
+
+    # julia の iundex は 1 始まりなので python の0始まりに合わせるために -1
+    lb_index = findall(check_is_inf, qps_data.lvar) .- 1
+    ub_index = findall(check_is_inf, qps_data.uvar) .- 1
     LPOnlyEqualityConstraint(
         qps_data.nvar,
         qps_data.ncon,
         A_E_rows .- 1, A_E_cols .- 1, A_E_vals, b_E,
         A_G_rows .- 1, A_G_cols .- 1, A_G_vals, b_G,
         A_L_rows .- 1, A_L_cols .- 1, A_L_vals, b_L,
-        lb_index, qps_data.lvar,
-        ub_index, qps_data.uvar,
+        lb_index, lb,
+        ub_index, ub,
         qps_data.c
     )
 end
