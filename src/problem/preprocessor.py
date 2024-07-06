@@ -1,12 +1,12 @@
 """LPに関する前処理を行う module"""
 
-from typing import Optional
+from collections import Counter
 
 import numpy as np
 from scipy.sparse import csr_matrix as Csr
 from tqdm import tqdm
 
-from ..logger import get_main_logger
+from ..logger import get_main_logger, indent
 from .problem import LinearProgrammingProblemStandard as LPS
 
 logger = get_main_logger()
@@ -43,6 +43,11 @@ class LPPreprocessor:
             rows_remove: 削除行. 入力されなければ空集合
             columns_remove: 削除列. 入力されなければ空集合
         """
+        if len(rows_remove) > 0:
+            logger.debug(f"{indent}Remove rows: {rows_remove}")
+        if len(columns_remove) > 0:
+            logger.debug(f"{indent}Remove columns: {columns_remove}")
+
         # 残す行, 列を指定
         rows_out = [i for i in range(A.shape[0]) if i not in rows_remove]
         columns_out = [i for i in range(A.shape[1]) if i not in columns_remove]
@@ -67,10 +72,11 @@ class LPPreprocessor:
         """
         rows_remove = set()
         # A が空行になっているindexに対して処理
-        for i in np.where(np.all(A.todense() == 0, axis=1))[0]:
+        empty_rows_of_A = {i for i in range(A.shape[0])} - set(A.nonzero()[0].tolist())
+        for i in empty_rows_of_A:
             # もしAが空行なのにbが0でなければ実行不可能
             if b[i] != 0:
-                raise ProblemInfeasibleError
+                raise ProblemInfeasibleError(f"{i}-th row of A is empty, but b[{i}] == {b[i]} != 0.")
             rows_remove.add(i)
 
         A_out, b_out, _ = self._remove_rows_and_columns(A, b=b, rows_remove=rows_remove)
@@ -84,7 +90,7 @@ class LPPreprocessor:
         """
         m = A.shape[0]
 
-        def scalar_times_vector(vec_a: np.ndarray, vec_b: np.ndarray) -> Optional[float]:
+        def scalar_times_vector(vec_a: np.ndarray, vec_b: np.ndarray) -> float | None:
             """vec_b が vec_a の定数倍であるならばその値を, そうでなければ None を出力"""
             # 0の位置が正しくなければ定数倍ではない
             idx_not_zero_a = np.where(vec_a != 0)[0]
@@ -133,10 +139,11 @@ class LPPreprocessor:
         """
         columns_remove = set()
         # Aが空列になっている index に対してのみ処理
-        for i in np.where(np.all(A.toarray() == 0, axis=0))[0]:
+        empty_cols_of_A = {i for i in range(A.shape[1])} - set(A.nonzero()[1].tolist())
+        for i in empty_cols_of_A:
             # もしAが空列なのにcが負であれば unbounded
             if c[i] < 0:
-                raise ProblemUnboundedError
+                raise ProblemUnboundedError(f"{i}-th col of A is empty, but c[{i}] == {c[i]} < 0.")
             columns_remove.add(i)
 
         A_out, _, c_out = self._remove_rows_and_columns(A, c=c, columns_remove=columns_remove)
@@ -167,16 +174,10 @@ class LPPreprocessor:
         return A_out, c_out
 
     def rows_only_one_nonzero(self, A: Csr) -> list[int]:
-        """Aの行のうち1つしか0以外の係数が存在しない行のインデックス取得
-
-        A が1行m列の制約になった場合エラーとなるので, その時は axis を変更する
-        """
-        A_dense = A.toarray()
-        if A_dense.shape[1] == 1:
-            output = np.where(np.count_nonzero(A_dense, axis=0) == 1)
-        else:
-            output = np.where(np.count_nonzero(A_dense, axis=1) == 1)
-        return output[0]
+        """Aの行のうち1つしか0以外の係数が存在しない行のインデックス取得"""
+        row_element_counter = Counter(A.nonzero()[0].tolist())
+        result = [row for row, count in row_element_counter.items() if count == 1]
+        return result
 
     def only_one_nonzero_elements_and_columns(
         self, A: Csr, row_indexs_only_one_nonzero: list[int]
@@ -206,7 +207,7 @@ class LPPreprocessor:
         # 行が削除された結果
         A_new, _, c_new = self._remove_rows_and_columns(A, c=c, rows_remove=rows_remove, columns_remove=columns_remove)
         # bのみ値が変わるため, 別で計算する
-        rows_output = [i for i in range(A.shape[0]) if i not in rows_remove]
+        rows_output = list({i for i in range(A.shape[0])} - set(rows_remove))
         b_new = b[rows_output] - A[np.ix_(rows_output, columns_remove)].dot(x)
 
         # 行を削除した結果, 再び要素が1つだけの行ができるかもしれないので再度実行
@@ -286,11 +287,22 @@ class LPPreprocessor:
         """
         # 実行不可能性の確認
         rows_b_negative = np.where(b < 0)[0]
-        if np.any(np.all(A[rows_b_negative, :].toarray() >= 0, axis=1)):
-            raise ProblemInfeasibleError
+        for row in rows_b_negative:
+            if np.all(A[row, :].data > 0):
+                raise ProblemInfeasibleError(
+                    f"{row}th row of A has only semi-positive coefficients but negative b_{row}: {b[row]}"
+                )
+        # if np.any(np.all(A[rows_b_negative, :].toarray() >= 0, axis=1)):
+        #     raise ProblemInfeasibleError("A has only semi-positive coefficients in the row of negative b")
+
         rows_b_positive = np.where(b > 0)[0]
-        if np.any(np.all(A[rows_b_positive, :].toarray() <= 0, axis=1)):
-            raise ProblemInfeasibleError
+        for row in rows_b_positive:
+            if np.all(A[row, :].data < 0):
+                raise ProblemInfeasibleError(
+                    f"{row}th row of A has only semi-negative coefficients but positive b_{row}: {b[row]}"
+                )
+        # if np.any(np.all(A[rows_b_positive, :].toarray() <= 0, axis=1)):
+        #     raise ProblemInfeasibleError("A has only semi-negative coefficients in the row of positive b")
 
         # 制約, 変数の削除
         rows_remove = set()
@@ -377,8 +389,8 @@ class LPPreprocessor:
             indexs_A_alpha_with_b = np.where(A[row, :].toarray()[0] * b[row] / abs(b[row]) > 0)[0]
             # 要素が1つのみの場合, indexを取得し走査終了
             if len(indexs_A_alpha_with_b) == 1:
-                remove_row = row
-                remove_col = indexs_A_alpha_with_b[0]
+                remove_row: int = row
+                remove_col: int = indexs_A_alpha_with_b[0]
                 break
         # 該当する条件の行がなかった場合は入力された行列を出力へ
         else:
@@ -390,7 +402,7 @@ class LPPreprocessor:
         A_alpha_i = A_alpha[remove_col]
         A_beta = A[:, remove_col].toarray()
         A_new, b_new, c_new = self._remove_rows_and_columns(
-            A=Csr(A - A_beta * A_alpha.reshape(1, A.shape[1]) / A_alpha_i),
+            A=A - Csr(A_beta) * Csr(A_alpha.reshape(1, A.shape[1]) / A_alpha_i),
             b=b - A_beta.reshape(-1) * b[remove_row] / A_alpha_i,
             c=c - c[remove_col] * A_alpha / A_alpha_i,
             rows_remove={remove_row},
@@ -449,25 +461,25 @@ class LPPreprocessor:
         b = problem.b.copy()
         c = problem.c.copy()
 
-        logger.info("1. Start removing empty rows.")
+        logger.info("1. Remove empty rows.")
         A, b = self.remove_empty_row(A, b)
-        # logger.info("2. Start removing duplicated rows.")
+        # logger.info("2. Remove duplicated rows.")
         # A, b = self.remove_duplicated_row(A, b)
-        logger.info("3. Start removing empty columns.")
+        logger.info("3. Remove empty columns.")
         A, c = self.remove_empty_column(A, c)
-        # logger.info("4. Start removing duplicated columns.")
+        # logger.info("4. Remove duplicated columns.")
         # A, c = self.remove_duplicated_column(A, c)
-        logger.info("5. Start removing row singletons.")
+        logger.info("5. Remove row singletons.")
         A, b, c = self.remove_row_singleton(A, b, c)
-        # logger.info("6. Start removing free variables.")
+        # logger.info("6. Remove free variables.")
         # A, b, c = self.remove_free_variables(A, b, c)
-        logger.info("7. Start fixing variables by single row.")
+        logger.info("7. Fix variables by single row.")
         A, b, c = self.fix_variables_by_single_row(A, b, c)
-        # logger.info("8. Start fixing variables by multiple rows.")
+        # logger.info("8. Fix variables by multiple rows.")
         # A, b, c = self.fix_variables_by_multiple_rows(A, b, c)
-        logger.info("9. Start fixing positive variable by sings.")
+        logger.info("9. Fix positive variable by sings.")
         A, b, c = self.fix_positive_variable_by_signs(A, b, c)
-        # logger.info("10. Start fixing singleton by two rows.")
+        # logger.info("10. Fix singleton by two rows.")
         # A, b, c = self.fix_singleton_by_two_rows(A, b, c)
 
         # A, b, c について変更されているか確認し, もしされていなければ出力
@@ -479,8 +491,9 @@ class LPPreprocessor:
             # scipy sparse は行列で比較して0以外の要素がなければok
             if (A - problem.A).nnz == 0 and np.all(b == problem.b) and np.all(c == problem.c):
                 logger.info("End preprocessing.")
-                if not problem.is_full_row_rank():
-                    logger.warning("This problem is not full row rank!")
+                # 時間かかるのでいったん抜く
+                # if not problem.is_full_row_rank():
+                #     logger.warning("This problem is not full row rank!")
                 return problem
         # されていればもう一度実行
         logger.info("Restart Preprocessing for changing coefficients.")
