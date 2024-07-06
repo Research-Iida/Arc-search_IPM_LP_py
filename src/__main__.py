@@ -5,8 +5,9 @@ from datetime import date
 from pathlib import Path
 
 from .drawer import Drawer
+from .infra.julia.repository_problem import JuliaLPRepository
+from .infra.julia.setup_julia import setup_julia
 from .infra.path_generator import PathGenerator
-from .infra.python.repository_problem import LPRepository
 from .infra.repository_solved_data import SolvedDataRepository
 from .logger import get_main_logger, setup_logger
 from .problem.repository import ILPRepository
@@ -149,7 +150,8 @@ def main(
     aSlack.notify(msg)
 
     # 各種インスタンスの用意
-    aLPRepository = LPRepository(config_section)
+    setup_julia()
+    aLPRepository = JuliaLPRepository(config_section)
     aSolvedDataRepository = SolvedDataRepository(config_section)
 
     # 対象の問題の決定

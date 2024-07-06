@@ -1,6 +1,8 @@
 import argparse
 import sys
 
+from .infra.julia.repository_problem import JuliaLPRepository
+from .infra.julia.setup_julia import setup_julia
 from .infra.python.repository_problem import LPRepository
 from .logger import get_main_logger, setup_logger
 from .slack.slack import get_slack_api
@@ -21,9 +23,7 @@ def main(problem_name: str, config_section: str | None, with_julia: bool):
 
     if with_julia:
         logger.info("Using julia for netlib loading.")
-
-        # Julia を使う場合, コンパイルに若干時間がかかるので判定後に import
-        from .infra.julia.repository_problem import JuliaLPRepository
+        setup_julia()
 
         repository = JuliaLPRepository(config_section)
     else:
