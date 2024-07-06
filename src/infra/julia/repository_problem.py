@@ -1,19 +1,11 @@
 import numpy as np
-from julia import Julia
+from julia import Main
 from scipy.sparse import coo_matrix
 
 from src.problem.problem import LinearProgrammingProblem, LinearProgrammingProblemStandard
 
 from ...problem.repository import ILPRepository
 from ..python.repository_problem import LPRepository
-
-jl = Julia(compiled_modules=False)
-
-from julia import Main, Pkg  # noqa: E402
-
-Pkg.activate(".")
-Pkg.instantiate()
-Main.include("src/infra/julia/repository_problem.jl")
 
 
 class JuliaLPRepository(ILPRepository):
@@ -23,6 +15,8 @@ class JuliaLPRepository(ILPRepository):
 
     def __init__(self, config_section: str):
         """pure python の実装を持っておき, `read_raw_LP` 以外はそちらを使う"""
+        Main.include("src/infra/julia/repository_problem.jl")
+
         self.pure_python_repository = LPRepository(config_section)
 
     def read_raw_LP(self, problem_name: str) -> LinearProgrammingProblem:
