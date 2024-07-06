@@ -63,18 +63,18 @@ class ILPSolvingAlgoritm(abc.ABC):
         """最初の段階での問題に関するロギングの実行"""
         logger.info(f"{indent}Dimension of problem n: {problem_0.n}, m: {problem_0.m}")
 
-        logger.info(f"{indent}Eigen values:")
-        # logger.info(f"{indent*2}Max: {problem_0.max_sqrt_eigen_value_AAT}, Min: {problem_0.min_sqrt_eigen_value_AAT}")
-        logger.info(f"{indent*2}Max: {problem_0.max_sqrt_eigen_value_AAT}")
-
         logger.info(f"{indent}Abs ratio scaling:")
         logger.info(f"{indent*2}Max: {problem_0.max_abs_A}, Min: {problem_0.min_abs_A_nonzero}")
 
-        logger.info(f"{indent}Condition number: {problem_0.condition_number_A}")
-        if not problem_0.is_full_row_rank():
-            logger.warning(
-                f"{indent}Constraint matrix is not full row rank! m: {problem_0.m}, rank: {problem_0.row_rank}"
-            )
+        # 以下は時間がかかるので実行しない
+        # TODO: 問題のサイズによって判定させる？
+        # logger.info(f"{indent}Eigen values:")
+        # logger.info(f"{indent*2}Max: {problem_0.max_sqrt_eigen_value_AAT}, Min: {problem_0.min_sqrt_eigen_value_AAT}")
+        # logger.info(f"{indent}Condition number: {problem_0.condition_number_A}")
+        # if not problem_0.is_full_row_rank():
+        #     logger.warning(
+        #         f"{indent}Constraint matrix is not full row rank! m: {problem_0.m}, rank: {problem_0.row_rank}"
+        #     )
 
     def log_positive_variables_negativity(self, v: LPVariables):
         """もし x, s が負になってしまった場合アルゴリズムが狂うので, 負になっていないか確認"""
