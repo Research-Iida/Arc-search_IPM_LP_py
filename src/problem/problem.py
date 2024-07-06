@@ -9,7 +9,7 @@ from functools import cached_property
 import numpy as np
 import scipy
 from scipy.sparse import csr_matrix as Csr
-from scipy.sparse import hstack, vstack
+from scipy.sparse import eye, hstack, vstack
 from scipy.sparse import lil_matrix as Lil
 from scipy.sparse.linalg import eigsh, inv
 
@@ -355,17 +355,17 @@ class LinearProgrammingProblem:
         m_b = len(lst_index_up)
 
         # box constraint に関する単位行列を作成
-        A_B = np.zeros([m_b, n])
+        A_B = Lil((m_b, n + m_g + m_l + m_b))
         for i, index_up in enumerate(lst_index_up):
             A_B[i, index_up] = 1
 
         # 組み合わせて一つの行列に
         output = vstack(
             [
-                hstack([A_E, np.zeros([m_e, m_g + m_l + m_b])]),
-                hstack([A_G, -np.eye(m_g), np.zeros([m_g, m_l + m_b])]),
-                hstack([A_L, np.zeros([m_l, m_g]), np.eye(m_l), np.zeros([m_l, m_b])]),
-                np.concatenate([A_B, np.zeros([m_b, m_g + m_l]), np.eye(m_b)], 1),
+                hstack([A_E, Lil((m_e, m_g + m_l + m_b))]),
+                hstack([A_G, -eye(m_g), Lil((m_g, m_l + m_b))]),
+                hstack([A_L, Lil((m_l, m_g)), eye(m_l), Lil((m_l, m_b))]),
+                A_B,
             ]
         )
         return output.tocsr()
