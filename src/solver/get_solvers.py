@@ -58,8 +58,7 @@ target_config_sections_by_algorithm: dict[str, list[str]] = {
         # "INEXACT_LINE_CG_MNES",
         "INEXACT_LINE_CG_NES",
         "INEXACT_LINE_CG_NES_LUSTING",
-        # "LINE_EXACT_MNES",
-        "LINE_EXACT_NES",
+        "INEXACT_LINE_EXACT_NES",
         "INEXACT_LINE_EXACT_NES_LUSTING",
     ],
     "iterative_refinement": [
