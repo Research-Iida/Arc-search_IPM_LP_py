@@ -5,6 +5,7 @@ from scipy.sparse import coo_matrix
 from src.problem.problem import LinearProgrammingProblem, LinearProgrammingProblemStandard
 
 from ...problem.repository import ILPRepository
+from ..path_generator import PathGenerator
 from ..python.repository_problem import LPRepository
 
 
@@ -13,11 +14,11 @@ class JuliaLPRepository(ILPRepository):
 
     pure_python_repository: LPRepository
 
-    def __init__(self, config_section: str):
+    def __init__(self, path_generator: PathGenerator):
         """pure python の実装を持っておき, `read_raw_LP` 以外はそちらを使う"""
         Main.include("src/infra/julia/repository_problem.jl")
 
-        self.pure_python_repository = LPRepository(config_section)
+        self.pure_python_repository = LPRepository(path_generator)
 
     def read_raw_LP(self, problem_name: str) -> LinearProgrammingProblem:
         """julia QPSReader を用いてファイルの読み込みを行う.

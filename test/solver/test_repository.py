@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 
+from src.infra.path_generator import PathGenerator
 from src.infra.repository_solved_data import SolvedDataRepository
 from src.solver.solver import SolvedSummary
 from src.utils.config_utils import read_config, test_section
@@ -15,7 +16,7 @@ filename_written = "test_written"
 
 @pytest.fixture
 def aSolvedDataRepository() -> SolvedDataRepository:
-    return SolvedDataRepository(test_section)
+    return SolvedDataRepository(PathGenerator(test_section))
 
 
 @pytest.fixture

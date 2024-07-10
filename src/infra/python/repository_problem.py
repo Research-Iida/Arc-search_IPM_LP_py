@@ -11,7 +11,7 @@ from ...logger import get_main_logger
 from ...problem import LinearProgrammingProblem as LP
 from ...problem import LinearProgrammingProblemStandard as LPS
 from ...problem.repository import CannotReadError, ILPRepository
-from ...utils import config_utils, str_util
+from ...utils import str_util
 from ..path_generator import PathGenerator
 
 logger = get_main_logger()
@@ -24,10 +24,8 @@ class LPRepository(ILPRepository):
     標準形式に起こす必要がある
     """
 
-    def __init__(self, config_section: str = config_utils.default_section):
+    def __init__(self, path_generator: PathGenerator):
         """初期化. `data` ディレクトリへのパスを設定する"""
-        path_generator = PathGenerator(config_section=config_section)
-
         self._path_netlib: Path = path_generator.generate_path_netlib()
         self._path_processed: Path = path_generator.generate_path_data_processed()
 

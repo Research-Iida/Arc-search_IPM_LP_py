@@ -21,44 +21,40 @@ logger = get_main_logger()
 setup_logger(__name__)
 aSlack = get_slack_api()
 
-# スキップする問題群. 基本的にサイズがでかすぎて解けなかったもの
+# スキップする問題群
 skip_problems = {
     "BLEND",  # SIFファイルに問題があり読み込みできなかった
-    # "CRE-B",  # Mps から読み込むのが時間かかりすぎ
-    # "CRE-D",  # Mps から読み込むのが時間かかりすぎ
     "DFL001",  # SIFファイルに問題があり読み込みできなかった
-    # "E226",  # SIF ファイルに問題があり読み込みできなかった
     "FORPLAN",  # SIFファイルに問題があり読み込みできなかった
     "GFRD-PNC",  # SIFファイルに問題があり読み込みできなかった
     "GREENBEB",  # CGだと永遠に終わらない
-    # "GROW7",  # SIFファイルに問題があり読み込みできなかった
-    # "GROW15",  # SIFファイルに問題があり読み込みできなかった
-    # "GROW22",  # SIFファイルに問題があり読み込みできなかった
-    # "KEN-11",  # 前処理の途中で落ちた
-    # "KEN-13",  # Mps から読み込めない（サイズが大きい）
-    # "KEN-18",  # Mps から読み込めない（サイズが大きい）
-    # "NESM",  # 前処理で実行不可能と判断
-    # "OSA-30",  # Mps から読み込むのが時間かかりすぎ
-    # "OSA-60",  # Mps から読み込むのが時間かかりすぎ
-    # "PDS-06",  # Mps から読み込むのが時間かかりすぎ
-    # "PDS-10",  # Mps から読み込むのが時間かかりすぎ
-    # "PDS-20",  # Mps から読み込むのが時間かかりすぎ
     "SCORPION",  # 初期点の計算時に特異行列が出てしまう
     "SIERRA",  # 文字列が数値の所に入っているらしい
-    # "STOCFOR3",  # 詳細は netlib の README 参照
 }
 # 解けるサイズではあるものの時間がかかるもの
 # skip_problems = skip_problems | {
 #     "80BAU3B",
+#     "CRE-B",
+#     "CRE-D",
 #     "FIT2D",
 #     "FIT2P",
+#     "KEN-11",
+#     "KEN-13",
+#     "KEN-18",
 #     "OSA-07",
 #     "OSA-14",
 #     "QAP15",
+#     "OSA-30",
+#     "OSA-60",
+#     "PDS-06",
+#     "PDS-10",
+#     "PDS-20",
+#     "STOCFOR3",
 # }
 
 # 出力されるファイル名
-str_today = date.today().strftime("%Y%m%d")
+today = date.today()
+str_today = today.strftime("%Y%m%d")
 name_result = str_util.add_suffix_csv(f"{str_today}_result")
 # log に日付を入れるためのメッセージ
 msg_for_logging_today = f"[{str_today}] "
@@ -151,8 +147,9 @@ def main(
 
     # 各種インスタンスの用意
     setup_julia()
-    aLPRepository = JuliaLPRepository(config_section)
-    aSolvedDataRepository = SolvedDataRepository(config_section)
+    path_generator = PathGenerator(config_section=config_section, date_=today)
+    aLPRepository = JuliaLPRepository(path_generator)
+    aSolvedDataRepository = SolvedDataRepository(path_generator)
 
     # 対象の問題の決定
     problem_files = decide_solved_problems(aLPRepository, num_problem, start_problem_number)
@@ -160,7 +157,6 @@ def main(
     logger.info(f"Target problems number: {target_problem_number}")
 
     # 書き込み先のディレクトリを作成
-    path_generator = PathGenerator(config_section=config_section)
     path_result = path_generator.generate_path_result_by_date()
     # パラメータもコピーしておく
     copy_optimization_parameters(path_result, config_section)
