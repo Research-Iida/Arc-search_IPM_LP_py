@@ -28,14 +28,16 @@ def main(problem_name: str, solver_name: str | None, config_section: str | None)
         log_file_name = f"{log_file_name}_{config_section}"
     setup_logger(log_file_name)
 
-    path_generator = PathGenerator(config_section=config_section)
-    path_result_by_problem = path_generator.generate_path_result_by_date_problem(problem_name)
-    repository = LPRepository(config_section)
-    aSolvedDataRepository = SolvedDataRepository(config_section)
-
     # 出力されるファイル名
-    str_today = date.today().strftime("%Y%m%d")
+    today = date.today()
+    str_today = today.strftime("%Y%m%d")
     name_result = str_util.add_suffix_csv(f"{str_today}_result")
+
+    path_generator = PathGenerator(config_section=config_section, date_=today)
+    path_result_by_problem = path_generator.generate_path_result_by_date_problem(problem_name)
+    repository = LPRepository(path_generator)
+    aSolvedDataRepository = SolvedDataRepository(path_generator)
+
     # csvのヘッダーを書き出す
     aSolvedDataRepository.write_SolvedSummary([], name_result, path=Path(path_result_by_problem))
 

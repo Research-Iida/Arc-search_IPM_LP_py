@@ -10,7 +10,7 @@ from src.utils.config_utils import test_section
 
 num_problem = 1
 path_generator = PathGenerator(test_section)
-aLPRepository = LPRepository(test_section)
+aLPRepository = LPRepository(path_generator)
 
 
 def test_decide_solved_problems():

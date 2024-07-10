@@ -3,6 +3,7 @@ import sys
 
 from .infra.julia.repository_problem import JuliaLPRepository
 from .infra.julia.setup_julia import setup_julia
+from .infra.path_generator import PathGenerator
 from .infra.python.repository_problem import LPRepository
 from .logger import get_main_logger, setup_logger
 from .slack.slack import get_slack_api
@@ -25,9 +26,9 @@ def main(problem_name: str, config_section: str | None, with_julia: bool):
         logger.info("Using julia for netlib loading.")
         setup_julia()
 
-        repository = JuliaLPRepository(config_section)
+        repository = JuliaLPRepository(PathGenerator(config_section))
     else:
-        repository = LPRepository(config_section)
+        repository = LPRepository(PathGenerator(config_section))
 
     preprocess(problem_name, repository)
 

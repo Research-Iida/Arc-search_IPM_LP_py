@@ -1,3 +1,4 @@
+from configparser import SectionProxy
 from datetime import date
 from pathlib import Path
 
@@ -8,8 +9,22 @@ from ..utils.file_util import create_dir_if_not_exists
 class PathGenerator:
     """config をもとにローカルで必要なパスの作成に責務を持つクラス"""
 
-    def __init__(self, config_section: str):
+    config: SectionProxy
+    str_date: str
+
+    def __init__(self, config_section: str, date_: date | None = None):
+        """初期化
+
+        Args:
+            config_section (str): config から読みだす際のセクション名
+            date (date): 計算実行日などの日付. 出力するパスに日付が入るので初期化時に指定しておく（でないと日付を超えた際に出力パスが異なる）. 入力がなければ今日の日付
+        """
         self.config = read_config(section=config_section)
+
+        if date_ is None:
+            self.str_date = date.today().strftime("%Y%m%d")
+        else:
+            self.str_date = date_.strftime("%Y%m%d")
 
     def generate_path_data(self) -> Path:
         return Path(self.config.get("PATH_DATA"))
@@ -32,8 +47,7 @@ class PathGenerator:
         Returns:
             Path: `{path_result}{実行日の日付, YYYYMMDD}`. 対応するディレクトリが作成された状態になる
         """
-        str_today = date.today().strftime("%Y%m%d")
-        result = self.generate_path_result().joinpath(str_today)
+        result = self.generate_path_result().joinpath(self.str_date)
         create_dir_if_not_exists(result)
         return result
 

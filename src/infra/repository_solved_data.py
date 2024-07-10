@@ -13,8 +13,8 @@ logger = get_main_logger()
 
 
 class SolvedDataRepository(ISolvedDataRepository):
-    def __init__(self, config_section: str):
-        self.path_generator = PathGenerator(config_section)
+    def __init__(self, path_generator: PathGenerator):
+        self.path_generator = path_generator
 
     def write_SolvedSummary(
         self, lst_solved_summary: list[SolvedSummary], name: str, path: Path, is_append: bool = False

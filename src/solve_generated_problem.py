@@ -30,7 +30,7 @@ def main(n: int, m: int, solver_name: str | None, config_section: str | None, ra
     setup_logger(log_file_name)
 
     path_generator = PathGenerator(config_section=config_section)
-    aSolvedDataRepository = SolvedDataRepository(config_section)
+    aSolvedDataRepository = SolvedDataRepository(path_generator)
 
     problem, opt_sol = generate_problem(n, m)
 

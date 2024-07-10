@@ -13,7 +13,6 @@ from src.problem.repository import CannotReadError
 from src.utils.config_utils import test_section
 
 path_generator = PathGenerator(test_section)
-path_netlib = path_generator.generate_path_netlib()
 
 # ファイル名の設定
 filename_written = "written"
@@ -21,11 +20,13 @@ filename_written = "written"
 
 @pytest.fixture
 def aLPRepository() -> LPRepository:
-    return LPRepository(test_section)
+    return LPRepository(path_generator)
 
 
 def test_get_problem_names(aLPRepository):
     """出力される SIF ファイル名はパスを含んでいないか, `.SIF` で終わっていないか"""
+    path_netlib = path_generator.generate_path_netlib()
+
     for file in aLPRepository.get_problem_names():
         assert not file.startswith(f"{path_netlib}")
         assert not file.endswith(".SIF")
@@ -77,6 +78,6 @@ def test_write_LP(aLPRepository, remove_written_file):
 @pytest.mark.parametrize("problem_name", ["KB2", "KEN-07"])
 def test_same_LP_between_pure_python_and_julia(fixture_setup_julia, problem_name: str):
     """pure python での実装と julia を使った実装が結果同じになることを確認"""
-    sol_LP = LPRepository(test_section).read_raw_LP(problem_name)
-    test_LP = JuliaLPRepository(test_section).read_raw_LP(problem_name)
+    sol_LP = LPRepository(path_generator).read_raw_LP(problem_name)
+    test_LP = JuliaLPRepository(path_generator).read_raw_LP(problem_name)
     assert test_LP == sol_LP
