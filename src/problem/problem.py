@@ -11,7 +11,7 @@ import scipy
 from scipy.sparse import csr_matrix as Csr
 from scipy.sparse import eye, hstack, vstack
 from scipy.sparse import lil_matrix as Lil
-from scipy.sparse.linalg import eigsh, inv
+from scipy.sparse.linalg import eigsh, factorized, inv
 
 from ..logger.logger import get_main_logger
 
@@ -106,6 +106,11 @@ class LinearProgrammingProblemStandard:
         """
         # scipy.sparce.linalg.inv にかける時は csc_matrix の方が効率よい
         return inv((self.A @ self.A.T).tocsc())
+
+    @cached_property
+    def AA_T_pre_factorized(self) -> callable:
+        # scipy.sparse.linalg.factorized は csc_matrix を引数に取らないと warning を出す
+        return factorized((self.A @ self.A.T).tocsc())
 
     @cached_property
     def row_rank(self) -> int:

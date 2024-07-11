@@ -24,11 +24,12 @@ class MehrotraInitialPointMaker(IInitialPointMaker):
         """初期点の作成"""
         A = problem.A
         c = problem.c
-        AA_T_inv = problem.AA_T_inv
+        # AA_T_inv = problem.AA_T_inv
 
-        yhat = AA_T_inv @ A @ c
-        s_hat = c - A.T @ yhat
-        x_hat = A.T @ AA_T_inv @ problem.b
+        yhat = problem.AA_T_pre_factorized(A @ c)
+        s_hat = c - A.T.tocsr() @ yhat
+        tmp = problem.AA_T_pre_factorized(problem.b)
+        x_hat = A.T.tocsr() @ tmp
 
         delta_x = max([-1.1 * min(x_hat), 0])
         delta_s = max([-1.1 * min(s_hat), 0])
@@ -58,7 +59,8 @@ class LustingInitialPointMaker(IInitialPointMaker):
         b = problem.b
         c = problem.c
 
-        x_hat = A.T.tocsr() @ problem.AA_T_inv @ b
+        tmp = problem.AA_T_pre_factorized(b)
+        x_hat = A.T.tocsr() @ tmp
         xi_1 = max(-100 * x_hat.min(), 100, np.linalg.norm(b, ord=1) / 100)
         xi_2 = 1 + np.linalg.norm(c, ord=1)
         x_0 = x_hat.copy()
