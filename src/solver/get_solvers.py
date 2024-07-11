@@ -11,8 +11,8 @@ target_algorithms: list[str] = [
     # "arc_restarting",
     # "arc_restarting_proven",
     "inexact_arc",
-    # "inexact_line",
-    "iterative_refinement",
+    "inexact_line",
+    # "iterative_refinement",
 ]
 # アルゴリズム別計算対象の config セクション一覧
 # 計算対象にさせたくないアルゴリズムは, すべての config セクションをコメントアウトする
