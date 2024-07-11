@@ -2,10 +2,10 @@
 仮想環境の activate とおまじないが必要なので `__init__.py` に記載
 """
 
-from julia import Julia
+# from julia import Julia
 
-# サーバー環境で実行するためのおまじない
-Julia(compiled_modules=False)
+# # サーバー環境で実行するためのおまじない
+# Julia(compiled_modules=False)
 
 from julia import Pkg  # noqa: E402
 
