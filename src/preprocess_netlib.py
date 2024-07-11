@@ -1,7 +1,7 @@
 import argparse
 import sys
 
-from .infra.julia import JuliaLPRepository, setup_julia
+from .infra.julia.repository_problem import JuliaLPRepository
 from .infra.path_generator import PathGenerator
 from .infra.python.repository_problem import LPRepository
 from .logger import get_main_logger, setup_logger
@@ -23,7 +23,6 @@ def main(problem_name: str, config_section: str | None, with_julia: bool):
 
     if with_julia:
         logger.info("Using julia for netlib loading.")
-        setup_julia()
 
         repository = JuliaLPRepository(PathGenerator(config_section))
     else:

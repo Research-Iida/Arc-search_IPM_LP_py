@@ -1,10 +1,12 @@
 """Python と julia を両立して使用する際に使用するコード
-おまじないが必要になるため, julia を使用するパッケージはかならずこの `__init__.py` から読み込む
+仮想環境の activate とおまじないが必要なので `__init__.py` に記載
 """
+
 from julia import Julia
 
 # サーバー環境で実行するためのおまじない
 Julia(compiled_modules=False)
 
-from ._setup_julia import setup_julia
-from .repository_problem import JuliaLPRepository
+from julia import Pkg  # noqa: E402
+
+Pkg.activate(".")

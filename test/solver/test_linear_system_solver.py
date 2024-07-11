@@ -22,7 +22,7 @@ def test_CG_tolerance():
 
 @pytest.mark.julia
 @pytest.mark.skip("Yao HHL がぶっ壊れたので実行しない")
-def test_HHL_julia(fixture_setup_julia):
+def test_HHL_julia():
     """julia による HHL アルゴリズムが正しく解けるか確認"""
     # 解: [2, 1, 0]
     A = np.array([[1.0, 1.0, 0.0], [1.0, 2.0, 0.0], [0.0, 0.0, 1.0]])
