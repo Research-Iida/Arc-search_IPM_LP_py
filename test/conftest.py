@@ -1,6 +1,6 @@
 import pytest
 
-from src.infra.julia.setup_julia import setup_julia
+from src.infra.julia import setup_julia
 
 
 @pytest.fixture(scope="session")

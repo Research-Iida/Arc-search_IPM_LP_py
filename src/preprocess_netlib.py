@@ -1,8 +1,7 @@
 import argparse
 import sys
 
-from .infra.julia.repository_problem import JuliaLPRepository
-from .infra.julia.setup_julia import setup_julia
+from .infra.julia import JuliaLPRepository, setup_julia
 from .infra.path_generator import PathGenerator
 from .infra.python.repository_problem import LPRepository
 from .logger import get_main_logger, setup_logger
