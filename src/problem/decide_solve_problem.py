@@ -10,8 +10,12 @@ skip_problems = {
     "FORPLAN",  # SIFファイルに問題があり読み込みできなかった
     "GFRD-PNC",  # SIFファイルに問題があり読み込みできなかった
     "GREENBEB",  # CGだと永遠に終わらない
+    "KEN-18",  # exact に線形方程式を解くにはサイズがでかすぎる
+    "OSA-60",  # exact に線形方程式を解くにはサイズがでかすぎる
+    "PDS-20",  # exact に線形方程式を解くにはサイズがでかすぎる
     "SCORPION",  # 初期点の計算時に特異行列が出てしまう
     "SIERRA",  # 文字列が数値の所に入っているらしい
+    "STOCFOR3",  # exact に線形方程式を解くにはサイズがでかすぎる
 }
 # 解けるサイズではあるものの時間がかかるもの
 # skip_problems = skip_problems | {
