@@ -1,8 +1,8 @@
 from collections.abc import Iterator
 
+from ..solver.solver import LPSolver
 from ..utils.config_utils import default_section
-from .algorithm.algorithm_builder import AlgorithmBuilder
-from .solver import LPSolver
+from .algorithm_builder import AlgorithmBuilder
 
 # 計算対象のアルゴリズム一覧
 target_algorithms: list[str] = [

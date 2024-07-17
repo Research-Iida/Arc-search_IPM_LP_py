@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 
-from src.solver.linear_system_solver.hhl_julia import HHLJuliaLinearSystemSolver
-from src.solver.linear_system_solver.hhl_qiskit import HHLLinearSystemSolver
+from src.infra.julia.hhl import HHLJuliaLinearSystemSolver
+from src.infra.python.hhl import HHLLinearSystemSolver
 from src.solver.linear_system_solver.inexact_linear_system_solver import CGLinearSystemSolver
 
 

@@ -1,38 +1,38 @@
-from ...logger import get_main_logger
-from ..linear_system_solver import inexact_linear_system_solver
-from ..linear_system_solver.exact_linear_system_solver import (
-    AbstractLinearSystemSolver,
-    ExactLinearSystemSolver,
-)
-from ..linear_system_solver.hhl_qiskit import HHLLinearSystemSolver
-from ..optimization_parameters import OptimizationParameters
-from ..solved_checker import (
-    AbsoluteSolvedChecker,
-    InexactSolvedChecker,
-    IterativeRefinementSolvedChecker,
-    RelativeSolvedChecker,
-    SolvedChecker,
-)
-from .algorithm import ILPSolvingAlgorithm
-from .inexact_interior_point_method import InexactArcSearchIPM, InexactLineSearchIPM
-from .initial_point_maker import (
+from ..logger import get_main_logger
+from ..solver.algorithm.algorithm import ILPSolvingAlgorithm
+from ..solver.algorithm.inexact_interior_point_method import InexactArcSearchIPM, InexactLineSearchIPM
+from ..solver.algorithm.initial_point_maker import (
     ConstantInitialPointMaker,
     IInitialPointMaker,
     LustingInitialPointMaker,
     MehrotraInitialPointMaker,
     YangInitialPointMaker,
 )
-from .interior_point_method import ArcSearchIPM, LineSearchIPM
-from .interior_point_method_with_restarting_strategy import (
+from ..solver.algorithm.interior_point_method import ArcSearchIPM, LineSearchIPM
+from ..solver.algorithm.interior_point_method_with_restarting_strategy import (
     ArcSearchIPMWithRestartingStrategy,
     ArcSearchIPMWithRestartingStrategyProven,
 )
-from .iterative_refinement import IterativeRefinementMethod
-from .search_direction_calculator import (
+from ..solver.algorithm.iterative_refinement import IterativeRefinementMethod
+from ..solver.algorithm.search_direction_calculator import (
     AbstractSearchDirectionCalculator,
     MNESSearchDirectionCalculator,
     NESSearchDirectionCalculator,
 )
+from ..solver.linear_system_solver import inexact_linear_system_solver
+from ..solver.linear_system_solver.exact_linear_system_solver import (
+    AbstractLinearSystemSolver,
+    ExactLinearSystemSolver,
+)
+from ..solver.optimization_parameters import OptimizationParameters
+from ..solver.solved_checker import (
+    AbsoluteSolvedChecker,
+    InexactSolvedChecker,
+    IterativeRefinementSolvedChecker,
+    RelativeSolvedChecker,
+    SolvedChecker,
+)
+from .python.hhl import HHLLinearSystemSolver
 
 logger = get_main_logger()
 
@@ -110,7 +110,7 @@ class AlgorithmBuilder:
                 return HHLLinearSystemSolver()
             case "HHLJulia":
                 # いちいち import すると Julia のコンパイルに時間がかかるので指定されたときだけ
-                from ..linear_system_solver.hhl_julia import HHLJuliaLinearSystemSolver
+                from .julia.hhl import HHLJuliaLinearSystemSolver
 
                 return HHLJuliaLinearSystemSolver(self.parameters.INEXACT_HHL_NUM_PHASE_ESTIMATOR_QUBITS)
             case "exact":
