@@ -5,38 +5,16 @@ import numpy as np
 
 from ...logger import get_main_logger, indent
 from ...problem import LinearProgrammingProblemStandard as LPS
-from ..linear_system_solver import inexact_linear_system_solver as ilss
-from ..linear_system_solver.exact_linear_system_solver import (
-    AbstractLinearSystemSolver,
-    ExactLinearSystemSolver,
-)
-from ..linear_system_solver.hhl_qiskit import HHLLinearSystemSolver
 from ..optimization_parameters import OptimizationParameters
 from ..solved_checker import SolvedChecker
 from ..solved_data import SolvedDetail
 from ..variables import LPVariables
 from .initial_point_maker import ConstantInitialPointMaker, IInitialPointMaker
 from .interior_point_method import InteriorPointMethod
-from .search_direction_calculator import (
-    AbstractSearchDirectionCalculator,
-    MNESSearchDirectionCalculator,
-    NESSearchDirectionCalculator,
-)
+from .search_direction_calculator import AbstractSearchDirectionCalculator
 from .variable_updater import ArcVariableUpdater, LineVariableUpdater
 
 logger = get_main_logger()
-
-
-class SelectionBasisError(Exception):
-    pass
-
-
-class LinearSystemSolverSelectionError(Exception):
-    pass
-
-
-class SearchDirectionCalculatorSelectionError(Exception):
-    pass
 
 
 class InexactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
@@ -45,49 +23,6 @@ class InexactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
     search_direction_calculator: AbstractSearchDirectionCalculator
     # 初期点時点で決定できるものや1回計算すればいいものは Attributes として使いまわす
     A_base_indexes: list[int] | None = None
-    # 途中から exact solver で解く場合があるため, Attribute として持っておく
-    exact_search_direction_calculator: AbstractSearchDirectionCalculator
-
-    def _get_linear_system_solver(self, str_solver: str) -> AbstractLinearSystemSolver:
-        """内部で実行する linear system solver の取得"""
-        match str_solver:
-            case "CG":
-                return ilss.CGLinearSystemSolver()
-            case "BiCG":
-                return ilss.BiCGLinearSystemSolver()
-            case "BiCGStab":
-                return ilss.BiCGStabLinearSystemSolver()
-            case "CGS":
-                return ilss.CGSLinearSystemSolver()
-            case "QMR":
-                return ilss.QMRLinearSystemSolver()
-            case "TFQMR":
-                return ilss.TFQMRLinearSystemSolver()
-            case "HHL":
-                return HHLLinearSystemSolver()
-            case "HHLJulia":
-                # いちいち import すると Julia のコンパイルに時間がかかるので指定されたときだけ
-                from ..linear_system_solver.hhl_julia import HHLJuliaLinearSystemSolver
-
-                return HHLJuliaLinearSystemSolver(self.parameters.INEXACT_HHL_NUM_PHASE_ESTIMATOR_QUBITS)
-            case "exact":
-                return ExactLinearSystemSolver()
-            case _:
-                raise LinearSystemSolverSelectionError(f"Don't match solver for ``{str_solver}''")
-
-    def _get_search_direction_calculator(
-        self, str_calculator: str, linear_system_solver: AbstractLinearSystemSolver
-    ) -> AbstractSearchDirectionCalculator:
-        """内部で実行する linear system solver の取得"""
-        match str_calculator:
-            case "MNES":
-                return MNESSearchDirectionCalculator(linear_system_solver)
-            case "NES":
-                return NESSearchDirectionCalculator(linear_system_solver)
-            case _:
-                raise SearchDirectionCalculatorSelectionError(
-                    f"Don't match search direction calculator for ``{str_calculator}''"
-                )
 
     def __init__(
         self,
@@ -95,25 +30,14 @@ class InexactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
         parameters: OptimizationParameters,
         solved_checker: SolvedChecker,
         initial_point_maker: IInitialPointMaker,
+        search_direction_calculator: AbstractSearchDirectionCalculator,
     ):
         # TODO: solved_checker は Inexact 用でないといけない
         super().__init__(config_section, parameters, solved_checker, initial_point_maker)
 
-        linear_system_solver = self._get_linear_system_solver(self.parameters.INEXACT_LINEAR_SYSTEM_SOLVER)
-        logger.info(f"Linear system solver is {linear_system_solver.__class__.__name__}.")
-
-        self.search_direction_calculator = self._get_search_direction_calculator(
-            self.parameters.INEXACT_SEARCH_DIRECTION_CALCULATOR, linear_system_solver
-        )
-        logger.info(f"Search direction calculator is {self.search_direction_calculator.__class__.__name__}.")
-
-        self.exact_search_direction_calculator = self._get_search_direction_calculator(
-            self.parameters.INEXACT_SEARCH_DIRECTION_CALCULATOR,
-            self._get_linear_system_solver("exact"),
-        )
-
-        if self.parameters.INEXACT_SOLVE_EXACTLY_FROM_THE_MIDDLE:
-            logger.info("When iteration point is close to optimal, Solve linear systems exactly.")
+        self.search_direction_calculator = search_direction_calculator
+        logger.info(f"Linear system solver is {search_direction_calculator.linear_system_solver.__class__.__name__}.")
+        logger.info(f"Search direction calculator is {search_direction_calculator.__class__.__name__}.")
 
     @property
     def beta(self) -> float:
@@ -224,14 +148,7 @@ class InexactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
 
         # 求解
         tol = self.calc_tolerance_for_inexact_first_derivative(v, problem)
-        # もし最適解に近づいていれば inexact solver だと計算時間的に不利になるので, exact solver に変更する
-        if self.is_close_to_optimal(v, problem) and self.parameters.INEXACT_SOLVE_EXACTLY_FROM_THE_MIDDLE:
-            logger.info("Solve first derivative exactly.")
-            x_dot, y_dot, s_dot, norm_residual = self.exact_search_direction_calculator.run(
-                v, problem, right_hand_side, tol
-            )
-        else:
-            x_dot, y_dot, s_dot, norm_residual = self.search_direction_calculator.run(v, problem, right_hand_side, tol)
+        x_dot, y_dot, s_dot, norm_residual = self.search_direction_calculator.run(v, problem, right_hand_side, tol)
         logger.debug(f"torelance: {tol}, ||M_1 z - sigma_1||: {norm_residual}")
         if norm_residual > tol:
             logger.warning(
@@ -354,8 +271,9 @@ class InexactLineSearchIPM(InexactInteriorPointMethod):
         parameters: OptimizationParameters,
         solved_checker: SolvedChecker,
         initial_point_maker: IInitialPointMaker,
+        search_direction_calculator: AbstractSearchDirectionCalculator,
     ):
-        super().__init__(config_section, parameters, solved_checker, initial_point_maker)
+        super().__init__(config_section, parameters, solved_checker, initial_point_maker, search_direction_calculator)
         self.variable_updater = LineVariableUpdater(self._delta_xs)
         self._validate()
 
@@ -562,8 +480,9 @@ class InexactArcSearchIPM(InexactInteriorPointMethod):
         parameters: OptimizationParameters,
         solved_checker: SolvedChecker,
         initial_point_maker: IInitialPointMaker,
+        search_direction_calculator: AbstractSearchDirectionCalculator,
     ):
-        super().__init__(config_section, parameters, solved_checker, initial_point_maker)
+        super().__init__(config_section, parameters, solved_checker, initial_point_maker, search_direction_calculator)
         self.variable_updater = ArcVariableUpdater(self._delta_xs)
         self._validate()
 
@@ -619,15 +538,7 @@ class InexactArcSearchIPM(InexactInteriorPointMethod):
         # 求解
         right_hand_side = np.concatenate([np.zeros(problem.m + problem.n), rhs_elements_nonzero])
         tol = self.calc_tolerance_for_inexact_second_derivative(v, problem)
-        # もし最適解に近づいていれば inexact solver だと計算時間的に不利になるので, exact solver に変更する
-        if self.is_close_to_optimal(v, problem) and self.parameters.INEXACT_SOLVE_EXACTLY_FROM_THE_MIDDLE:
-            x_ddot, y_ddot, s_ddot, norm_residual = self.exact_search_direction_calculator.run(
-                v, problem, right_hand_side, tol
-            )
-        else:
-            x_ddot, y_ddot, s_ddot, norm_residual = self.search_direction_calculator.run(
-                v, problem, right_hand_side, tol
-            )
+        x_ddot, y_ddot, s_ddot, norm_residual = self.search_direction_calculator.run(v, problem, right_hand_side, tol)
         logger.debug(f"tolerance: {tol}, ||M_2 z - sigma_2||: {norm_residual}")
         if norm_residual > tol:
             logger.warning(

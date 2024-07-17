@@ -6,13 +6,10 @@ import numpy as np
 from ...logger import get_main_logger, indent
 from ...problem import LinearProgrammingProblemStandard as LPS
 from ..optimization_parameters import OptimizationParameters
-from ..solved_checker import InexactSolvedChecker, IterativeRefinementSolvedChecker, SolvedChecker
+from ..solved_checker import IterativeRefinementSolvedChecker, SolvedChecker
 from ..solved_data import SolvedDetail
 from ..variables import LPVariables
-from .algorithm import ILPSolvingAlgoritm
-from .inexact_interior_point_method import InexactArcSearchIPM, InexactLineSearchIPM
-from .initial_point_maker import IInitialPointMaker
-from .interior_point_method import ArcSearchIPM, LineSearchIPM
+from .algorithm import ILPSolvingAlgorithm
 
 logger = get_main_logger()
 
@@ -29,42 +26,18 @@ class AlgorithmSettingError(Exception):
     pass
 
 
-class IterativeRefinementMethod(ILPSolvingAlgoritm):
+class IterativeRefinementMethod(ILPSolvingAlgorithm):
     """Iterative Refinement によって問題を都度更新してLPを求解するクラス"""
 
-    inner_algorithm: ILPSolvingAlgoritm
+    inner_algorithm: ILPSolvingAlgorithm
     solved_checker: IterativeRefinementSolvedChecker
-
-    @property
-    def hat_zeta(self) -> float:
-        return self.parameters.ITERATIVE_REFINEMENT_OPTIMAL_THRESHOLD_OF_SOLVER
-
-    def _get_inner_algorithm(self) -> ILPSolvingAlgoritm:
-        """Iterative Refinement 内部で実行する inexact solver の取得"""
-        str_solver = self.parameters.ITERATIVE_REFINEMENT_INNER_SOLVER
-        solved_checker = InexactSolvedChecker(self.hat_zeta, self.parameters.THRESHOLD_XS_NEGATIVE, False)
-        match str_solver:
-            case "inexact_arc":
-                return InexactArcSearchIPM(
-                    self.config_section, self.parameters, solved_checker, self.initial_point_maker
-                )
-            case "inexact_line":
-                return InexactLineSearchIPM(
-                    self.config_section, self.parameters, solved_checker, self.initial_point_maker
-                )
-            case "arc":
-                return ArcSearchIPM(self.config_section, self.parameters, solved_checker, self.initial_point_maker)
-            case "line":
-                return LineSearchIPM(self.config_section, self.parameters, solved_checker, self.initial_point_maker)
-            case _:
-                raise InnerSolverSelectionError(f"Don't match solver for {str_solver}")
 
     def __init__(
         self,
         config_section: str,
         parameters: OptimizationParameters,
         solved_checker: SolvedChecker,
-        initial_point_maker: IInitialPointMaker,
+        inner_algorithm: ILPSolvingAlgorithm,
     ):
         """初期化
 
@@ -73,18 +46,15 @@ class IterativeRefinementMethod(ILPSolvingAlgoritm):
             inner_algorithm (InteriorPointMethod | None, optional): 内部で使用するソルバー.
                 インスタンス化されているので設定も含む. Defaults to None.
         """
-        super().__init__(config_section, parameters, solved_checker, initial_point_maker)
-        if not isinstance(self.solved_checker, IterativeRefinementSolvedChecker):
+        if not isinstance(solved_checker, IterativeRefinementSolvedChecker):
             raise AlgorithmSettingError(
                 f"IterativeRefinement must have IterativeRefinementSolvedChecker. You got '{self.solved_checker.__class__.__name__}'"
             )
 
-        self.inner_algorithm = self._get_inner_algorithm()
-        logger.info(f"Inner solver is {self.inner_algorithm.__class__.__name__}.")
+        super().__init__(config_section, parameters, solved_checker)
 
-    @property
-    def zeta(self) -> float:
-        return self.parameters.STOP_CRITERIA_PARAMETER
+        self.inner_algorithm = inner_algorithm
+        logger.info(f"Inner solver is {inner_algorithm.__class__.__name__}.")
 
     @property
     def rho(self) -> float:

@@ -10,7 +10,7 @@ from ..optimization_parameters import OptimizationParameters
 from ..solved_checker import SolvedChecker
 from ..solved_data import SolvedDetail
 from ..variables import LPVariables
-from .algorithm import ILPSolvingAlgoritm
+from .algorithm import ILPSolvingAlgorithm
 from .initial_point_maker import IInitialPointMaker
 from .search_direction_calculator import AbstractSearchDirectionCalculator, NESSearchDirectionCalculator
 from .variable_updater import ArcVariableUpdater, LineVariableUpdater, VariableUpdater
@@ -18,10 +18,23 @@ from .variable_updater import ArcVariableUpdater, LineVariableUpdater, VariableU
 logger = get_main_logger()
 
 
-class InteriorPointMethod(ILPSolvingAlgoritm, metaclass=abc.ABCMeta):
+class InteriorPointMethod(ILPSolvingAlgorithm, metaclass=abc.ABCMeta):
     """LPを内点法で解く際のインターフェース"""
 
+    initial_point_maker: IInitialPointMaker
     variable_updater: VariableUpdater
+
+    def __init__(
+        self,
+        config_section: str,
+        parameters: OptimizationParameters,
+        solved_checker: SolvedChecker,
+        initial_point_maker: IInitialPointMaker,
+    ):
+        super().__init__(config_section, parameters, solved_checker)
+
+        self.initial_point_maker = initial_point_maker
+        logger.info(f"Initial points are made by the method of {initial_point_maker.__class__.__name__}")
 
     @property
     def _delta_xs(self) -> float:
