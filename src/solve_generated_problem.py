@@ -4,11 +4,11 @@ import sys
 import numpy as np
 
 from .drawer import Drawer
+from .infra.get_solvers import get_solvers
 from .infra.path_generator import PathGenerator
 from .infra.repository_solved_data import SolvedDataRepository
 from .logger import get_main_logger, setup_logger
 from .problem.generate_problem import generate_problem
-from .solver.get_solvers import get_solvers
 from .solver.solve_problem import optimize
 
 logger = get_main_logger()

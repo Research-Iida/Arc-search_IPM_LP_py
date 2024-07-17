@@ -1,4 +1,4 @@
-from src.solver.algorithm.algorithm_builder import AlgorithmBuilder
+from src.infra.algorithm_builder import AlgorithmBuilder
 from src.solver.algorithm.inexact_interior_point_method import InexactArcSearchIPM
 from src.solver.algorithm.initial_point_maker import LustingInitialPointMaker
 from src.solver.algorithm.interior_point_method import ArcSearchIPM

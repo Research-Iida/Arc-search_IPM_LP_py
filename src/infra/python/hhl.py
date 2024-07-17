@@ -3,7 +3,7 @@ from qiskit.algorithms.linear_solvers.hhl import HHL
 from qiskit.quantum_info import Statevector
 
 from ...logger import get_main_logger
-from .inexact_linear_system_solver import AbstractInexactLinearSystemSolver
+from ...solver.linear_system_solver.inexact_linear_system_solver import AbstractInexactLinearSystemSolver
 
 logger = get_main_logger()
 

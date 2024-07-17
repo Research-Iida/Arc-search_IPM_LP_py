@@ -2,7 +2,7 @@ import numpy as np
 from julia import Main
 
 from ...logger import get_main_logger
-from .inexact_linear_system_solver import AbstractInexactLinearSystemSolver
+from ...solver.linear_system_solver.inexact_linear_system_solver import AbstractInexactLinearSystemSolver
 
 logger = get_main_logger()
 

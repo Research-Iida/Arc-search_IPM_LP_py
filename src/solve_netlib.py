@@ -4,13 +4,13 @@ from datetime import date
 from pathlib import Path
 
 from .drawer import Drawer
+from .infra.get_solvers import get_solvers
 from .infra.path_generator import PathGenerator
 from .infra.python.repository_problem import LPRepository
 from .infra.repository_solved_data import SolvedDataRepository
 from .logger import get_main_logger, setup_logger
 from .profiler.profiler import profile_decorator
 from .slack.slack import get_slack_api
-from .solver.get_solvers import get_solvers
 from .solver.solve_problem import solve_and_write
 from .utils import str_util
 

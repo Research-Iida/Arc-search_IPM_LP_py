@@ -1,6 +1,6 @@
 import pytest
 
-from src.solver.algorithm.algorithm_builder import AlgorithmBuilder
+from src.infra.algorithm_builder import AlgorithmBuilder
 from src.solver.optimization_parameters import OptimizationParameters
 from src.solver.solver import LPSolver
 from src.utils.config_utils import read_config, test_section
