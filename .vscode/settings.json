@@ -12,5 +12,6 @@
         "qiskit",
         "sqla",
         "tolil",
+        "kennington",
     ],
 }

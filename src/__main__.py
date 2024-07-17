@@ -47,7 +47,8 @@ def main(
     num_problem: int | None,
     name_solver: str | None,
     config_section: str | None,
-    start_problem_number: int | None = None,
+    start_problem_number: int,
+    use_kennington: bool,
 ):
     """main関数
 
@@ -58,7 +59,8 @@ def main(
         config_section: 使用する config のセクション. 指定がなければスクリプト内で指定したすべてのセクションで実行する
         start_problem_number: 整列した問題ファイルの中から指定された問題番号以降を解く
     """
-    if start_problem_number is None or start_problem_number <= 0:
+    if start_problem_number < 0:
+        logger.warning(f"{start_problem_number=}, it is negative! Reset as 0.")
         start_problem_number = 0
 
     if num_problem is None:
@@ -75,7 +77,7 @@ def main(
     aSolvedDataRepository = SolvedDataRepository(path_generator)
 
     # 対象の問題の決定
-    problem_files = decide_solved_problems(aLPRepository, num_problem, start_problem_number)
+    problem_files = decide_solved_problems(aLPRepository, num_problem, start_problem_number, use_kennington)
     target_problem_number = len(problem_files)
     logger.info(f"Target problems number: {target_problem_number}")
 
@@ -143,12 +145,19 @@ if __name__ == "__main__":
     parser.add_argument("-n", "--num_problem", help="Number of problems to solve", type=int, default=None)
     parser.add_argument("-s", "--solver", default=None, help="solver for solving problem")
     parser.add_argument("-c", "--config_section", type=str, default=None, help="config section for solving problem")
-    parser.add_argument("-sn", "--start_problem_number", type=int, default=None, help="start problem from this number")
+    parser.add_argument("-sn", "--start_problem_number", type=int, default=0, help="start problem from this number")
+    parser.add_argument("-k", "--use_kennington", action="store_true", help="start problem from this number")
     args = parser.parse_args()
 
     try:
         profile_decorator(
-            main, "solve_all_problems", args.num_problem, args.solver, args.config_section, args.start_problem_number
+            main,
+            "solve_all_problems",
+            args.num_problem,
+            args.solver,
+            args.config_section,
+            args.start_problem_number,
+            args.use_kennington,
         )
         aSlack.notify_mentioned(f"{msg_for_logging_today}End calculation.")
     except:  # NOQA
