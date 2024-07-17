@@ -6,7 +6,7 @@
 
 from ..logger import get_main_logger, indent
 from ..problem import LinearProgrammingProblemStandard as LPS
-from .algorithm.algorithm import ILPSolvingAlgoritm
+from .algorithm.algorithm import ILPSolvingAlgorithm
 from .solved_data import SolvedDetail, SolvedSummary
 from .variables import LPVariables
 
@@ -16,11 +16,11 @@ logger = get_main_logger()
 class LPSolver:
     """LPを解くためのソルバーに関する抽象クラス"""
 
-    algorithm: ILPSolvingAlgoritm
+    algorithm: ILPSolvingAlgorithm
 
     def __init__(
         self,
-        algorithm: ILPSolvingAlgoritm,
+        algorithm: ILPSolvingAlgorithm,
     ):
         """インスタンス初期化. アルゴリズムを設定する"""
         self.algorithm = algorithm

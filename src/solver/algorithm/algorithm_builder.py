@@ -1,3 +1,10 @@
+from ...logger import get_main_logger
+from ..linear_system_solver import inexact_linear_system_solver
+from ..linear_system_solver.exact_linear_system_solver import (
+    AbstractLinearSystemSolver,
+    ExactLinearSystemSolver,
+)
+from ..linear_system_solver.hhl_qiskit import HHLLinearSystemSolver
 from ..optimization_parameters import OptimizationParameters
 from ..solved_checker import (
     AbsoluteSolvedChecker,
@@ -6,7 +13,7 @@ from ..solved_checker import (
     RelativeSolvedChecker,
     SolvedChecker,
 )
-from .algorithm import ILPSolvingAlgoritm
+from .algorithm import ILPSolvingAlgorithm
 from .inexact_interior_point_method import InexactArcSearchIPM, InexactLineSearchIPM
 from .initial_point_maker import (
     ConstantInitialPointMaker,
@@ -21,6 +28,13 @@ from .interior_point_method_with_restarting_strategy import (
     ArcSearchIPMWithRestartingStrategyProven,
 )
 from .iterative_refinement import IterativeRefinementMethod
+from .search_direction_calculator import (
+    AbstractSearchDirectionCalculator,
+    MNESSearchDirectionCalculator,
+    NESSearchDirectionCalculator,
+)
+
+logger = get_main_logger()
 
 
 class SelectionError(Exception):
@@ -67,19 +81,95 @@ class AlgorithmBuilder:
         name = self.parameters.INITIAL_POINT_MAKER
         match name.lower():
             case "yang":
-                result = YangInitialPointMaker()
+                return YangInitialPointMaker()
             case "mehrotra":
-                result = MehrotraInitialPointMaker()
+                return MehrotraInitialPointMaker()
             case "lusting":
-                result = LustingInitialPointMaker()
+                return LustingInitialPointMaker()
             case "constant":
-                result = ConstantInitialPointMaker(self.parameters.INITIAL_POINT_SCALE)
+                return ConstantInitialPointMaker(self.parameters.INITIAL_POINT_SCALE)
             case _:
                 raise SelectionError(f"指定された初期点決定法が存在しません: {name}")
 
-        return result
+    def get_linear_system_solver(self, str_solver: str) -> AbstractLinearSystemSolver:
+        """内部で実行する linear system solver の取得"""
+        match str_solver:
+            case "CG":
+                return inexact_linear_system_solver.CGLinearSystemSolver()
+            case "BiCG":
+                return inexact_linear_system_solver.BiCGLinearSystemSolver()
+            case "BiCGStab":
+                return inexact_linear_system_solver.BiCGStabLinearSystemSolver()
+            case "CGS":
+                return inexact_linear_system_solver.CGSLinearSystemSolver()
+            case "QMR":
+                return inexact_linear_system_solver.QMRLinearSystemSolver()
+            case "TFQMR":
+                return inexact_linear_system_solver.TFQMRLinearSystemSolver()
+            case "HHL":
+                return HHLLinearSystemSolver()
+            case "HHLJulia":
+                # いちいち import すると Julia のコンパイルに時間がかかるので指定されたときだけ
+                from ..linear_system_solver.hhl_julia import HHLJuliaLinearSystemSolver
 
-    def build(self, algorithm: str) -> ILPSolvingAlgoritm:
+                return HHLJuliaLinearSystemSolver(self.parameters.INEXACT_HHL_NUM_PHASE_ESTIMATOR_QUBITS)
+            case "exact":
+                return ExactLinearSystemSolver()
+            case _:
+                raise SelectionError(f"Don't match linear system solver: {str_solver}")
+
+    def get_search_direction_calculator(
+        self, str_calculator: str, linear_system_solver: AbstractLinearSystemSolver
+    ) -> AbstractSearchDirectionCalculator:
+        """内部で実行する linear system solver の取得"""
+        match str_calculator:
+            case "MNES":
+                return MNESSearchDirectionCalculator(linear_system_solver)
+            case "NES":
+                return NESSearchDirectionCalculator(linear_system_solver)
+            case _:
+                raise SelectionError(f"Don't match search direction calculator: {str_calculator}")
+
+    def get_inner_algorithm_for_iterative_refinement(
+        self, initial_point_maker: IInitialPointMaker
+    ) -> ILPSolvingAlgorithm:
+        """Iterative Refinement 内部で実行する inexact solver の取得"""
+        solved_checker = InexactSolvedChecker(
+            self.parameters.ITERATIVE_REFINEMENT_OPTIMAL_THRESHOLD_OF_SOLVER,
+            self.parameters.THRESHOLD_XS_NEGATIVE,
+            False,
+        )
+        linear_system_solver = self.get_linear_system_solver(self.parameters.INEXACT_LINEAR_SYSTEM_SOLVER)
+        search_direction_calculator = self.get_search_direction_calculator(
+            self.parameters.INEXACT_SEARCH_DIRECTION_CALCULATOR, linear_system_solver
+        )
+
+        str_algorithm = self.parameters.ITERATIVE_REFINEMENT_INNER_SOLVER
+        match str_algorithm:
+            case "inexact_arc":
+                return InexactArcSearchIPM(
+                    self.config_section,
+                    self.parameters,
+                    solved_checker,
+                    initial_point_maker,
+                    search_direction_calculator,
+                )
+            case "inexact_line":
+                return InexactLineSearchIPM(
+                    self.config_section,
+                    self.parameters,
+                    solved_checker,
+                    initial_point_maker,
+                    search_direction_calculator,
+                )
+            case "arc":
+                return ArcSearchIPM(self.config_section, self.parameters, solved_checker, initial_point_maker)
+            case "line":
+                return LineSearchIPM(self.config_section, self.parameters, solved_checker, initial_point_maker)
+            case _:
+                raise SelectionError(f"Don't match inner algorithm in iterative refinement: {str_algorithm}")
+
+    def build(self, algorithm: str) -> ILPSolvingAlgorithm:
         """線形計画問題の algorithm 取得
 
         Args:
@@ -117,27 +207,37 @@ class AlgorithmBuilder:
                     initial_point_maker=initial_point_maker,
                 )
             case "inexact_arc":
+                linear_system_solver = self.get_linear_system_solver(self.parameters.INEXACT_LINEAR_SYSTEM_SOLVER)
+                search_direction_calculator = self.get_search_direction_calculator(
+                    self.parameters.INEXACT_SEARCH_DIRECTION_CALCULATOR, linear_system_solver
+                )
                 algorithm = InexactArcSearchIPM(
                     self.config_section,
                     parameters=self.parameters,
                     solved_checker=self.get_solved_cheker(algorithm),
                     initial_point_maker=initial_point_maker,
+                    search_direction_calculator=search_direction_calculator,
                 )
             case "inexact_line":
+                linear_system_solver = self.get_linear_system_solver(self.parameters.INEXACT_LINEAR_SYSTEM_SOLVER)
+                search_direction_calculator = self.get_search_direction_calculator(
+                    self.parameters.INEXACT_SEARCH_DIRECTION_CALCULATOR, linear_system_solver
+                )
                 algorithm = InexactLineSearchIPM(
                     self.config_section,
                     parameters=self.parameters,
                     solved_checker=self.get_solved_cheker(algorithm),
                     initial_point_maker=initial_point_maker,
+                    search_direction_calculator=search_direction_calculator,
                 )
             case "iterative_refinement":
                 algorithm = IterativeRefinementMethod(
                     self.config_section,
                     parameters=self.parameters,
                     solved_checker=self.get_solved_cheker(algorithm),
-                    initial_point_maker=initial_point_maker,
+                    inner_algorithm=self.get_inner_algorithm_for_iterative_refinement(initial_point_maker),
                 )
             case _:
-                raise SelectionError(f"指定されたアルゴリズムが存在しません: {algorithm}")
+                raise SelectionError(f"Don't match inner algorithm: {algorithm}")
 
         return algorithm

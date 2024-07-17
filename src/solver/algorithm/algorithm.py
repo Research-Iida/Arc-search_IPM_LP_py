@@ -8,25 +8,22 @@ from ..optimization_parameters import OptimizationParameters
 from ..solved_checker import SolvedChecker
 from ..solved_data import SolvedDetail, SolvedSummary
 from ..variables import LPVariables
-from .initial_point_maker import IInitialPointMaker
 
 logger = get_main_logger()
 
 
-class ILPSolvingAlgoritm(abc.ABC):
+class ILPSolvingAlgorithm(abc.ABC):
     """LP を解くアルゴリズムのインターフェース. IPM などが実装にあたる"""
 
     config_section: str
     parameters: OptimizationParameters
     solved_checker: SolvedChecker
-    initial_point_maker: IInitialPointMaker
 
     def __init__(
         self,
         config_section: str,
         parameters: OptimizationParameters,
         solved_checker: SolvedChecker,
-        initial_point_maker: IInitialPointMaker,
     ):
         """インスタンス初期化
 
@@ -37,8 +34,6 @@ class ILPSolvingAlgoritm(abc.ABC):
         self.config_section = config_section
         self.parameters = parameters
         self.solved_checker = solved_checker
-        self.initial_point_maker = initial_point_maker
-        logger.info(f"Initial points are made by the method of {self.initial_point_maker.__class__.__name__}")
 
     @property
     def is_stopping_criteria_relative(self) -> bool:
