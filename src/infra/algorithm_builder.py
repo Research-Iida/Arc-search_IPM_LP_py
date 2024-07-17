@@ -14,17 +14,16 @@ from ..solver.algorithm.interior_point_method_with_restarting_strategy import (
     ArcSearchIPMWithRestartingStrategyProven,
 )
 from ..solver.algorithm.iterative_refinement import IterativeRefinementMethod
-from ..solver.algorithm.search_direction_calculator import (
-    AbstractSearchDirectionCalculator,
-    MNESSearchDirectionCalculator,
-    NESSearchDirectionCalculator,
-)
 from ..solver.linear_system_solver import inexact_linear_system_solver
 from ..solver.linear_system_solver.exact_linear_system_solver import (
     AbstractLinearSystemSolver,
     ExactLinearSystemSolver,
 )
 from ..solver.optimization_parameters import OptimizationParameters
+from ..solver.search_direction_calculator.nes_search_direction_calculator import NESSearchDirectionCalculator
+from ..solver.search_direction_calculator.search_direction_calculator import (
+    AbstractSearchDirectionCalculator,
+)
 from ..solver.solved_checker import (
     AbsoluteSolvedChecker,
     InexactSolvedChecker,
@@ -33,6 +32,7 @@ from ..solver.solved_checker import (
     SolvedChecker,
 )
 from .python.hhl import HHLLinearSystemSolver
+from .python.mnes_search_direction_calculator import MNESSearchDirectionCalculator
 
 logger = get_main_logger()
 
