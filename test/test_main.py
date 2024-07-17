@@ -37,6 +37,7 @@ def test_main(remove_written_file):
         name_solver="arc",
         config_section=test_section,
         start_problem_number=start_problem_number,
+        use_kennington=False,
     )
 
     path_result = path_generator.generate_path_result_by_date()
