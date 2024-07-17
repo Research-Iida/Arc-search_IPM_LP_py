@@ -3,7 +3,7 @@
 ## Run scripts
 ### `src/__main__.py`
 ```sh
-poetry run python -m src -n {求解する問題数} -s {使用するソルバー} -c {config のセクション名} -sn {何番目の問題から解くか}
+poetry run python -m src -n {求解する問題数} -s {使用するソルバー} -c {config のセクション名} -sn {何番目の問題から解くか} {-k: Kennington の大きいサイズの問題を解く場合つける}
 ```
 
 NETLIB のベンチマーク問題を読み取り, ソルバーにかけ, 必要な反復回数や実行可能性を記録
