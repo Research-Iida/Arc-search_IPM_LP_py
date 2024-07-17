@@ -6,12 +6,12 @@ import numpy as np
 from ...logger import get_main_logger, indent
 from ...problem import LinearProgrammingProblemStandard as LPS
 from ..optimization_parameters import OptimizationParameters
+from ..search_direction_calculator.search_direction_calculator import AbstractSearchDirectionCalculator
 from ..solved_checker import SolvedChecker
 from ..solved_data import SolvedDetail
 from ..variables import LPVariables
 from .initial_point_maker import ConstantInitialPointMaker, IInitialPointMaker
 from .interior_point_method import InteriorPointMethod
-from .search_direction_calculator import AbstractSearchDirectionCalculator
 from .variable_updater import ArcVariableUpdater, LineVariableUpdater
 
 logger = get_main_logger()

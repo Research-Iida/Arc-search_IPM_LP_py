@@ -7,12 +7,13 @@ from ...logger import get_main_logger, indent
 from ...problem import LinearProgrammingProblemStandard as LPS
 from ..linear_system_solver.exact_linear_system_solver import ExactLinearSystemSolver
 from ..optimization_parameters import OptimizationParameters
+from ..search_direction_calculator.nes_search_direction_calculator import NESSearchDirectionCalculator
+from ..search_direction_calculator.search_direction_calculator import AbstractSearchDirectionCalculator
 from ..solved_checker import SolvedChecker
 from ..solved_data import SolvedDetail
 from ..variables import LPVariables
 from .algorithm import ILPSolvingAlgorithm
 from .initial_point_maker import IInitialPointMaker
-from .search_direction_calculator import AbstractSearchDirectionCalculator, NESSearchDirectionCalculator
 from .variable_updater import ArcVariableUpdater, LineVariableUpdater, VariableUpdater
 
 logger = get_main_logger()
