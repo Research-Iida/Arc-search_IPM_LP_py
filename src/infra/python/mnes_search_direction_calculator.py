@@ -6,11 +6,10 @@ import numpy as np
 from scipy.sparse import csr_matrix as Csr
 from scipy.sparse.linalg import inv
 
-from src.problem import LinearProgrammingProblemStandard as LPS
-from src.solver.search_direction_calculator.search_direction_calculator import AbstractSearchDirectionCalculator
-from src.solver.variables import LPVariables
-
 from ...logger import get_main_logger, indent
+from ...problem import LinearProgrammingProblemStandard as LPS
+from ...solver.search_direction_calculator.search_direction_calculator import AbstractSearchDirectionCalculator
+from ...solver.variables import LPVariables
 
 logger = get_main_logger()
 
