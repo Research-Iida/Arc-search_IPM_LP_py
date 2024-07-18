@@ -3,9 +3,9 @@
 """
 
 # サーバー環境で実行するためのおまじない
-# from julia import Julia
+from julia import Julia
 
-# Julia(compiled_modules=False)
+Julia(compiled_modules=False)
 
 from julia import Pkg  # noqa: E402
 
