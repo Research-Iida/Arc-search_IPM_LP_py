@@ -22,6 +22,18 @@ class MNESSearchDirectionCalculator(AbstractSearchDirectionCalculator):
     # 初期点時点で決定できるものや1回計算すればいいものは Attributes として使いまわす
     A_base_indexes: list[int] | None = None
 
+    def _extract_columns_with_less_than_2_non_zero_rows(self, problem: LPS) -> set[int]:
+        """行で非ゼロ要素が2つ以下しかない列は線形独立としてよい"""
+        results: set[int] = set()
+
+        rows_nonzero, columns_nonzero = np.where(np.abs(problem.A) > 10 ** (-6))
+        for i in range(problem.m):
+            idxs_row_nonzero = np.where(rows_nonzero == i)
+            if len(idxs_row_nonzero[0]) <= 2:
+                results.add(columns_nonzero[idxs_row_nonzero[0][0]])
+        logger.info(f"Number of columns in only one or two nonzero element row: {len(results)}")
+        return results
+
     def select_base_indexes(self, problem: LPS) -> list[int]:
         """MNES, OSS 定式化で使用する基底の index を選択
         先頭から1つずつ列を選んで, rank が上がれば基底として加える.
@@ -41,16 +53,8 @@ class MNESSearchDirectionCalculator(AbstractSearchDirectionCalculator):
 
         doing_msg = "selecting A base"
         logger.info(f"Start {doing_msg}.")
-        logger.debug(f"rank(A): {np.linalg.matrix_rank(problem.A)}, m: {problem.m}")
 
-        base_idxs: set[int] = set()
-        # 行で非ゼロ要素が2つ以下しかない列は線形独立としてよい
-        rows_nonzero, columns_nonzero = np.where(np.abs(problem.A) > 10 ** (-6))
-        for i in range(problem.m):
-            idxs_row_nonzero = np.where(rows_nonzero == i)
-            if len(idxs_row_nonzero[0]) <= 2:
-                base_idxs.add(columns_nonzero[idxs_row_nonzero[0][0]])
-        logger.info(f"Number of columns in only one or two nonzero element row: {len(base_idxs)}")
+        base_idxs = self._extract_columns_with_less_than_2_non_zero_rows(problem)
 
         # ``Convergence analysis of a long-step primal-dual infeasible interior-point LP algorithm based on iterative linear solvers''
         cycle_number = 0
