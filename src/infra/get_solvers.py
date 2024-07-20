@@ -47,7 +47,7 @@ target_config_sections_by_algorithm: dict[str, list[str]] = {
         "INEXACT_ARC_CG_NES_CONSTANT",
         # "INEXACT_ARC_EXACT_NES",
         # "INEXACT_ARC_EXACT_NES_LUSTING",
-        "INEXACT_ARC_EXACT_NES_CONSTANT",
+        # "INEXACT_ARC_EXACT_NES_CONSTANT",
         # "INEXACT_ARC_BICG_NES",
         # "INEXACT_ARC_BICGSTAB_NES",
         # "INEXACT_ARC_CGS_NES",
@@ -63,7 +63,7 @@ target_config_sections_by_algorithm: dict[str, list[str]] = {
         "INEXACT_LINE_CG_NES_CONSTANT",
         # "INEXACT_LINE_EXACT_NES",
         # "INEXACT_LINE_EXACT_NES_LUSTING",
-        "INEXACT_LINE_EXACT_NES_CONSTANT",
+        # "INEXACT_LINE_EXACT_NES_CONSTANT",
     ],
     "iterative_refinement": [
         # "INEXACT_ARC_CG_MNES",
