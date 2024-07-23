@@ -160,9 +160,8 @@ class InexactSolvedChecker(SolvedChecker):
         if not self.is_xs_positive(v):
             return False
 
-        if self.check_relative_solved:
-            if self.relative_checker.run(v, problem):
-                return True
+        if self.check_relative_solved and not self.relative_checker.run(v, problem):
+            return False
 
         is_small_mu = v.mu <= self.stop_criteria_threshold
         r_b = problem.residual_main_constraint(v.x)
