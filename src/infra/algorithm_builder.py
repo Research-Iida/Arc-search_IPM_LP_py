@@ -1,5 +1,6 @@
 from ..logger import get_main_logger
 from ..solver.algorithm.algorithm import ILPSolvingAlgorithm
+from ..solver.algorithm.inexact_arc_search_without_proof import InexactArcSearchIPMWithoutProof
 from ..solver.algorithm.inexact_interior_point_method import InexactArcSearchIPM, InexactLineSearchIPM
 from ..solver.algorithm.initial_point_maker import (
     ConstantInitialPointMaker,
@@ -61,7 +62,7 @@ class AlgorithmBuilder:
         if algorithm == "iterative_refinement":
             return IterativeRefinementSolvedChecker(threshold_stop_criteria, threshold_xs_negative)
 
-        if algorithm in {"inexact_arc", "inexact_line"}:
+        if algorithm.startswith("inexact_"):
             return InexactSolvedChecker(threshold_stop_criteria, threshold_xs_negative, is_stop_relative)
 
         if is_stop_relative:
@@ -236,6 +237,18 @@ class AlgorithmBuilder:
                     parameters=self.parameters,
                     solved_checker=self.get_solved_cheker(algorithm),
                     inner_algorithm=self.get_inner_algorithm_for_iterative_refinement(initial_point_maker),
+                )
+            case "inexact_arc_without_proof":
+                linear_system_solver = self.get_linear_system_solver(self.parameters.INEXACT_LINEAR_SYSTEM_SOLVER)
+                search_direction_calculator = self.get_search_direction_calculator(
+                    self.parameters.INEXACT_SEARCH_DIRECTION_CALCULATOR, linear_system_solver
+                )
+                algorithm = InexactArcSearchIPMWithoutProof(
+                    self.config_section,
+                    parameters=self.parameters,
+                    solved_checker=self.get_solved_cheker(algorithm),
+                    initial_point_maker=initial_point_maker,
+                    search_direction_calculator=search_direction_calculator,
                 )
             case _:
                 raise SelectionError(f"Don't match inner algorithm: {algorithm}")

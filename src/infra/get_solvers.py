@@ -13,6 +13,7 @@ target_algorithms: list[str] = [
     "inexact_arc",
     "inexact_line",
     # "iterative_refinement",
+    # "inexact_arc_without_proof",
 ]
 # アルゴリズム別計算対象の config セクション一覧
 # 計算対象にさせたくないアルゴリズムは, すべての config セクションをコメントアウトする
@@ -74,6 +75,7 @@ target_config_sections_by_algorithm: dict[str, list[str]] = {
         # "INEXACT_ARC_HHLJULIA_NES",
         # "INEXACT_ARC_HHLJULIA_NES_IN_SERVER",
     ],
+    "inexact_arc_without_proof": ["INEXACT_ARC_CG_NES_CONSTANT"],
 }
 
 
