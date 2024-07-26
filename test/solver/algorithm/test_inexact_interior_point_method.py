@@ -29,6 +29,7 @@ def test_parameter_settings():
         ("inexact arc CGS", AlgorithmBuilder("INEXACT_ARC_CGS_NES").build("inexact_arc")),
         ("inexact arc QMR", AlgorithmBuilder("INEXACT_ARC_QMR_NES").build("inexact_arc")),
         ("inexact arc TFQMR", AlgorithmBuilder("INEXACT_ARC_TFQMR_NES").build("inexact_arc")),
+        ("inexact arc CG without proof", AlgorithmBuilder(test_section).build("inexact_arc_without_proof")),
     ],
 )
 def test_run(name, algorithm):

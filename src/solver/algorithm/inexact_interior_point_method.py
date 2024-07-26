@@ -12,7 +12,7 @@ from ..solved_data import SolvedDetail
 from ..variables import LPVariables
 from .initial_point_maker import ConstantInitialPointMaker, IInitialPointMaker
 from .interior_point_method import InteriorPointMethod
-from .variable_updater import ArcVariableUpdater, LineVariableUpdater
+from .variable_updater import ArcVariableUpdater, LineVariableUpdater, VariableUpdater
 
 logger = get_main_logger()
 
@@ -20,9 +20,8 @@ logger = get_main_logger()
 class InexactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
     """Inexact に線形方程式を解きながら内点法を実施するクラス"""
 
+    variable_updater: VariableUpdater
     search_direction_calculator: AbstractSearchDirectionCalculator
-    # 初期点時点で決定できるものや1回計算すればいいものは Attributes として使いまわす
-    A_base_indexes: list[int] | None = None
 
     def __init__(
         self,
@@ -67,42 +66,6 @@ class InexactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
             result = ConstantInitialPointMaker(self.parameters.INITIAL_POINT_SCALE).make_initial_point(problem)
 
         return result
-
-    # def initial_problem_and_point(self, problem_0: LPS, v_0: LPVariables | None) -> tuple[LPS, LPVariables, list[int]]:
-    #     """数値的に安定させるため, 与えられた問題と初期点に改良を加えて出力
-
-    #     Args:
-    #         problem_0 (LPS): 与えられた最初の問題
-    #         v_0 (LPVariables): 初期点
-
-    #     Returns:
-    #         LPS: 修正した問題
-    #         LPVariables: 修正した変数
-    #         list[int]: 修正の過程で削除された制約の行の index
-    #     """
-    #     problem = problem_0
-    #     v = v_0
-
-    #     # Aの各行で正規化
-    #     # 問題の最適解自体を変えてしまうので使用しないこととした
-    #     # problem = problem.create_A_row_normalized()
-    #     # logger.info("Problem is normalized for each A row.")
-
-    #     # A の基底を取る関係で, 数値誤差で rank 落ちするような状況は避けたい.
-    #     # なのでまず LU分解を施して数値誤差の範囲で0の行になるところは削除する
-    #     # problem, remove_constraint_rows = problem.create_A_LU_factorized()
-    #     # logger.info(f"Problem is LU factorized. number of removed rows: {len(remove_constraint_rows)}")
-    #     # if remove_constraint_rows:
-    #     #     logger.info(f"Removed constraint rows because of zero row: {remove_constraint_rows}")
-    #     # v = v.remove_constraint_rows(remove_constraint_rows)
-    #     remove_constraint_rows = []
-
-    #     # 初期点が近傍に入っていなければ, 新しく近傍に入る初期点を作成
-    #     if not self.is_in_center_path_neighborhood(v, problem, self.calculate_gamma_2(v, problem)):
-    #         logger.info("Initial points is not in neighborhood! Start with general initial point.")
-    #         v = ConstantInitialPointMaker(self.parameters.INITIAL_POINT_SCALE).make_initial_point(problem)
-
-    #     return problem, v, remove_constraint_rows
 
     def calc_tolerance_for_inexact_first_derivative(self, v: LPVariables, problem: LPS) -> float:
         """一階微分を inexact に解く際の誤差許容度"""
@@ -236,6 +199,51 @@ class InexactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
         """
         return (1 - (1 - self.beta) * np.sin(alpha)) * v.mu - v_alpha.mu >= 0
 
+    def decide_step_size(
+        self,
+        v: LPVariables,
+        problem: LPS,
+        gamma_2: float,
+        x_dot: np.ndarray,
+        y_dot: np.ndarray,
+        s_dot: np.ndarray,
+        x_ddot: np.ndarray,
+        y_ddot: np.ndarray,
+        s_ddot: np.ndarray,
+    ) -> float:
+        """step size を決定.
+        近傍に入る step size になるまで Armijo のルールに従う
+
+        Returns:
+            float: step size
+        """
+        # alpha_x_max = self.variable_updater.max_step_size_guarantee_positive(v.x, x_dot, x_ddot)
+        # alpha_s_max = self.variable_updater.max_step_size_guarantee_positive(v.s, s_dot, s_ddot)
+        # max_alpha_xs_positive = min(alpha_x_max, alpha_s_max)
+
+        alpha = self.variable_updater.max_step_size
+
+        def is_x_s_positive_and_v_in_neighborhood(v_alpha: LPVariables, alpha: float) -> bool:
+            if min(v_alpha.x) < 0 or min(v_alpha.s) < 0:
+                return False
+            if not self.is_in_center_path_neighborhood(v_alpha, problem, gamma_2):
+                return False
+            if not self.is_G_and_g_no_less_than_0(v_alpha, v, alpha):
+                return False
+            return True
+
+        while alpha > self.min_step_size:
+            v_alpha = LPVariables(
+                self.variable_updater.run(v.x, x_dot, x_ddot, alpha),
+                self.variable_updater.run(v.y, y_dot, y_ddot, alpha),
+                self.variable_updater.run(v.s, s_dot, s_ddot, alpha),
+            )
+            if is_x_s_positive_and_v_in_neighborhood(v_alpha, alpha) and self.is_h_no_less_than_0(v_alpha, v, alpha):
+                break
+            alpha *= 3 / 4
+
+        return alpha
+
     def log_constraints_residual_decreasing(self, v: LPVariables, problem: LPS, alpha: float, pre_r_b: np.ndarray):
         """制約残差が減っているかロギング
 
@@ -359,24 +367,7 @@ class InexactLineSearchIPM(InexactInteriorPointMethod):
             lst_norm_vdot.append(np.linalg.norm(np.concatenate([x_dot, y_dot, s_dot])))
             lst_residual_inexact_vdot.append(residual_first_derivative)
 
-            # 近傍に入る step size になるまで Armijo のルールに従う
-            alpha_x_max = self.variable_updater.max_step_size_guarantee_positive(v.x, x_dot, xs_ddot)
-            alpha_s_max = self.variable_updater.max_step_size_guarantee_positive(v.s, s_dot, xs_ddot)
-            alpha = min(alpha_x_max, alpha_s_max)
-            logger.debug(f"{indent}Max step size: {alpha}")
-            while alpha > self.min_step_size:
-                v_alpha = LPVariables(
-                    self.variable_updater.run(v.x, x_dot, xs_ddot, alpha),
-                    self.variable_updater.run(v.y, y_dot, y_ddot, alpha),
-                    self.variable_updater.run(v.s, s_dot, xs_ddot, alpha),
-                )
-                is_in_neighborhood = self.is_in_center_path_neighborhood(
-                    v_alpha, problem, gamma_2
-                ) and self.is_G_and_g_no_less_than_0(v_alpha, v, alpha)
-                if is_in_neighborhood and self.is_h_no_less_than_0(v_alpha, v, alpha):
-                    break
-                alpha /= 2
-            # while 文入らなかった場合に備えて新しく作成
+            alpha = self.decide_step_size(v, problem, gamma_2, x_dot, y_dot, s_dot, xs_ddot, y_ddot, xs_ddot)
             v = LPVariables(
                 self.variable_updater.run(v.x, x_dot, xs_ddot, alpha),
                 self.variable_updater.run(v.y, y_dot, y_ddot, alpha),
@@ -641,23 +632,7 @@ class InexactArcSearchIPM(InexactInteriorPointMethod):
             lst_norm_vddot.append(np.linalg.norm(np.concatenate([x_ddot, y_ddot, s_ddot])))
             lst_residual_inexact_vddot.append(residual_second_derivative)
 
-            # 近傍に入る step size になるまで Armijo のルールに従う
-            alpha_x_max = self.variable_updater.max_step_size_guarantee_positive(v.x, x_dot, x_ddot)
-            alpha_s_max = self.variable_updater.max_step_size_guarantee_positive(v.s, s_dot, s_ddot)
-            alpha = min(alpha_x_max, alpha_s_max)
-            logger.debug(f"{indent}Max step size: {alpha}")
-            while alpha > self.min_step_size:
-                v_alpha = LPVariables(
-                    self.variable_updater.run(v.x, x_dot, x_ddot, alpha),
-                    self.variable_updater.run(v.y, y_dot, y_ddot, alpha),
-                    self.variable_updater.run(v.s, s_dot, s_ddot, alpha),
-                )
-                is_in_neighborhood = self.is_in_center_path_neighborhood(
-                    v_alpha, problem, gamma_2
-                ) and self.is_G_and_g_no_less_than_0(v_alpha, v, alpha)
-                if is_in_neighborhood and self.is_h_no_less_than_0(v_alpha, v, alpha):
-                    break
-                alpha /= 2
+            alpha = self.decide_step_size(v, problem, gamma_2, x_dot, y_dot, s_dot, x_ddot, y_ddot, s_ddot)
             v = LPVariables(
                 self.variable_updater.run(v.x, x_dot, x_ddot, alpha),
                 self.variable_updater.run(v.y, y_dot, y_ddot, alpha),
