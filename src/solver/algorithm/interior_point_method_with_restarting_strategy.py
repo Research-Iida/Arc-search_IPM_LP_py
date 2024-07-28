@@ -291,15 +291,6 @@ class ArcSearchIPMWithRestartingStrategy(IPMWithRestartingStrategyBase, Mehrotra
 class ArcSearchIPMWithRestartingStrategyProven(IPMWithRestartingStrategyBase):
     """arc search restarting strategy の論文で収束することを証明したアルゴリズム"""
 
-    @property
-    def is_stopping_criteria_relative(self) -> bool:
-        """停止条件を relative なもの（数値実験上は効率がよいとされている）に設定するか
-
-        Proven クラスで論文の証明に従う場合は False を返すように override
-        """
-        return False
-        # return super().is_stopping_criteria_relative
-
     def __init__(
         self,
         config_section: str,

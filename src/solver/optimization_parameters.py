@@ -13,7 +13,7 @@ class OptimizationParameters:
     ITER_UPPER_COEF: int
     MIN_STEP_SIZE: float
     THRESHOLD_XS_NEGATIVE: float
-    IS_STOPPING_CRITERIA_RELATIVE: bool
+    SOLVED_CHECKER_TYPE: str
     INITIAL_POINT_SCALE: int
     INITIAL_POINT_MAKER: str
 
