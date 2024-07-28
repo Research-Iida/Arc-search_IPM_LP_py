@@ -6,8 +6,8 @@ from .algorithm_builder import AlgorithmBuilder
 
 # 計算対象のアルゴリズム一覧
 target_algorithms: list[str] = [
-    # "line",
-    # "arc",
+    "arc",
+    "line",
     # "arc_restarting",
     # "arc_restarting_proven",
     "inexact_arc",
@@ -18,8 +18,8 @@ target_algorithms: list[str] = [
 # アルゴリズム別計算対象の config セクション一覧
 # 計算対象にさせたくないアルゴリズムは, すべての config セクションをコメントアウトする
 target_config_sections_by_algorithm: dict[str, list[str]] = {
-    "line": [default_section],
     "arc": [default_section],
+    "line": [default_section],
     "arc_restarting": [
         default_section,
         # "GUARANTEE_MAIN_RESIDUAL_DECREASING",
@@ -42,10 +42,11 @@ target_config_sections_by_algorithm: dict[str, list[str]] = {
         # "RESTART_1",
     ],
     "inexact_arc": [
+        "SOLVE_LARGE_PROBLEMS",
         # "INEXACT_ARC_CG_MNES",
         # "INEXACT_ARC_CG_NES",
         # "INEXACT_ARC_CG_NES_LUSTING",
-        "INEXACT_ARC_CG_NES_CONSTANT",
+        # "INEXACT_ARC_CG_NES_CONSTANT",
         # "INEXACT_ARC_EXACT_NES",
         # "INEXACT_ARC_EXACT_NES_LUSTING",
         # "INEXACT_ARC_EXACT_NES_CONSTANT",
@@ -58,10 +59,11 @@ target_config_sections_by_algorithm: dict[str, list[str]] = {
         # "INEXACT_ARC_HHLJULIA_NES_IN_SERVER",
     ],
     "inexact_line": [
+        "SOLVE_LARGE_PROBLEMS",
         # "INEXACT_LINE_CG_MNES",
         # "INEXACT_LINE_CG_NES",
         # "INEXACT_LINE_CG_NES_LUSTING",
-        "INEXACT_LINE_CG_NES_CONSTANT",
+        # "INEXACT_LINE_CG_NES_CONSTANT",
         # "INEXACT_LINE_EXACT_NES",
         # "INEXACT_LINE_EXACT_NES_LUSTING",
         # "INEXACT_LINE_EXACT_NES_CONSTANT",

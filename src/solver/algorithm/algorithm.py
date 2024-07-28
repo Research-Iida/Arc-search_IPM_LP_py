@@ -34,11 +34,7 @@ class ILPSolvingAlgorithm(abc.ABC):
         self.config_section = config_section
         self.parameters = parameters
         self.solved_checker = solved_checker
-
-    @property
-    def is_stopping_criteria_relative(self) -> bool:
-        """停止条件を relative なもの（数値実験上は効率がよいとされている）に設定するか"""
-        return self.parameters.IS_STOPPING_CRITERIA_RELATIVE
+        logger.info(f"Checking solved by the method of {self.solved_checker.__class__.__name__}")
 
     @property
     def min_step_size(self) -> float:

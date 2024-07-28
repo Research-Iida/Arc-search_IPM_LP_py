@@ -27,7 +27,7 @@ from ..solver.search_direction_calculator.search_direction_calculator import (
 )
 from ..solver.solved_checker import (
     AbsoluteSolvedChecker,
-    InexactSolvedChecker,
+    ArcIPMWithRestartingProvenSolvedChecker,
     IterativeRefinementSolvedChecker,
     RelativeSolvedChecker,
     SolvedChecker,
@@ -54,21 +54,18 @@ class AlgorithmBuilder:
         self.config_section = config_section
         self.parameters = OptimizationParameters.import_(config_section)
 
-    def get_solved_cheker(self, algorithm: str) -> SolvedChecker:
+    def get_solved_cheker(self) -> SolvedChecker:
         threshold_stop_criteria = self.parameters.STOP_CRITERIA_PARAMETER
         threshold_xs_negative = self.parameters.THRESHOLD_XS_NEGATIVE
-        is_stop_relative = self.parameters.IS_STOPPING_CRITERIA_RELATIVE
+        checker_type = self.parameters.SOLVED_CHECKER_TYPE
 
-        if algorithm == "iterative_refinement":
-            return IterativeRefinementSolvedChecker(threshold_stop_criteria, threshold_xs_negative)
-
-        if algorithm.startswith("inexact_"):
-            return InexactSolvedChecker(threshold_stop_criteria, threshold_xs_negative, is_stop_relative)
-
-        if is_stop_relative:
-            return RelativeSolvedChecker(threshold_stop_criteria, threshold_xs_negative)
-
-        return AbsoluteSolvedChecker(threshold_stop_criteria, threshold_xs_negative)
+        match checker_type.lower():
+            case "relative":
+                return RelativeSolvedChecker(threshold_stop_criteria, threshold_xs_negative)
+            case "absolute":
+                return AbsoluteSolvedChecker(threshold_stop_criteria, threshold_xs_negative)
+            case _:
+                raise SelectionError(f"指定された収束判定が存在しません: {checker_type}")
 
     def get_initial_point_maker(self) -> IInitialPointMaker:
         """初期点を決定するクラスの取得
@@ -135,10 +132,9 @@ class AlgorithmBuilder:
         self, initial_point_maker: IInitialPointMaker
     ) -> ILPSolvingAlgorithm:
         """Iterative Refinement 内部で実行する inexact solver の取得"""
-        solved_checker = InexactSolvedChecker(
+        solved_checker = AbsoluteSolvedChecker(
             self.parameters.ITERATIVE_REFINEMENT_OPTIMAL_THRESHOLD_OF_SOLVER,
             self.parameters.THRESHOLD_XS_NEGATIVE,
-            False,
         )
         linear_system_solver = self.get_linear_system_solver(self.parameters.INEXACT_LINEAR_SYSTEM_SOLVER)
         search_direction_calculator = self.get_search_direction_calculator(
@@ -183,28 +179,30 @@ class AlgorithmBuilder:
                 algorithm = ArcSearchIPM(
                     self.config_section,
                     parameters=self.parameters,
-                    solved_checker=self.get_solved_cheker(algorithm),
+                    solved_checker=self.get_solved_cheker(),
                     initial_point_maker=initial_point_maker,
                 )
             case "line":
                 algorithm = LineSearchIPM(
                     self.config_section,
                     parameters=self.parameters,
-                    solved_checker=self.get_solved_cheker(algorithm),
+                    solved_checker=self.get_solved_cheker(),
                     initial_point_maker=initial_point_maker,
                 )
             case "arc_restarting":
                 algorithm = ArcSearchIPMWithRestartingStrategy(
                     self.config_section,
                     parameters=self.parameters,
-                    solved_checker=self.get_solved_cheker(algorithm),
+                    solved_checker=self.get_solved_cheker(),
                     initial_point_maker=initial_point_maker,
                 )
             case "arc_restarting_proven":
                 algorithm = ArcSearchIPMWithRestartingStrategyProven(
                     self.config_section,
                     parameters=self.parameters,
-                    solved_checker=self.get_solved_cheker(algorithm),
+                    solved_checker=ArcIPMWithRestartingProvenSolvedChecker(
+                        self.parameters.STOP_CRITERIA_PARAMETER, self.parameters.THRESHOLD_XS_NEGATIVE
+                    ),
                     initial_point_maker=initial_point_maker,
                 )
             case "inexact_arc":
@@ -215,7 +213,7 @@ class AlgorithmBuilder:
                 algorithm = InexactArcSearchIPM(
                     self.config_section,
                     parameters=self.parameters,
-                    solved_checker=self.get_solved_cheker(algorithm),
+                    solved_checker=self.get_solved_cheker(),
                     initial_point_maker=initial_point_maker,
                     search_direction_calculator=search_direction_calculator,
                 )
@@ -227,15 +225,17 @@ class AlgorithmBuilder:
                 algorithm = InexactLineSearchIPM(
                     self.config_section,
                     parameters=self.parameters,
-                    solved_checker=self.get_solved_cheker(algorithm),
+                    solved_checker=self.get_solved_cheker(),
                     initial_point_maker=initial_point_maker,
                     search_direction_calculator=search_direction_calculator,
                 )
             case "iterative_refinement":
+                threshold_stop_criteria = self.parameters.STOP_CRITERIA_PARAMETER
+                threshold_xs_negative = self.parameters.THRESHOLD_XS_NEGATIVE
                 algorithm = IterativeRefinementMethod(
                     self.config_section,
                     parameters=self.parameters,
-                    solved_checker=self.get_solved_cheker(algorithm),
+                    solved_checker=IterativeRefinementSolvedChecker(threshold_stop_criteria, threshold_xs_negative),
                     inner_algorithm=self.get_inner_algorithm_for_iterative_refinement(initial_point_maker),
                 )
             case "inexact_arc_without_proof":
@@ -246,7 +246,7 @@ class AlgorithmBuilder:
                 algorithm = InexactArcSearchIPMWithoutProof(
                     self.config_section,
                     parameters=self.parameters,
-                    solved_checker=self.get_solved_cheker(algorithm),
+                    solved_checker=self.get_solved_cheker(),
                     initial_point_maker=initial_point_maker,
                     search_direction_calculator=search_direction_calculator,
                 )

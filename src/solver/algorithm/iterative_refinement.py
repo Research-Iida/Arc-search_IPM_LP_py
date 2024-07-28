@@ -208,7 +208,7 @@ class IterativeRefinementMethod(ILPSolvingAlgorithm):
 
         # 出力の作成
         # delta_k での判定は iterative refinement 特有のもので問題自体を解けたかは不明. なので relative な判定を行う
-        is_solved = self.solved_checker.is_relative_solved(v_star, problem_0)
+        is_solved = self.solved_checker.run(v_star, problem_0)
         # 反復回数上限に達したかどうかは iterative refinement を何回行ったかで判断
         aSolvedSummary = self.make_SolvedSummary(
             v_star,
@@ -263,10 +263,6 @@ class IterativeRefinementMethod(ILPSolvingAlgorithm):
     ) -> bool:
         if self.solved_checker.run(v, problem, delta_p_k=delta_p_k, delta_d_k=delta_d_k):
             logger.info(f"{indent}Variables satisfy the solution condition.")
-            return True
-        # 変数が最適性を満たしていれば, iterative refinement の終了条件に関わらず終了する
-        if self.solved_checker.is_relative_solved(v, problem):
-            logger.info(f"{indent}Variables satisfy the solution condition with relative criteria.")
             return True
 
         if self.is_iteration_number_reached_upper(count_iterative_refinement, problem):
