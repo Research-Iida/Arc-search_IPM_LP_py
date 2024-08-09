@@ -22,6 +22,7 @@ aSlack = get_slack_api()
 # 出力されるファイル名
 today = date.today()
 str_today = today.strftime("%Y%m%d")
+name_result = str_util.add_suffix_csv(f"{str_today}_result")
 # log に日付を入れるためのメッセージ
 msg_for_logging_today = f"[{str_today}] "
 
@@ -82,7 +83,6 @@ def main(
     copy_optimization_parameters(path_result, path_generator)
 
     # csvのヘッダーを書き出す
-    name_result = str_util.add_suffix_csv(f"{str_today}_result")
     aSolvedDataRepository.write_SolvedSummary([], name_result, path=path_result)
 
     # 並列処理の設定
@@ -146,16 +146,20 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     path_generator = PathGenerator(config_section=args.config_section, date_=today)
-    setup_logger(__name__)
+    setup_logger(__name__, path_log=path_generator.generate_path_result_by_date())
+    config_section = args.config_section
+    if config_section is None:
+        profile_name = str_util.add_suffix("solve_all_problems", ".prof")
+    else:
+        profile_name = str_util.add_suffix(f"solve_all_problems_{config_section}", ".prof")
 
     try:
         profile_decorator(
             main,
-            path_generator.generate_path_result_by_date(),
-            "solve_all_problems",
+            path_generator.generate_path_result_by_date().joinpath(profile_name),
             args.num_problem,
             args.solver,
-            args.config_section,
+            config_section,
             args.start_problem_number,
             args.use_kennington,
             path_generator,
