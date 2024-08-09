@@ -22,14 +22,6 @@ today = date.today()
 
 def main(problem_name: str, solver_name: str | None, config_section: str | None, path_generator: PathGenerator):
     """main 関数"""
-    # 直接実行された場合ファイルに起こす必要があるため, 新たにlogger設定
-    log_file_name = f"solve_{problem_name}"
-    if solver_name is not None:
-        log_file_name = f"{log_file_name}_{solver_name}"
-    if config_section is not None:
-        log_file_name = f"{log_file_name}_{config_section}"
-    setup_logger(log_file_name)
-
     # 出力されるファイル名
     str_today = today.strftime("%Y%m%d")
     name_result = str_util.add_suffix_csv(f"{str_today}_result")
@@ -63,22 +55,25 @@ if __name__ == "__main__":
     parser.add_argument("-c", "--config_section", type=str, default=None, help="config section for solving problem")
     args = parser.parse_args()
 
-    path_generator = PathGenerator(config_section=args.config_section, date_=today)
+    config_section = args.config_section
+    path_generator = PathGenerator(config_section=config_section, date_=today)
 
     problem_name = args.problem_name
-    profile_name = f"solve_{problem_name}"
+    path_result = path_generator.generate_path_result_by_date_problem(problem_name)
+    log_profile_base_name = f"solve_{problem_name}"
+
     solver_name = args.solver
     if solver_name is not None:
-        profile_name = f"{profile_name}_{solver_name}"
-    config_section = args.config_section
+        log_profile_base_name = f"{log_profile_base_name}_{solver_name}"
     if config_section is not None:
-        profile_name = f"{profile_name}_{config_section}"
+        log_profile_base_name = f"{log_profile_base_name}_{config_section}"
+
+    setup_logger(log_profile_base_name, path_log=path_result)
 
     try:
         profile_decorator(
             main,
-            path_generator.generate_path_result_by_date_problem(problem_name),
-            profile_name,
+            path_result.joinpath(str_util.add_suffix(log_profile_base_name, ".prof")),
             problem_name,
             solver_name,
             config_section,
