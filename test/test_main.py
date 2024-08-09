@@ -38,6 +38,7 @@ def test_main(remove_written_file):
         config_section=test_section,
         start_problem_number=start_problem_number,
         use_kennington=False,
+        path_generator=path_generator,
     )
 
     path_result = path_generator.generate_path_result_by_date()

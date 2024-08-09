@@ -17,8 +17,10 @@ from .utils import str_util
 logger = get_main_logger()
 aSlack = get_slack_api()
 
+today = date.today()
 
-def main(problem_name: str, solver_name: str | None, config_section: str | None):
+
+def main(problem_name: str, solver_name: str | None, config_section: str | None, path_generator: PathGenerator):
     """main 関数"""
     # 直接実行された場合ファイルに起こす必要があるため, 新たにlogger設定
     log_file_name = f"solve_{problem_name}"
@@ -29,11 +31,9 @@ def main(problem_name: str, solver_name: str | None, config_section: str | None)
     setup_logger(log_file_name)
 
     # 出力されるファイル名
-    today = date.today()
     str_today = today.strftime("%Y%m%d")
     name_result = str_util.add_suffix_csv(f"{str_today}_result")
 
-    path_generator = PathGenerator(config_section=config_section, date_=today)
     path_result_by_problem = path_generator.generate_path_result_by_date_problem(problem_name)
     repository = LPRepository(path_generator)
     aSolvedDataRepository = SolvedDataRepository(path_generator)
@@ -63,6 +63,8 @@ if __name__ == "__main__":
     parser.add_argument("-c", "--config_section", type=str, default=None, help="config section for solving problem")
     args = parser.parse_args()
 
+    path_generator = PathGenerator(config_section=args.config_section, date_=today)
+
     problem_name = args.problem_name
     profile_name = f"solve_{problem_name}"
     solver_name = args.solver
@@ -73,7 +75,15 @@ if __name__ == "__main__":
         profile_name = f"{profile_name}_{config_section}"
 
     try:
-        profile_decorator(main, profile_name, problem_name, solver_name, config_section)
+        profile_decorator(
+            main,
+            path_generator.generate_path_result_by_date_problem(problem_name),
+            profile_name,
+            problem_name,
+            solver_name,
+            config_section,
+            path_generator,
+        )
         aSlack.notify_mentioned("End calculation")
     except:  # NOQA
         aSlack.notify_error()
