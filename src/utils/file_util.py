@@ -1,8 +1,7 @@
 """ファイルの処理に関する便利ツールをまとめたスクリプト"""
+
 import os
 import shutil
-
-from logging import Logger
 
 from . import str_util
 
@@ -21,7 +20,7 @@ def fullpath(file_name: str, dir_name: str = "") -> str:
     return f"{str_util.add_suffix(dir_name, '/')}{file_name}"
 
 
-def create_dir_if_not_exists(dir_name: str, logger: Logger = None):
+def create_dir_if_not_exists(dir_name: str):
     if not os.path.exists(dir_name):
         os.makedirs(dir_name)
 

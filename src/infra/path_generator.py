@@ -72,3 +72,6 @@ class PathGenerator:
         result = self.generate_path_result_by_date_problem(problem_name).joinpath(solver_name, config_section)
         create_dir_if_not_exists(result)
         return result
+
+    def generate_path_config_optimizer(self) -> Path:
+        return Path(self.config.get("PATH_CONFIG")).joinpath(self.config.get("CONFIG_OPTIMIZER"))

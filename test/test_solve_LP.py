@@ -21,11 +21,12 @@ target_algorithms: list[str] = [
 
 class TestSolveKB2:
     name_problem = "KB2"
+    path_generator = PathGenerator(test_section)
 
     @pytest.fixture(scope="class")
     def remove_KB2_processed(self):
         """KB2を解く前に `data/test/processed` ディレクトリに作成されるファイルを削除"""
-        path_processed = PathGenerator(test_section).generate_path_data_processed()
+        path_processed = self.path_generator.generate_path_data_processed()
         remove_files_and_dirs(glob.glob(f"{path_processed}/{self.name_problem}*"))
 
         yield
@@ -35,4 +36,4 @@ class TestSolveKB2:
         """`data/test/raw/netlib/KB2.mps` から問題を読み込み,
         TEST セクションの設定でソルバーを使用して最適化する
         """
-        solve_netlib.main(self.name_problem, algorithm, test_section)
+        solve_netlib.main(self.name_problem, algorithm, test_section, self.path_generator)

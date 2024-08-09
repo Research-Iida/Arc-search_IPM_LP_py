@@ -14,31 +14,26 @@ from .problem.decide_solve_problem import decide_solved_problems
 from .profiler.profiler import profile_decorator
 from .slack.slack import get_slack_api
 from .solver.solve_problem import solve_and_write
-from .utils import config_utils, str_util
+from .utils import str_util
 
 logger = get_main_logger()
-setup_logger(__name__)
 aSlack = get_slack_api()
 
 # 出力されるファイル名
 today = date.today()
 str_today = today.strftime("%Y%m%d")
-name_result = str_util.add_suffix_csv(f"{str_today}_result")
 # log に日付を入れるためのメッセージ
 msg_for_logging_today = f"[{str_today}] "
 
 
-def copy_optimization_parameters(path_result: Path, config_section: str):
+def copy_optimization_parameters(path_result: Path, path_generator: PathGenerator):
     """`config_optimizer.ini` を結果を格納するディレクトリにコピー
 
     Args:
         path_result (Path): 結果を書き込む先のディレクトリ
     """
-    config = config_utils.read_config(section=config_section)
-    path_config = config.get("PATH_CONFIG")
-    name_config_opt = config.get("CONFIG_OPTIMIZER")
-    origin_config_opt = f"{path_config}{name_config_opt}"
-    destination_config_opt = path_result.joinpath(name_config_opt)
+    origin_config_opt = path_generator.generate_path_config_optimizer()
+    destination_config_opt = path_result.joinpath(origin_config_opt.name)
     logger.info(f"Write {origin_config_opt} to {destination_config_opt}")
     shutil.copyfile(origin_config_opt, destination_config_opt)
 
@@ -49,6 +44,7 @@ def main(
     config_section: str | None,
     start_problem_number: int,
     use_kennington: bool,
+    path_generator: PathGenerator,
 ):
     """main関数
 
@@ -72,7 +68,6 @@ def main(
     aSlack.notify(msg)
 
     # 各種インスタンスの用意
-    path_generator = PathGenerator(config_section=config_section, date_=today)
     aLPRepository = JuliaLPRepository(path_generator)
     aSolvedDataRepository = SolvedDataRepository(path_generator)
 
@@ -84,9 +79,10 @@ def main(
     # 書き込み先のディレクトリを作成
     path_result = path_generator.generate_path_result_by_date()
     # パラメータもコピーしておく
-    copy_optimization_parameters(path_result, config_section)
+    copy_optimization_parameters(path_result, path_generator)
 
     # csvのヘッダーを書き出す
+    name_result = str_util.add_suffix_csv(f"{str_today}_result")
     aSolvedDataRepository.write_SolvedSummary([], name_result, path=path_result)
 
     # 並列処理の設定
@@ -149,15 +145,20 @@ if __name__ == "__main__":
     parser.add_argument("-k", "--use_kennington", action="store_true", help="start problem from this number")
     args = parser.parse_args()
 
+    path_generator = PathGenerator(config_section=args.config_section, date_=today)
+    setup_logger(__name__)
+
     try:
         profile_decorator(
             main,
+            path_generator.generate_path_result_by_date(),
             "solve_all_problems",
             args.num_problem,
             args.solver,
             args.config_section,
             args.start_problem_number,
             args.use_kennington,
+            path_generator,
         )
         aSlack.notify_mentioned(f"{msg_for_logging_today}End calculation.")
     except:  # NOQA
