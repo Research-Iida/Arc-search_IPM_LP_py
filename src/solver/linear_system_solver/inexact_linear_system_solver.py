@@ -59,7 +59,7 @@ class CGLinearSystemSolver(AbstractInexactLinearSystemSolver):
             rtol=0,
             atol=tolerance,
             M=diags(1 / coef_matrix.diagonal()),
-            maxiter=100 * coef_matrix.shape[0],
+            # maxiter=100 * coef_matrix.shape[0],
         )
         logger.info(f"{self.method_name} end.")
 
@@ -80,7 +80,7 @@ class CGLinearSystemSolver(AbstractInexactLinearSystemSolver):
                     tol=0,
                     atol=tolerance,
                     M=diags(1 / coef_matrix.diagonal()),
-                    maxiter=100 * coef_matrix.shape[0],
+                    # maxiter=100 * coef_matrix.shape[0],
                 )
 
         # cg法が解けなかった場合の warning
