@@ -6,8 +6,8 @@ from .algorithm_builder import AlgorithmBuilder
 
 # 計算対象のアルゴリズム一覧
 target_algorithms: list[str] = [
-    "arc",
-    "line",
+    # "arc",
+    # "line",
     # "arc_restarting",
     # "arc_restarting_proven",
     "inexact_arc",
