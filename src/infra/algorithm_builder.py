@@ -79,11 +79,17 @@ class AlgorithmBuilder:
         name = self.parameters.INITIAL_POINT_MAKER
         match name.lower():
             case "yang":
-                return YangInitialPointMaker()
+                return YangInitialPointMaker(ExactLinearSystemSolver())
             case "mehrotra":
-                return MehrotraInitialPointMaker()
+                return MehrotraInitialPointMaker(ExactLinearSystemSolver())
             case "lusting":
-                return LustingInitialPointMaker()
+                return LustingInitialPointMaker(ExactLinearSystemSolver())
+            case "yang_inexact":
+                return YangInitialPointMaker(inexact_linear_system_solver.CGLinearSystemSolver())
+            case "mehrotra_inexact":
+                return MehrotraInitialPointMaker(inexact_linear_system_solver.CGLinearSystemSolver())
+            case "lusting_inexact":
+                return LustingInitialPointMaker(inexact_linear_system_solver.CGLinearSystemSolver())
             case "constant":
                 return ConstantInitialPointMaker(self.parameters.INITIAL_POINT_SCALE)
             case _:

@@ -28,7 +28,7 @@ class AbstractLinearSystemSolver(metaclass=ABCMeta):
     prev_A: Csr | None = None
 
     @abstractmethod
-    def solve(self, A: Csr, b: np.ndarray, tolerance: float | None, *args) -> np.ndarray:
+    def solve(self, A: Csr, b: np.ndarray, tolerance: float | None = 10**-7, *args) -> np.ndarray:
         """線形方程式 Ax=b を解き, x を求める
 
         Args:
