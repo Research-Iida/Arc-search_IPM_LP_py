@@ -10,7 +10,7 @@ from abc import ABCMeta
 import numpy as np
 import scipy.sparse.linalg as spla
 from scipy.sparse import csr_matrix as Csr
-from scipy.sparse import diags, eye
+from scipy.sparse import diags
 
 from ...logger import get_main_logger
 from .exact_linear_system_solver import AbstractLinearSystemSolver
@@ -59,29 +59,30 @@ class CGLinearSystemSolver(AbstractInexactLinearSystemSolver):
             rtol=0,
             atol=tolerance,
             M=diags(1 / coef_matrix.diagonal()),
-            # maxiter=100 * coef_matrix.shape[0],
+            maxiter=1000 * coef_matrix.shape[0],
         )
         logger.info(f"{self.method_name} end.")
 
         # 理論的には係数行列は半正定値になるはずだが, 誤差の範囲内におさまらない場合, 数値誤差の影響で半正定値でない可能性がある
         # その場合だけ, 最小固有値分摂動を行って再度解く（毎回固有値を求めるのはコストが大きいので回数は少なくしたい）
-        if np.linalg.norm(coef_matrix @ result - right_hand_side) > tolerance:
-            logger.warning(f"{self.method_name} cannot solve within the tolerance!")
-            max_eigen_value = spla.eigsh(coef_matrix, k=1, which="LM", return_eigenvectors=False)
-            if not max_eigen_value > 0:
-                logger.warning("Coefficient matrix of the LSS is not positive definite!")
-                coef_perturbation = 10 ** (-3)
-                logger.info(f"Perturbation coefficient matrix by {coef_perturbation}.")
-                coef_matrix += coef_perturbation * eye(coef_matrix.shape[0])
+        # 以下は実行してもあまり意味ないことが数値実験でわかったので, やらないようにする
+        # if np.linalg.norm(coef_matrix @ result - right_hand_side) > tolerance:
+        #     logger.warning(f"{self.method_name} cannot solve within the tolerance!")
+        #     max_eigen_value = spla.eigsh(coef_matrix, k=1, which="LM", return_eigenvectors=False)
+        #     if not max_eigen_value > 0:
+        #         logger.warning("Coefficient matrix of the LSS is not positive definite!")
+        #         coef_perturbation = 10 ** (-3)
+        #         logger.info(f"Perturbation coefficient matrix by {coef_perturbation}.")
+        #         coef_matrix += coef_perturbation * eye(coef_matrix.shape[0])
 
-                result, info = spla.cg(
-                    coef_matrix,
-                    right_hand_side,
-                    tol=0,
-                    atol=tolerance,
-                    M=diags(1 / coef_matrix.diagonal()),
-                    # maxiter=100 * coef_matrix.shape[0],
-                )
+        #         result, info = spla.cg(
+        #             coef_matrix,
+        #             right_hand_side,
+        #             tol=0,
+        #             atol=tolerance,
+        #             M=diags(1 / coef_matrix.diagonal()),
+        #             # maxiter=100 * coef_matrix.shape[0],
+        #         )
 
         # cg法が解けなかった場合の warning
         if info > 0:
