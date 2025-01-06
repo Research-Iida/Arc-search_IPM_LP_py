@@ -17,7 +17,7 @@ poetry run python -m src.solve_netlib {instance name of Netlib} -s {solver name}
 
 ### Preprocess a instance of Netlib
 ```sh
-poetry run python -m src.preprocess_netlib {instance name of Netlib} -c {section name of config}
+poetry run python -m src.preprocess_netlib {instance name of Netlib} -c {section name of config} {-j: Julia を使用するか}
 ```
 
 ---
