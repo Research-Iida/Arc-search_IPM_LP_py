@@ -1,8 +1,10 @@
 import abc
 
 import numpy as np
+from scipy.sparse import csr_matrix as Csr
 
 from ...problem import LinearProgrammingProblemStandard as LPS
+from ..linear_system_solver.exact_linear_system_solver import AbstractLinearSystemSolver
 from ..variables import LPVariables
 
 
@@ -15,7 +17,19 @@ class IInitialPointMaker(abc.ABC):
         pass
 
 
-class MehrotraInitialPointMaker(IInitialPointMaker):
+class ILinearSystemSolvingInitialPointMaker(IInitialPointMaker):
+    """線形方程式の求解が必要な初期点作成に関するクラス"""
+
+    linear_system_solver: AbstractLinearSystemSolver
+
+    def __init__(self, linear_system_solver: AbstractLinearSystemSolver):
+        self.linear_system_solver = linear_system_solver
+
+    def solve_linear_system(self, A: Csr, b: np.ndarray) -> np.ndarray:
+        return self.linear_system_solver.solve(A, b)
+
+
+class MehrotraInitialPointMaker(ILinearSystemSolvingInitialPointMaker):
     """Mehrotra の `On the implementation of a primal-dual interior point method` を
     参考にした初期点作成
     """
@@ -24,11 +38,11 @@ class MehrotraInitialPointMaker(IInitialPointMaker):
         """初期点の作成"""
         A = problem.A
         c = problem.c
-        # AA_T_inv = problem.AA_T_inv
+        A_AT = A @ A.T
 
-        yhat = problem.AA_T_pre_factorized(A @ c)
+        yhat = self.solve_linear_system(A_AT, A @ c)
         s_hat = c - A.T.tocsr() @ yhat
-        tmp = problem.AA_T_pre_factorized(problem.b)
+        tmp = self.solve_linear_system(A_AT, problem.b)
         x_hat = A.T.tocsr() @ tmp
 
         delta_x = max([-1.1 * min(x_hat), 0])
@@ -47,7 +61,7 @@ class MehrotraInitialPointMaker(IInitialPointMaker):
         return output
 
 
-class LustingInitialPointMaker(IInitialPointMaker):
+class LustingInitialPointMaker(ILinearSystemSolvingInitialPointMaker):
     """Lustig etc. の
     `On implementing Mehrotra's predictor corrector interior-point method for linear programming`
     を参考にした初期点作成
@@ -59,8 +73,7 @@ class LustingInitialPointMaker(IInitialPointMaker):
         b = problem.b
         c = problem.c
 
-        tmp = problem.AA_T_pre_factorized(b)
-        x_hat = A.T.tocsr() @ tmp
+        x_hat = A.T.tocsr() @ self.solve_linear_system(A @ A.T, b)
         xi_1 = max(-100 * x_hat.min(), 100, np.linalg.norm(b, ord=1) / 100)
         xi_2 = 1 + np.linalg.norm(c, ord=1)
         x_0 = x_hat.copy()
@@ -74,7 +87,7 @@ class LustingInitialPointMaker(IInitialPointMaker):
         return LPVariables(x_0, np.zeros(problem.m), s_0)
 
 
-class YangInitialPointMaker(IInitialPointMaker):
+class YangInitialPointMaker(ILinearSystemSolvingInitialPointMaker):
     """Yang の
     `CurveLP-A MATLAB implementation of an infeasible interior-point algorithm for linear programming`
     を参考にした初期点作成
@@ -90,8 +103,8 @@ class YangInitialPointMaker(IInitialPointMaker):
         Returns:
             LPVariables: 初期点 x, y, s
         """
-        v_m = MehrotraInitialPointMaker().make_initial_point(problem)
-        v_l = LustingInitialPointMaker().make_initial_point(problem)
+        v_m = MehrotraInitialPointMaker(self.linear_system_solver).make_initial_point(problem)
+        v_l = LustingInitialPointMaker(self.linear_system_solver).make_initial_point(problem)
 
         def max_residual_mu(v_0: LPVariables, problem: LPS) -> float:
             """制約残渣, mu のうち最大の値を出力"""
