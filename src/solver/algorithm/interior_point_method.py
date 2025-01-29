@@ -275,7 +275,7 @@ class MehrotraTypeIPM(ExactInteriorPointMethod, metaclass=abc.ABCMeta):
         共通のものをここにおく
         """
         # 実行時間記録開始
-        start_time = time.time()
+        start_time = time.perf_counter()
 
         # 初期点の設定
         v_0 = self.make_initial_point(problem_0, v_0)
@@ -283,7 +283,7 @@ class MehrotraTypeIPM(ExactInteriorPointMethod, metaclass=abc.ABCMeta):
         # 初期点時点で最適解だった場合, そのまま出力
         if self.solved_checker.run(v_0, problem_0):
             logger.info("Initial point satisfies solved condition.")
-            aSolvedSummary = self.make_SolvedSummary(v_0, problem_0, True, 0, False, time.time() - start_time)
+            aSolvedSummary = self.make_SolvedSummary(v_0, problem_0, True, 0, False, time.perf_counter() - start_time)
             return SolvedDetail(aSolvedSummary, v_0, problem_0, v_0, problem_0)
 
         # 初期点を現在の点として初期化
@@ -299,7 +299,7 @@ class MehrotraTypeIPM(ExactInteriorPointMethod, metaclass=abc.ABCMeta):
 
         iter_num = 0
         is_solved = self.solved_checker.run(v_0, problem_0)
-        is_terminated = self.is_terminate(is_solved, iter_num, problem_0, time.time() - start_time)
+        is_terminated = self.is_terminate(is_solved, iter_num, problem_0, time.perf_counter() - start_time)
 
         # SolvedDetail の出力
         lst_variables = [v]
@@ -317,10 +317,14 @@ class MehrotraTypeIPM(ExactInteriorPointMethod, metaclass=abc.ABCMeta):
             logger.info(f"Iteration number: {iter_num}, mu: {mu}")
 
             # 探索方向の決定
+            start_calc_search_direction = time.perf_counter()
             x_dot, y_dot, s_dot = self.calc_first_derivatives(v, problem)
-            lst_norm_vdot.append(np.linalg.norm(np.concatenate([x_dot, y_dot, s_dot])))
-
             x_ddot, y_ddot, s_ddot = self.calc_second_derivative(v, x_dot, y_dot, s_dot, problem)
+            logger.info(
+                f"{indent}Calculation of search direction: {time.perf_counter() - start_calc_search_direction:.2f} sec"
+            )
+
+            lst_norm_vdot.append(np.linalg.norm(np.concatenate([x_dot, y_dot, s_dot])))
             lst_norm_vddot.append(np.linalg.norm(np.concatenate([x_ddot, y_ddot, s_ddot])))
 
             # step size の決定
@@ -335,7 +339,12 @@ class MehrotraTypeIPM(ExactInteriorPointMethod, metaclass=abc.ABCMeta):
             )
             is_solved = self.solved_checker.run(v_max_step, problem, mu_0=mu_0, r_b_0=r_b_0, r_c_0=r_c_0)
             if self.is_terminate(
-                is_solved, iter_num, problem, time.time() - start_time, alpha_x=alpha_x_max, alpha_s=alpha_s_max
+                is_solved,
+                iter_num,
+                problem,
+                time.perf_counter() - start_time,
+                alpha_x=alpha_x_max,
+                alpha_s=alpha_s_max,
             ):
                 # break しないが, while最後の is_terminate が True になるので問題ない
                 logger.info(f"{indent}Variables satisfy terminate criteria with max step size.")
@@ -390,7 +399,7 @@ class MehrotraTypeIPM(ExactInteriorPointMethod, metaclass=abc.ABCMeta):
                 is_solved,
                 iter_num,
                 problem,
-                time.time() - start_time,
+                time.perf_counter() - start_time,
                 alpha_x,
                 alpha_s,
                 pre_r_b=pre_r_b,
@@ -400,7 +409,7 @@ class MehrotraTypeIPM(ExactInteriorPointMethod, metaclass=abc.ABCMeta):
             )
 
         # 時間計測終了
-        elapsed_time = time.time() - start_time
+        elapsed_time = time.perf_counter() - start_time
 
         # 出力の作成
         aSolvedSummary = self.make_SolvedSummary(

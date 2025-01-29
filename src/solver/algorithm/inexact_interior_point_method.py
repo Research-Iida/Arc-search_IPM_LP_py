@@ -311,7 +311,7 @@ class InexactLineSearchIPM(InexactInteriorPointMethod):
             SolvedDetail: 求解した結果
         """
         # 実行時間記録開始
-        start_time = time.time()
+        start_time = time.perf_counter()
 
         # 初期点の設定
         v_0 = self.make_initial_point(problem_0, v_0)
@@ -319,7 +319,7 @@ class InexactLineSearchIPM(InexactInteriorPointMethod):
         # 初期点時点で最適解だった場合, そのまま出力
         if self.solved_checker.run(v_0, problem_0):
             logger.info("Initial point satisfies solved condition.")
-            aSolvedSummary = self.make_SolvedSummary(v_0, problem_0, True, 0, False, time.time() - start_time)
+            aSolvedSummary = self.make_SolvedSummary(v_0, problem_0, True, 0, False, time.perf_counter() - start_time)
             return SolvedDetail(aSolvedSummary, v_0, problem_0, v_0, problem_0)
 
         # 初期点を現在の点として初期化
@@ -336,7 +336,7 @@ class InexactLineSearchIPM(InexactInteriorPointMethod):
 
         iter_num = 0
         is_solved = self.solved_checker.run(v_0, problem_0)
-        is_terminated = self.is_terminate(is_solved, iter_num, problem_0, time.time() - start_time)
+        is_terminated = self.is_terminate(is_solved, iter_num, problem_0, time.perf_counter() - start_time)
 
         # SolvedDetail の出力
         lst_variables = [v]
@@ -360,10 +360,15 @@ class InexactLineSearchIPM(InexactInteriorPointMethod):
                 f"{indent}max_r_b: {np.linalg.norm(r_b, ord=np.inf)}, max_r_c: {np.linalg.norm(r_c, ord=np.inf)}"
             )
 
-            # 探索方向の決定
             lst_tolerance_inexact_vdot.append(self.calc_tolerance_for_inexact_first_derivative(v, problem))
 
+            # 探索方向の決定
+            start_calc_search_direction = time.perf_counter()
             x_dot, y_dot, s_dot, residual_first_derivative = self.calc_first_derivatives(v, problem)
+            logger.info(
+                f"{indent}Calculation of search direction: {time.perf_counter() - start_calc_search_direction:.2f} sec"
+            )
+
             lst_norm_vdot.append(np.linalg.norm(np.concatenate([x_dot, y_dot, s_dot])))
             lst_residual_inexact_vdot.append(residual_first_derivative)
 
@@ -401,7 +406,7 @@ class InexactLineSearchIPM(InexactInteriorPointMethod):
                 is_solved,
                 iter_num,
                 problem,
-                time.time() - start_time,
+                time.perf_counter() - start_time,
                 alpha_x=alpha,
                 alpha_s=alpha,
                 pre_r_b=pre_r_b,
@@ -411,7 +416,7 @@ class InexactLineSearchIPM(InexactInteriorPointMethod):
             )
 
         # 時間計測終了
-        elapsed_time = time.time() - start_time
+        elapsed_time = time.perf_counter() - start_time
 
         # 出力の作成
         aSolvedSummary = self.make_SolvedSummary(
@@ -566,7 +571,7 @@ class InexactArcSearchIPM(InexactInteriorPointMethod):
             SolvedDetail: 求解した結果
         """
         # 実行時間記録開始
-        start_time = time.time()
+        start_time = time.perf_counter()
 
         # 初期点の設定
         v_0 = self.make_initial_point(problem_0, v_0)
@@ -574,7 +579,7 @@ class InexactArcSearchIPM(InexactInteriorPointMethod):
         # 初期点時点で最適解だった場合, そのまま出力
         if self.solved_checker.run(v_0, problem_0):
             logger.info("Initial point satisfies solved condition.")
-            aSolvedSummary = self.make_SolvedSummary(v_0, problem_0, True, 0, False, time.time() - start_time)
+            aSolvedSummary = self.make_SolvedSummary(v_0, problem_0, True, 0, False, time.perf_counter() - start_time)
             return SolvedDetail(aSolvedSummary, v_0, problem_0, v_0, problem_0)
 
         # 初期点を現在の点として初期化
@@ -591,7 +596,7 @@ class InexactArcSearchIPM(InexactInteriorPointMethod):
 
         iter_num = 0
         is_solved = self.solved_checker.run(v_0, problem_0)
-        is_terminated = self.is_terminate(is_solved, iter_num, problem_0, time.time() - start_time)
+        is_terminated = self.is_terminate(is_solved, iter_num, problem_0, time.perf_counter() - start_time)
 
         # SolvedDetail の出力
         lst_variables = [v]
@@ -618,17 +623,21 @@ class InexactArcSearchIPM(InexactInteriorPointMethod):
                 f"{indent}max_r_b: {np.linalg.norm(r_b, ord=np.inf)}, max_r_c: {np.linalg.norm(r_c, ord=np.inf)}"
             )
 
-            # 探索方向の決定
             lst_tolerance_inexact_vdot.append(self.calc_tolerance_for_inexact_first_derivative(v, problem))
-            x_dot, y_dot, s_dot, residual_first_derivative = self.calc_first_derivatives(v, problem)
-            lst_norm_vdot.append(np.linalg.norm(np.concatenate([x_dot, y_dot, s_dot])))
-            lst_residual_inexact_vdot.append(residual_first_derivative)
-
             lst_tolerance_inexact_vddot.append(self.calc_tolerance_for_inexact_second_derivative(v, problem))
 
+            # 探索方向の決定
+            start_calc_search_direction = time.perf_counter()
+            x_dot, y_dot, s_dot, residual_first_derivative = self.calc_first_derivatives(v, problem)
             x_ddot, y_ddot, s_ddot, residual_second_derivative = self.calc_second_derivative(
                 v, x_dot, y_dot, s_dot, problem
             )
+            logger.info(
+                f"{indent}Calculation of search direction: {time.perf_counter() - start_calc_search_direction:.2f} sec"
+            )
+
+            lst_norm_vdot.append(np.linalg.norm(np.concatenate([x_dot, y_dot, s_dot])))
+            lst_residual_inexact_vdot.append(residual_first_derivative)
             lst_norm_vddot.append(np.linalg.norm(np.concatenate([x_ddot, y_ddot, s_ddot])))
             lst_residual_inexact_vddot.append(residual_second_derivative)
 
@@ -665,7 +674,7 @@ class InexactArcSearchIPM(InexactInteriorPointMethod):
                 is_solved,
                 iter_num,
                 problem,
-                time.time() - start_time,
+                time.perf_counter() - start_time,
                 alpha_x=alpha,
                 alpha_s=alpha,
                 pre_r_b=pre_r_b,
@@ -675,7 +684,7 @@ class InexactArcSearchIPM(InexactInteriorPointMethod):
             )
 
         # 時間計測終了
-        elapsed_time = time.time() - start_time
+        elapsed_time = time.perf_counter() - start_time
 
         aSolvedSummary = self.make_SolvedSummary(
             v,
