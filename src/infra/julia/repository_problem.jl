@@ -47,6 +47,7 @@ end
 
 function load_mps(problem_name::String)::LPOnlyEqualityConstraint
     netlib_path = fetch_netlib()
+    println("netlib path: ", netlib_path)
     qps_data = readqps(netlib_path * "/" * problem_name * ".SIF")
 
     A_E_rows, A_E_cols, A_E_vals, b_E = extract_elements(qps_data, 1)

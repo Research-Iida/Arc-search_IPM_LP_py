@@ -5,17 +5,19 @@ logger = get_main_logger()
 
 # スキップする問題群
 skip_problems = {
-    "BLEND",  # SIFファイルに問題があり読み込みできなかった
-    "DFL001",  # SIFファイルに問題があり読み込みできなかった
-    "FORPLAN",  # SIFファイルに問題があり読み込みできなかった
-    "GFRD-PNC",  # SIFファイルに問題があり読み込みできなかった
     "GREENBEB",  # CGだと永遠に終わらない
-    "KEN-18",  # exact に線形方程式を解くにはサイズがでかすぎる
-    "OSA-60",  # exact に線形方程式を解くにはサイズがでかすぎる
-    "PDS-20",  # exact に線形方程式を解くにはサイズがでかすぎる
     "SCORPION",  # 初期点の計算時に特異行列が出てしまう
     "SIERRA",  # 文字列が数値の所に入っているらしい
-    "STOCFOR3",  # exact に線形方程式を解くにはサイズがでかすぎる
+    # SIFファイルに問題があり読み込みできなかった
+    "BLEND",
+    "FORPLAN",
+    "GFRD-PNC",
+    "DFL001",  # SIFファイルに問題あるが, 手作業で修正して読み込めるようにした
+    # exact に線形方程式を解くにはサイズがでかすぎる
+    "KEN-18",
+    "OSA-60",
+    "PDS-20",
+    "STOCFOR3",
 }
 # Kennington によるサイズの大きい問題群. 普段は skip の対象
 kennington_problems = {
@@ -34,8 +36,10 @@ kennington_problems = {
     "PDS-06",
     "PDS-10",
     "PDS-20",
-    # 以下, Kennington の問題ではないけどサイズが大きく, exact で解くと時間がかかる
+    # 以下, Kennington の問題ではないけどサイズが大きい
+    "DFL001",
     "QAP15",
+    "STOCFOR3",
 }
 
 
