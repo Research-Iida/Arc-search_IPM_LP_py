@@ -59,7 +59,7 @@ class CGLinearSystemSolver(AbstractInexactLinearSystemSolver):
             rtol=0,
             atol=tolerance,
             M=diags(1 / coef_matrix.diagonal()),
-            maxiter=1000 * coef_matrix.shape[0],
+            maxiter=10000 * coef_matrix.shape[0],
         )
         logger.info(f"{self.method_name} end.")
 
