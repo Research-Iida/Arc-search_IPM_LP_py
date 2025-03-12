@@ -6,13 +6,15 @@ import numpy as np
 from ...logger import get_main_logger, indent
 from ...problem import LinearProgrammingProblemStandard as LPS
 from ..optimization_parameters import OptimizationParameters
-from ..search_direction_calculator.search_direction_calculator import AbstractSearchDirectionCalculator
+from ..search_direction_calculator.search_direction_calculator import \
+    AbstractSearchDirectionCalculator
 from ..solved_checker import SolvedChecker
 from ..solved_data import SolvedDetail
 from ..variables import LPVariables
 from .initial_point_maker import ConstantInitialPointMaker, IInitialPointMaker
 from .interior_point_method import InteriorPointMethod
-from .variable_updater import ArcVariableUpdater, LineVariableUpdater, VariableUpdater
+from .variable_updater import (ArcVariableUpdater, LineVariableUpdater,
+                               VariableUpdater)
 
 logger = get_main_logger()
 
@@ -360,13 +362,15 @@ class InexactLineSearchIPM(InexactInteriorPointMethod):
                 f"{indent}max_r_b: {np.linalg.norm(r_b, ord=np.inf)}, max_r_c: {np.linalg.norm(r_c, ord=np.inf)}"
             )
 
+            start_calc_iteration = time.perf_counter()
+
             lst_tolerance_inexact_vdot.append(self.calc_tolerance_for_inexact_first_derivative(v, problem))
 
             # 探索方向の決定
             start_calc_search_direction = time.perf_counter()
             x_dot, y_dot, s_dot, residual_first_derivative = self.calc_first_derivatives(v, problem)
             logger.info(
-                f"{indent}Calculation of search direction: {time.perf_counter() - start_calc_search_direction:.2f} sec"
+                f"{indent}Calc time to obtain the search direction: {time.perf_counter() - start_calc_search_direction:.2f} sec"
             )
 
             lst_norm_vdot.append(np.linalg.norm(np.concatenate([x_dot, y_dot, s_dot])))
@@ -414,6 +418,8 @@ class InexactLineSearchIPM(InexactInteriorPointMethod):
                 r_b=r_b,
                 r_c=r_c,
             )
+
+            logger.info(f"{indent}Calc time of the iteration: {time.perf_counter() - start_calc_iteration:.2f} sec")
 
         # 時間計測終了
         elapsed_time = time.perf_counter() - start_time
