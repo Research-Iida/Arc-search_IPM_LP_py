@@ -3,7 +3,7 @@ name: Sync to Public Repo on Tag
 on:
   push:
     tags:
-      - "v2.*" # セマンティックバージョンに合わせて調整してください
+      - "v*" # セマンティックバージョンに合わせて調整してください
 
 permissions:
   contents: read
