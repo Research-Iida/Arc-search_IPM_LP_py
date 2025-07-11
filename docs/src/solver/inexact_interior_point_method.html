@@ -1,0 +1,1483 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.1">
+<title>src.solver.inexact_interior_point_method API documentation</title>
+<meta name="description" content="">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>src.solver.inexact_interior_point_method</code></h1>
+</header>
+<section id="section-intro">
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="src.solver.inexact_interior_point_method.InexactArcSearchIPM"><code class="flex name class">
+<span>class <span class="ident">InexactArcSearchIPM</span></span>
+<span>(</span><span>config_section: str = 'DEFAULT', solved_checker: <a title="src.solver.solved_checker.SolvedChecker" href="solved_checker.html#src.solver.solved_checker.SolvedChecker">SolvedChecker</a> | None = None, linear_system_solver: <a title="src.linear_system_solver.exact_linear_system_solver.AbstractLinearSystemSolver" href="../linear_system_solver/exact_linear_system_solver.html#src.linear_system_solver.exact_linear_system_solver.AbstractLinearSystemSolver">AbstractLinearSystemSolver</a> | None = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Inexact に線形方程式を解きながら内点法を実施するクラス</p>
+<p>インスタンス初期化</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>config_section</code></strong> :&ensp;<code>str</code></dt>
+<dd>設定ファイルのセクション名.
+logging にも使用するので文字列で取得しておく</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class InexactArcSearchIPM(InexactInteriorPointMethod):
+    def _validate(self):
+        &#34;&#34;&#34;アルゴリズムが理論通り動くようにパラメータが設定されているか確認
+        もし条件が満たされていなければ, アルゴリズムが収束する保障がないことを warning
+        &#34;&#34;&#34;
+        is_sigma_more_than_eta = self.sigma &gt; self.eta
+        if not is_sigma_more_than_eta:
+            logger.warning(
+                f&#34;sigma must be more than eta! sigma: {self.sigma}, eta: {self.eta}&#34;
+            )
+
+        is_G_i_more_than_zero = (1 - self.gamma_1) * self.sigma &gt; (
+            1 + self.gamma_1
+        ) * self.eta
+        if not is_G_i_more_than_zero:
+            logger.warning(
+                f&#34;(1 - gamma_1) sigma must be more than (1 + gamma_1) eta! gamma_1: {self.gamma_1}, sigma: {self.sigma}, eta: {self.eta}&#34;
+            )
+
+        is_beta_more_than_sigma_plus_eta = self.beta &gt; self.sigma + self.eta
+        if not is_beta_more_than_sigma_plus_eta:
+            logger.warning(
+                f&#34;beta must be more than sigma + eta! beta: {self.beta}, sigma: {self.sigma}, eta: {self.eta}&#34;
+            )
+
+        if not (
+            is_sigma_more_than_eta
+            and is_G_i_more_than_zero
+            and is_beta_more_than_sigma_plus_eta
+        ):
+            logger.warning(&#34;Algorithm is not satisfied for convergence.&#34;)
+
+    def __init__(
+        self,
+        config_section: str = config_utils.default_section,
+        solved_checker: SolvedChecker | None = None,
+        linear_system_solver: AbstractLinearSystemSolver | None = None,
+    ):
+        super().__init__(config_section, solved_checker, linear_system_solver)
+        self.variable_updater = ArcVariableUpdater(self._delta_xs)
+        self._validate()
+
+    def is_iteration_number_reached_upper(self, iter_num: int, problem: LPS) -&gt; bool:
+        &#34;&#34;&#34;反復回数が上限を超えたか
+
+        本来は O(n^1.5 L) だが, 時間がかかって嫌なので設定どおりの値を使用
+
+        Args:
+            iter_num: 反復回数
+        &#34;&#34;&#34;
+        upper = max(
+            self.parameters.ITER_UPPER_COEF * (problem.n**1.5),
+            self.parameters.ITER_UPPER,
+        )
+        # upper = self.parameters.ITER_UPPER
+        return iter_num &gt;= upper
+
+    def calc_tolerance_for_inexact_second_derivative(
+        self, v: LPVariables, problem: LPS
+    ) -&gt; float:
+        &#34;&#34;&#34;二階微分を inexact に解く際の誤差許容度&#34;&#34;&#34;
+        return self.calc_tolerance_for_inexact_first_derivative(v, problem)
+
+    def calc_second_derivative(
+        self,
+        v: LPVariables,
+        x_dot: np.ndarray,
+        y_dot: np.ndarray,
+        s_dot: np.ndarray,
+        problem: LPS,
+        *args,
+        **kwargs,
+    ) -&gt; tuple[np.ndarray, np.ndarray, np.ndarray, float]:
+        &#34;&#34;&#34;二次微分の値を出力. OSS の定式化で計算するため中身を内点法のものから変更
+
+        Returns:
+            np.ndarray: x の二次微分
+            np.ndarray: y の二次微分
+            np.ndarray: s の二次微分
+            float: 線形方程式を解いた際の誤差ノルム
+        &#34;&#34;&#34;
+        rhs_elements_nonzero = -2 * x_dot * s_dot
+        y_ddot_zero = np.zeros(problem.m)
+        xs_ddot_zero = np.zeros(problem.n)
+
+        # 二階微分の計算をしなくても threshold 以下に収まるなら, 計算時間短縮のために省く
+        residual_with_0_vector = np.linalg.norm(rhs_elements_nonzero, ord=np.inf)
+        tol_for_max_norm = self.eta * v.mu
+        if residual_with_0_vector &lt;= tol_for_max_norm:
+            logger.info(&#34;RHS of second derivative is too small, so return zero vector.&#34;)
+            logger.info(
+                f&#34;norm of RHS: {residual_with_0_vector}, tolerance: {tol_for_max_norm}&#34;
+            )
+            return xs_ddot_zero, y_ddot_zero, xs_ddot_zero, residual_with_0_vector
+
+        # 求解
+        right_hand_side = np.concatenate(
+            [np.zeros(problem.m + problem.n), rhs_elements_nonzero]
+        )
+        tol = self.calc_tolerance_for_inexact_second_derivative(v, problem)
+        # もし最適解に近づいていれば inexact solver だと計算時間的に不利になるので, exact solver に変更する
+        if (
+            self.is_close_to_optimal(v, problem)
+            and self.parameters.INEXACT_SOLVE_EXACTLY_FROM_THE_MIDDLE
+        ):
+            x_ddot, y_ddot, s_ddot, norm_residual = (
+                self.exact_search_direction_calculator.run(
+                    v, problem, right_hand_side, tol
+                )
+            )
+        else:
+            x_ddot, y_ddot, s_ddot, norm_residual = (
+                self.search_direction_calculator.run(v, problem, right_hand_side, tol)
+            )
+        logger.debug(f&#34;tolerance: {tol}, ||M_2 z - sigma_2||: {norm_residual}&#34;)
+        if norm_residual &gt; tol:
+            logger.warning(
+                f&#34;Second derivative residual over tolerance! tolerance: {tol}, ||M_2 z - sigma_2||: {norm_residual}&#34;
+            )
+
+        # 誤差が0ベクトルの場合よりも大きい場合, 解を 0ベクトルに修正
+        x_ddot_with_zero_y_ddot = rhs_elements_nonzero / v.s
+        residual_with_zero_y_ddot = np.linalg.norm(problem.A @ x_ddot_with_zero_y_ddot)
+        logger.debug(
+            f&#34;{indent}Norm of second derivative residual = {norm_residual}, ||RHS|| = {residual_with_zero_y_ddot}&#34;
+        )
+        if norm_residual &gt; residual_with_zero_y_ddot:
+            logger.warning(
+                f&#34;{indent}Second derivative residual is too large. Second derivative is changed to zero vector.&#34;
+            )
+            return (
+                x_ddot_with_zero_y_ddot,
+                y_ddot_zero,
+                xs_ddot_zero,
+                residual_with_zero_y_ddot,
+            )
+
+        return x_ddot, y_ddot, s_ddot, norm_residual
+
+    def run_algorithm(self, problem_0: LPS, v_0: LPVariables) -&gt; SolvedDetail:
+        &#34;&#34;&#34;反復で解く arc-saarch の実行, 線形方程式は inexact に解く
+
+        Args:
+            problem_0 (LPS): 問題の最初の状態
+            v_0 (LPVariables): 初期点
+
+        Returns:
+            SolvedDetail: 求解した結果
+        &#34;&#34;&#34;
+        # 実行時間記録開始
+        start_time = time.time()
+
+        problem, v, remove_constraint_rows = self.initial_problem_and_point(
+            problem_0, v_0
+        )
+
+        # 初期点や問題が変わることで状況が変わるのでログ
+        # logger.info(&#34;Logging problem information.&#34;)
+        # self.log_initial_problem_information(problem)
+        logger.info(&#34;Logging initial situation.&#34;)
+        self.log_initial_situation(v, problem)
+
+        mu = v.mu
+        mu_0 = mu
+        r_b = problem.residual_main_constraint(v.x)
+        r_b_0 = r_b
+        r_c = problem.residual_dual_constraint(v.y, v.s)
+        r_c_0 = r_c
+        gamma_2 = self.calculate_gamma_2(v, problem)
+
+        iter_num = 0
+        is_solved = self.solved_checker.run(v_0, problem_0)
+        is_terminated = self.is_terminate(
+            is_solved, iter_num, problem_0, time.time() - start_time
+        )
+
+        # SolvedDetail の出力
+        lst_variables = [v]
+        lst_mu = [mu_0]
+        lst_alpha: list[float] = []
+        lst_norm_vdot: list[float] = []
+        lst_norm_vddot: list[float] = []
+        lst_max_norm_main_const = [np.linalg.norm(r_b_0, ord=np.inf)]
+        lst_max_norm_dual_const = [np.linalg.norm(r_c_0, ord=np.inf)]
+        lst_residual_inexact_vdot: list[float] = []
+        lst_tolerance_inexact_vdot: list[float] = []
+        lst_residual_inexact_vddot: list[float] = []
+        lst_tolerance_inexact_vddot: list[float] = []
+
+        # while 文中で使用
+        # xs_ddot_zero = np.zeros(problem.n)
+        # y_ddot_zero = np.zeros(problem.m)
+
+        # 収束条件を満たすまで反復する
+        while not is_terminated:
+            iter_num += 1
+            logger.info(f&#34;Iteration number: {iter_num}, mu: {mu}&#34;)
+            logger.info(
+                f&#34;{indent}max_r_b: {np.linalg.norm(r_b, ord=np.inf)}, max_r_c: {np.linalg.norm(r_c, ord=np.inf)}&#34;
+            )
+
+            # 探索方向の決定
+            lst_tolerance_inexact_vdot.append(
+                self.calc_tolerance_for_inexact_first_derivative(v, problem)
+            )
+            x_dot, y_dot, s_dot, residual_first_derivative = (
+                self.calc_first_derivatives(v, problem)
+            )
+            lst_norm_vdot.append(np.linalg.norm(np.concatenate([x_dot, y_dot, s_dot])))
+            lst_residual_inexact_vdot.append(residual_first_derivative)
+
+            lst_tolerance_inexact_vddot.append(
+                self.calc_tolerance_for_inexact_second_derivative(v, problem)
+            )
+
+            x_ddot, y_ddot, s_ddot, residual_second_derivative = (
+                self.calc_second_derivative(v, x_dot, y_dot, s_dot, problem)
+            )
+            lst_norm_vddot.append(
+                np.linalg.norm(np.concatenate([x_ddot, y_ddot, s_ddot]))
+            )
+            lst_residual_inexact_vddot.append(residual_second_derivative)
+
+            # 近傍に入る step size になるまで Armijo のルールに従う
+            alpha_x_max = self.variable_updater.max_step_size_guarantee_positive(
+                v.x, x_dot, x_ddot
+            )
+            alpha_s_max = self.variable_updater.max_step_size_guarantee_positive(
+                v.s, s_dot, s_ddot
+            )
+            alpha = min(alpha_x_max, alpha_s_max)
+            logger.debug(f&#34;{indent}Max step size: {alpha}&#34;)
+            while alpha &gt; self.min_step_size:
+                v_alpha = LPVariables(
+                    self.variable_updater.run(v.x, x_dot, x_ddot, alpha),
+                    self.variable_updater.run(v.y, y_dot, y_ddot, alpha),
+                    self.variable_updater.run(v.s, s_dot, s_ddot, alpha),
+                )
+                is_in_neighborhood = self.is_in_center_path_neighborhood(
+                    v_alpha, problem, gamma_2
+                ) and self.is_G_and_g_no_less_than_0(v_alpha, v, alpha)
+                if is_in_neighborhood and self.is_h_no_less_than_0(v_alpha, v, alpha):
+                    break
+                alpha /= 2
+            v = LPVariables(
+                self.variable_updater.run(v.x, x_dot, x_ddot, alpha),
+                self.variable_updater.run(v.y, y_dot, y_ddot, alpha),
+                self.variable_updater.run(v.s, s_dot, s_ddot, alpha),
+            )
+            logger.info(f&#34;{indent}Step size: {alpha}&#34;)
+
+            # もし x, s が負になってしまった場合アルゴリズムが狂うので, 負になっていないか確認
+            self.log_positive_variables_negativity(v)
+
+            pre_r_b = r_b
+            pre_r_c = r_c
+            r_b = problem.residual_main_constraint(v.x)
+            r_c = problem.residual_dual_constraint(v.y, v.s)
+            # 制約残差がどうなっているかlogging
+            self.log_constraints_residual_decreasing(v, problem, alpha, pre_r_b)
+
+            mu = v.mu
+
+            # 記録用の値追加
+            lst_variables.append(v)
+            lst_mu.append(mu)
+            lst_alpha.append(alpha)
+            lst_max_norm_main_const.append(np.linalg.norm(r_b, ord=np.inf))
+            lst_max_norm_dual_const.append(np.linalg.norm(r_c, ord=np.inf))
+
+            # 停止条件更新
+            is_solved = self.solved_checker.run(v, problem)
+            is_terminated = self.is_terminate(
+                is_solved,
+                iter_num,
+                problem,
+                time.time() - start_time,
+                alpha_x=alpha,
+                alpha_s=alpha,
+                pre_r_b=pre_r_b,
+                pre_r_c=pre_r_c,
+                r_b=r_b,
+                r_c=r_c,
+            )
+
+        # 時間計測終了
+        elapsed_time = time.time() - start_time
+
+        aSolvedSummary = self.make_SolvedSummary(
+            v,
+            problem,
+            is_solved,
+            iter_num,
+            self.is_iteration_number_reached_upper(iter_num, problem),
+            elapsed_time,
+        )
+        # problem_0 と比較する際に変数の次元が合わないと困るため復帰させる
+        output = SolvedDetail(
+            aSolvedSummary,
+            v,
+            problem,
+            v_0,
+            problem_0,
+            lst_variables_by_iter=lst_variables,
+            lst_main_step_size_by_iter=lst_alpha,
+            lst_dual_step_size_by_iter=lst_alpha,
+            lst_mu_by_iter=lst_mu,
+            lst_norm_vdot_by_iter=lst_norm_vdot,
+            lst_norm_vddot_by_iter=lst_norm_vddot,
+            lst_max_norm_main_constraint_by_iter=lst_max_norm_main_const,
+            lst_max_norm_dual_constraint_by_iter=lst_max_norm_dual_const,
+            lst_residual_inexact_vdot=lst_residual_inexact_vdot,
+            lst_tolerance_inexact_vdot=lst_tolerance_inexact_vdot,
+            lst_residual_inexact_vddot=lst_residual_inexact_vddot,
+            lst_tolerance_inexact_vddot=lst_tolerance_inexact_vddot,
+        )
+        return output</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod" href="#src.solver.inexact_interior_point_method.InexactInteriorPointMethod">InexactInteriorPointMethod</a></li>
+<li><a title="src.solver.interior_point_method.InteriorPointMethod" href="interior_point_method.html#src.solver.interior_point_method.InteriorPointMethod">InteriorPointMethod</a></li>
+<li><a title="src.solver.solver.LPSolver" href="solver.html#src.solver.solver.LPSolver">LPSolver</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="src.solver.inexact_interior_point_method.InexactArcSearchIPM.calc_second_derivative"><code class="name flex">
+<span>def <span class="ident">calc_second_derivative</span></span>(<span>self, v: <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a>, x_dot: numpy.ndarray, y_dot: numpy.ndarray, s_dot: numpy.ndarray, problem: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>, *args, **kwargs) ‑> tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray, float]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>二次微分の値を出力. OSS の定式化で計算するため中身を内点法のものから変更</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>np.ndarray</code></dt>
+<dd>x の二次微分</dd>
+<dt><code>np.ndarray</code></dt>
+<dd>y の二次微分</dd>
+<dt><code>np.ndarray</code></dt>
+<dd>s の二次微分</dd>
+<dt><code>float</code></dt>
+<dd>線形方程式を解いた際の誤差ノルム</dd>
+</dl></div>
+</dd>
+<dt id="src.solver.inexact_interior_point_method.InexactArcSearchIPM.calc_tolerance_for_inexact_second_derivative"><code class="name flex">
+<span>def <span class="ident">calc_tolerance_for_inexact_second_derivative</span></span>(<span>self, v: <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a>, problem: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>) ‑> float</span>
+</code></dt>
+<dd>
+<div class="desc"><p>二階微分を inexact に解く際の誤差許容度</p></div>
+</dd>
+<dt id="src.solver.inexact_interior_point_method.InexactArcSearchIPM.is_iteration_number_reached_upper"><code class="name flex">
+<span>def <span class="ident">is_iteration_number_reached_upper</span></span>(<span>self, iter_num: int, problem: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>反復回数が上限を超えたか</p>
+<p>本来は O(n^1.5 L) だが, 時間がかかって嫌なので設定どおりの値を使用</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>iter_num</code></strong></dt>
+<dd>反復回数</dd>
+</dl></div>
+</dd>
+<dt id="src.solver.inexact_interior_point_method.InexactArcSearchIPM.run_algorithm"><code class="name flex">
+<span>def <span class="ident">run_algorithm</span></span>(<span>self, problem_0: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>, v_0: <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a>) ‑> <a title="src.solver.solved_data.SolvedDetail" href="solved_data.html#src.solver.solved_data.SolvedDetail">SolvedDetail</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>反復で解く arc-saarch の実行, 線形方程式は inexact に解く</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>problem_0</code></strong> :&ensp;<code>LPS</code></dt>
+<dd>問題の最初の状態</dd>
+<dt><strong><code>v_0</code></strong> :&ensp;<code>LPVariables</code></dt>
+<dd>初期点</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>SolvedDetail</code></dt>
+<dd>求解した結果</dd>
+</dl></div>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod" href="#src.solver.inexact_interior_point_method.InexactInteriorPointMethod">InexactInteriorPointMethod</a></b></code>:
+<ul class="hlist">
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.calc_first_derivatives" href="#src.solver.inexact_interior_point_method.InexactInteriorPointMethod.calc_first_derivatives">calc_first_derivatives</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.calc_tolerance_for_inexact_first_derivative" href="#src.solver.inexact_interior_point_method.InexactInteriorPointMethod.calc_tolerance_for_inexact_first_derivative">calc_tolerance_for_inexact_first_derivative</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.calculate_gamma_2" href="#src.solver.inexact_interior_point_method.InexactInteriorPointMethod.calculate_gamma_2">calculate_gamma_2</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.initial_problem_and_point" href="#src.solver.inexact_interior_point_method.InexactInteriorPointMethod.initial_problem_and_point">initial_problem_and_point</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.initial_variables" href="solver.html#src.solver.solver.LPSolver.initial_variables">initial_variables</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.is_G_and_g_no_less_than_0" href="#src.solver.inexact_interior_point_method.InexactInteriorPointMethod.is_G_and_g_no_less_than_0">is_G_and_g_no_less_than_0</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.is_calculation_time_reached_upper" href="solver.html#src.solver.solver.LPSolver.is_calculation_time_reached_upper">is_calculation_time_reached_upper</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.is_close_to_optimal" href="#src.solver.inexact_interior_point_method.InexactInteriorPointMethod.is_close_to_optimal">is_close_to_optimal</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.is_h_no_less_than_0" href="#src.solver.inexact_interior_point_method.InexactInteriorPointMethod.is_h_no_less_than_0">is_h_no_less_than_0</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.is_in_center_path_neighborhood" href="#src.solver.inexact_interior_point_method.InexactInteriorPointMethod.is_in_center_path_neighborhood">is_in_center_path_neighborhood</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.is_not_decrease_residuals" href="interior_point_method.html#src.solver.interior_point_method.InteriorPointMethod.is_not_decrease_residuals">is_not_decrease_residuals</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.is_stopping_criteria_relative" href="solver.html#src.solver.solver.LPSolver.is_stopping_criteria_relative">is_stopping_criteria_relative</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.is_terminate" href="interior_point_method.html#src.solver.interior_point_method.InteriorPointMethod.is_terminate">is_terminate</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.log_constraints_residual_decreasing" href="#src.solver.inexact_interior_point_method.InexactInteriorPointMethod.log_constraints_residual_decreasing">log_constraints_residual_decreasing</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.log_initial_problem_information" href="solver.html#src.solver.solver.LPSolver.log_initial_problem_information">log_initial_problem_information</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.log_initial_situation" href="solver.html#src.solver.solver.LPSolver.log_initial_situation">log_initial_situation</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.log_positive_variables_negativity" href="solver.html#src.solver.solver.LPSolver.log_positive_variables_negativity">log_positive_variables_negativity</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.log_solved_data" href="solver.html#src.solver.solver.LPSolver.log_solved_data">log_solved_data</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.make_SolvedSummary" href="solver.html#src.solver.solver.LPSolver.make_SolvedSummary">make_SolvedSummary</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.run" href="solver.html#src.solver.solver.LPSolver.run">run</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.scale_step_size" href="solver.html#src.solver.solver.LPSolver.scale_step_size">scale_step_size</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="src.solver.inexact_interior_point_method.InexactInteriorPointMethod"><code class="flex name class">
+<span>class <span class="ident">InexactInteriorPointMethod</span></span>
+<span>(</span><span>config_section: str, solved_checker: <a title="src.solver.solved_checker.SolvedChecker" href="solved_checker.html#src.solver.solved_checker.SolvedChecker">SolvedChecker</a> | None, linear_system_solver: <a title="src.linear_system_solver.exact_linear_system_solver.AbstractLinearSystemSolver" href="../linear_system_solver/exact_linear_system_solver.html#src.linear_system_solver.exact_linear_system_solver.AbstractLinearSystemSolver">AbstractLinearSystemSolver</a> | None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Inexact に線形方程式を解きながら内点法を実施するクラス</p>
+<p>インスタンス初期化</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>config_section</code></strong> :&ensp;<code>str</code></dt>
+<dd>設定ファイルのセクション名.
+logging にも使用するので文字列で取得しておく</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class InexactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
+    &#34;&#34;&#34;Inexact に線形方程式を解きながら内点法を実施するクラス&#34;&#34;&#34;
+
+    search_direction_calculator: AbstractSearchDirectionCalculator
+    # 初期点時点で決定できるものや1回計算すればいいものは Attributes として使いまわす
+    A_base_indexes: list[int] | None = None
+    # 途中から exact solver で解く場合があるため, Attribute として持っておく
+    exact_search_direction_calculator: AbstractSearchDirectionCalculator
+
+    def _get_linear_system_solver(self, str_solver: str) -&gt; AbstractLinearSystemSolver:
+        &#34;&#34;&#34;内部で実行する linear system solver の取得&#34;&#34;&#34;
+        match str_solver:
+            case &#34;CG&#34;:
+                return ilss.CGLinearSystemSolver()
+            case &#34;BiCG&#34;:
+                return ilss.BiCGLinearSystemSolver()
+            case &#34;BiCGStab&#34;:
+                return ilss.BiCGStabLinearSystemSolver()
+            case &#34;CGS&#34;:
+                return ilss.CGSLinearSystemSolver()
+            case &#34;QMR&#34;:
+                return ilss.QMRLinearSystemSolver()
+            case &#34;TFQMR&#34;:
+                return ilss.TFQMRLinearSystemSolver()
+            case &#34;HHL&#34;:
+                return HHLLinearSystemSolver()
+            case &#34;HHLJulia&#34;:
+                # いちいち import すると Julia のコンパイルに時間がかかるので指定されたときだけ
+                from ..linear_system_solver.hhl_julia import HHLJuliaLinearSystemSolver
+
+                return HHLJuliaLinearSystemSolver(
+                    self.parameters.INEXACT_HHL_NUM_PHASE_ESTIMATOR_QUBITS
+                )
+            case &#34;exact&#34;:
+                return ExactLinearSystemSolver()
+            case _:
+                raise LinearSystemSolverSelectionError(
+                    f&#34;Don&#39;t match solver for ``{str_solver}&#39;&#39;&#34;
+                )
+
+    def _get_search_direction_calculator(
+        self, str_calculator: str, linear_system_solver: AbstractLinearSystemSolver
+    ) -&gt; AbstractSearchDirectionCalculator:
+        &#34;&#34;&#34;内部で実行する linear system solver の取得&#34;&#34;&#34;
+        match str_calculator:
+            case &#34;MNES&#34;:
+                return MNESSearchDirectionCalculator(linear_system_solver)
+            case &#34;NES&#34;:
+                return NESSearchDirectionCalculator(linear_system_solver)
+            case _:
+                raise SearchDirectionCalculatorSelectionError(
+                    f&#34;Don&#39;t match search direction calculator for ``{str_calculator}&#39;&#39;&#34;
+                )
+
+    def __init__(
+        self,
+        config_section: str,
+        solved_checker: SolvedChecker | None,
+        linear_system_solver: AbstractLinearSystemSolver | None,
+    ):
+        self._set_config_and_parameters(config_section)
+
+        if solved_checker is None:
+            self.solved_checker = InexactSolvedChecker(
+                self.parameters.STOP_CRITERIA_PARAMETER,
+                self.parameters.THRESHOLD_XS_NEGATIVE,
+            )
+        else:
+            self.solved_checker = solved_checker
+
+        if linear_system_solver is None:
+            linear_system_solver = self._get_linear_system_solver(
+                self.parameters.INEXACT_LINEAR_SYSTEM_SOLVER
+            )
+        logger.info(
+            f&#34;Linear system solver is {linear_system_solver.__class__.__name__}.&#34;
+        )
+
+        self.search_direction_calculator = self._get_search_direction_calculator(
+            self.parameters.INEXACT_SEARCH_DIRECTION_CALCULATOR, linear_system_solver
+        )
+        logger.info(
+            f&#34;Search direction calculator is {self.search_direction_calculator.__class__.__name__}.&#34;
+        )
+
+        self.exact_search_direction_calculator = self._get_search_direction_calculator(
+            self.parameters.INEXACT_SEARCH_DIRECTION_CALCULATOR,
+            self._get_linear_system_solver(&#34;exact&#34;),
+        )
+
+        if self.parameters.INEXACT_SOLVE_EXACTLY_FROM_THE_MIDDLE:
+            logger.info(
+                &#34;When iteration point is close to optimal, Solve linear systems exactly.&#34;
+            )
+
+    @property
+    def beta(self) -&gt; float:
+        return self.parameters.INEXACT_COEF_OF_ARMIJO_RULE
+
+    @property
+    def sigma(self) -&gt; float:
+        return self.parameters.INEXACT_CENTERING_PARAMETER
+
+    @property
+    def eta(self) -&gt; float:
+        return self.parameters.INEXACT_TOLERANCE_OF_RESIDUAL_OF_LINEAR_SYSTEM
+
+    @property
+    def gamma_1(self) -&gt; float:
+        return self.parameters.INEXACT_COEF_NEIGHBORHOOD_DUALITY
+
+    def initial_problem_and_point(
+        self, problem_0: LPS, v_0: LPVariables
+    ) -&gt; tuple[LPS, LPVariables, list[int]]:
+        &#34;&#34;&#34;数値的に安定させるため, 与えられた問題と初期点に改良を加えて出力
+
+        Args:
+            problem_0 (LPS): 与えられた最初の問題
+            v_0 (LPVariables): 初期点
+
+        Returns:
+            LPS: 修正した問題
+            LPVariables: 修正した変数
+            list[int]: 修正の過程で削除された制約の行の index
+        &#34;&#34;&#34;
+        problem = problem_0
+        v = v_0
+
+        # Aの各行で正規化
+        # 問題の最適解自体を変えてしまうので使用しないこととした
+        # problem = problem.create_A_row_normalized()
+        # logger.info(&#34;Problem is normalized for each A row.&#34;)
+
+        # A の基底を取る関係で, 数値誤差で rank 落ちするような状況は避けたい.
+        # なのでまず LU分解を施して数値誤差の範囲で0の行になるところは削除する
+        # problem, remove_constraint_rows = problem.create_A_LU_factorized()
+        # logger.info(f&#34;Problem is LU factorized. number of removed rows: {len(remove_constraint_rows)}&#34;)
+        # if remove_constraint_rows:
+        #     logger.info(f&#34;Removed constraint rows because of zero row: {remove_constraint_rows}&#34;)
+        # v = v.remove_constraint_rows(remove_constraint_rows)
+        remove_constraint_rows = []
+
+        # 初期点が近傍に入っていなければ, 新しく近傍に入る初期点を作成
+        if not self.is_in_center_path_neighborhood(
+            v, problem, self.calculate_gamma_2(v, problem)
+        ):
+            logger.info(
+                &#34;Initial points is not in neighborhood! Start with general initial point.&#34;
+            )
+            v = self._initial_variables_constant(problem)
+
+        return problem, v, remove_constraint_rows
+
+    def calc_tolerance_for_inexact_first_derivative(
+        self, v: LPVariables, problem: LPS
+    ) -&gt; float:
+        &#34;&#34;&#34;一階微分を inexact に解く際の誤差許容度&#34;&#34;&#34;
+        return self.eta * np.sqrt(v.mu / problem.n)
+
+    def is_close_to_optimal(self, v: LPVariables, problem: LPS) -&gt; bool:
+        &#34;&#34;&#34;最適解に近づいているか.
+        最適解に近づくと閾値が低かったり condition number が大きくなったりで inexact solver が求解するのに時間がかかる.
+        なので, 十分最適解に近づいたら exact に求解するようにするための判定
+
+        Args:
+            v (LPVariables): 現在の反復点
+            problem (LPS): 現在の問題
+
+        Returns:
+            bool: inexact solver に求められる精度が 10^{-4} 未満であれば True
+        &#34;&#34;&#34;
+        return v.mu &lt; 1 / problem.n
+        # return self.calc_tolerance_for_inexact_first_derivative(v, problem) &lt; 10**(-4)
+
+    def calc_first_derivatives(
+        self,
+        v: LPVariables,
+        problem: LPS,
+        *args,
+        **kwargs,
+    ) -&gt; tuple[np.ndarray, np.ndarray, np.ndarray, float]:
+        &#34;&#34;&#34;一次微分の値を出力. MNES の定式化で計算するため中身を内点法のものから変更
+
+        Returns:
+            np.ndarray: x の一次微分
+            np.ndarray: y の一次微分
+            np.ndarray: s の一次微分
+            float: 線形方程式を解いた際の誤差ノルム
+        &#34;&#34;&#34;
+        right_hand_side = np.concatenate(
+            [
+                problem.residual_main_constraint(v.x),
+                problem.residual_dual_constraint(v.y, v.s),
+                v.x * v.s - self.sigma * v.mu,
+            ]
+        )
+
+        # 求解
+        tol = self.calc_tolerance_for_inexact_first_derivative(v, problem)
+        # もし最適解に近づいていれば inexact solver だと計算時間的に不利になるので, exact solver に変更する
+        if (
+            self.is_close_to_optimal(v, problem)
+            and self.parameters.INEXACT_SOLVE_EXACTLY_FROM_THE_MIDDLE
+        ):
+            logger.info(&#34;Solve first derivative exactly.&#34;)
+            x_dot, y_dot, s_dot, norm_residual = (
+                self.exact_search_direction_calculator.run(
+                    v, problem, right_hand_side, tol
+                )
+            )
+        else:
+            x_dot, y_dot, s_dot, norm_residual = self.search_direction_calculator.run(
+                v, problem, right_hand_side, tol
+            )
+        logger.debug(f&#34;torelance: {tol}, ||M_1 z - sigma_1||: {norm_residual}&#34;)
+        if norm_residual &gt; tol:
+            logger.warning(
+                f&#34;First derivative residual over tolerance! torelance: {tol}, ||M_1 z - sigma_1||: {norm_residual}&#34;
+            )
+
+        return x_dot, y_dot, s_dot, norm_residual
+
+    def calculate_gamma_2(self, v_0: LPVariables, problem: LPS) -&gt; float:
+        &#34;&#34;&#34;近傍のパラメータで必要な gamma_2 の計算
+        初期点での係数も含む
+
+        Args:
+            v_0 (LPVariables): 初期点
+            problem (LPS): LP. 制約残差を取得するために使用
+
+        Returns:
+            float: 論文で定義された gamma_2
+        &#34;&#34;&#34;
+        # mu_0 が 0 に近いと(Iterative Refinement でありうる) warning が出てうっとうしいので, 0 の時は場合分け
+        if np.isclose(v_0.mu, 0):
+            return np.inf
+
+        resi_main = problem.residual_main_constraint(v_0.x)
+        resi_dual = problem.residual_dual_constraint(v_0.y, v_0.s)
+        norm_residuals = np.linalg.norm(np.concatenate([resi_main, resi_dual]))
+        return (
+            self.parameters.INEXACT_COEF_NEIGHBORHOOD_CONSTRAINTS
+            * norm_residuals
+            / v_0.mu
+        )
+
+    def is_in_center_path_neighborhood(
+        self, v: LPVariables, problem: LPS, gamma_2: float
+    ) -&gt; bool:
+        &#34;&#34;&#34;現在の点が論文上の近傍に入っているかを判定する関数
+
+        Args:
+            v (LPVariables): 現在の反復点. 初期点が近傍に入っているかを確認することもある.
+            problem (LPS): LP. 制約残差を取得するために使用
+            gamma_2 (float): 初期点の時点で計算されるパラメータ
+
+        Returns:
+            bool: 近傍の条件を満たしていれば True
+        &#34;&#34;&#34;
+        mu = v.mu
+        x_s_minus_gamma_mu = v.x * v.s - self.gamma_1 * mu
+        if any(x_s_minus_gamma_mu &lt; 0):
+            return False
+
+        # mu_0 が0に十分近いと warning が鬱陶しいので場合分け
+        if gamma_2 == np.inf:
+            return True
+
+        resi_main = problem.residual_main_constraint(v.x)
+        resi_dual = problem.residual_dual_constraint(v.y, v.s)
+        return np.linalg.norm(np.concatenate([resi_main, resi_dual])) &lt;= gamma_2 * mu
+
+    def is_G_and_g_no_less_than_0(
+        self, v_alpha: LPVariables, v: LPVariables, alpha: float
+    ) -&gt; bool:
+        &#34;&#34;&#34;論文上の G^k, g^k が0以上になっているかを判定する関数
+        理論的には gamma_2 が適切に設定されていれば中心パスに入るが,
+        数値誤差でずれることもあるため正しく計算する
+
+        Args:
+            v_alpha (LPVariables): 与えられた step size だけ移動したと仮定した場合の変数
+            v (LPVariables): 現在の反復点. 初期点が近傍に入っているかを確認することもある.
+            alpha (float): step size
+
+        Returns:
+            bool: 近傍の条件を満たしていれば True
+        &#34;&#34;&#34;
+        # G_i^k &gt;= 0
+        mu_alpha = v_alpha.mu
+        x_s_minus_gamma_mu = v_alpha.x * v_alpha.s - self.gamma_1 * mu_alpha
+        if any(x_s_minus_gamma_mu &lt; 0):
+            return False
+
+        # g^k &gt;= 0
+        return mu_alpha &gt;= (1 - alpha) * v.mu
+
+    def is_h_no_less_than_0(
+        self, v_alpha: LPVariables, v: LPVariables, alpha: float
+    ) -&gt; bool:
+        &#34;&#34;&#34;論文上の h^k が0以上になっているかを判定する関数
+
+        Args:
+            v_alpha (LPVariables): 与えられた step size だけ移動したと仮定した場合の変数
+            v (LPVariables): 現在の反復点
+            alpha (float): step size
+
+        Returns:
+            bool: h^k(alpha) &gt;= 0 なら True
+        &#34;&#34;&#34;
+        return (1 - (1 - self.beta) * np.sin(alpha)) * v.mu - v_alpha.mu &gt;= 0
+
+    def log_constraints_residual_decreasing(
+        self, v: LPVariables, problem: LPS, alpha: float, pre_r_b: np.ndarray
+    ):
+        &#34;&#34;&#34;制約残差が減っているかロギング
+
+        Args:
+            alpha (float): step size
+        &#34;&#34;&#34;
+        r_b = problem.residual_main_constraint(v.x)
+        r_c = problem.residual_dual_constraint(v.y, v.s)
+        logger.debug(f&#34;{indent}max r_b: {max(np.abs(r_b))}, r_c: {max(np.abs(r_c))}&#34;)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="src.solver.interior_point_method.InteriorPointMethod" href="interior_point_method.html#src.solver.interior_point_method.InteriorPointMethod">InteriorPointMethod</a></li>
+<li><a title="src.solver.solver.LPSolver" href="solver.html#src.solver.solver.LPSolver">LPSolver</a></li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="src.solver.inexact_interior_point_method.InexactArcSearchIPM" href="#src.solver.inexact_interior_point_method.InexactArcSearchIPM">InexactArcSearchIPM</a></li>
+<li><a title="src.solver.inexact_interior_point_method.InexactLineSearchIPM" href="#src.solver.inexact_interior_point_method.InexactLineSearchIPM">InexactLineSearchIPM</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.A_base_indexes"><code class="name">var <span class="ident">A_base_indexes</span> : list[int] | None</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.exact_search_direction_calculator"><code class="name">var <span class="ident">exact_search_direction_calculator</span> : <a title="src.solver.search_direction_calculator.AbstractSearchDirectionCalculator" href="search_direction_calculator.html#src.solver.search_direction_calculator.AbstractSearchDirectionCalculator">AbstractSearchDirectionCalculator</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.search_direction_calculator"><code class="name">var <span class="ident">search_direction_calculator</span> : <a title="src.solver.search_direction_calculator.AbstractSearchDirectionCalculator" href="search_direction_calculator.html#src.solver.search_direction_calculator.AbstractSearchDirectionCalculator">AbstractSearchDirectionCalculator</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.beta"><code class="name">prop <span class="ident">beta</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def beta(self) -&gt; float:
+    return self.parameters.INEXACT_COEF_OF_ARMIJO_RULE</code></pre>
+</details>
+</dd>
+<dt id="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.eta"><code class="name">prop <span class="ident">eta</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def eta(self) -&gt; float:
+    return self.parameters.INEXACT_TOLERANCE_OF_RESIDUAL_OF_LINEAR_SYSTEM</code></pre>
+</details>
+</dd>
+<dt id="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.gamma_1"><code class="name">prop <span class="ident">gamma_1</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def gamma_1(self) -&gt; float:
+    return self.parameters.INEXACT_COEF_NEIGHBORHOOD_DUALITY</code></pre>
+</details>
+</dd>
+<dt id="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.sigma"><code class="name">prop <span class="ident">sigma</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def sigma(self) -&gt; float:
+    return self.parameters.INEXACT_CENTERING_PARAMETER</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.calc_first_derivatives"><code class="name flex">
+<span>def <span class="ident">calc_first_derivatives</span></span>(<span>self, v: <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a>, problem: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>, *args, **kwargs) ‑> tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray, float]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>一次微分の値を出力. MNES の定式化で計算するため中身を内点法のものから変更</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>np.ndarray</code></dt>
+<dd>x の一次微分</dd>
+<dt><code>np.ndarray</code></dt>
+<dd>y の一次微分</dd>
+<dt><code>np.ndarray</code></dt>
+<dd>s の一次微分</dd>
+<dt><code>float</code></dt>
+<dd>線形方程式を解いた際の誤差ノルム</dd>
+</dl></div>
+</dd>
+<dt id="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.calc_tolerance_for_inexact_first_derivative"><code class="name flex">
+<span>def <span class="ident">calc_tolerance_for_inexact_first_derivative</span></span>(<span>self, v: <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a>, problem: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>) ‑> float</span>
+</code></dt>
+<dd>
+<div class="desc"><p>一階微分を inexact に解く際の誤差許容度</p></div>
+</dd>
+<dt id="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.calculate_gamma_2"><code class="name flex">
+<span>def <span class="ident">calculate_gamma_2</span></span>(<span>self, v_0: <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a>, problem: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>) ‑> float</span>
+</code></dt>
+<dd>
+<div class="desc"><p>近傍のパラメータで必要な gamma_2 の計算
+初期点での係数も含む</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>v_0</code></strong> :&ensp;<code>LPVariables</code></dt>
+<dd>初期点</dd>
+<dt><strong><code>problem</code></strong> :&ensp;<code>LPS</code></dt>
+<dd>LP. 制約残差を取得するために使用</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>float</code></dt>
+<dd>論文で定義された gamma_2</dd>
+</dl></div>
+</dd>
+<dt id="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.initial_problem_and_point"><code class="name flex">
+<span>def <span class="ident">initial_problem_and_point</span></span>(<span>self, problem_0: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>, v_0: <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a>) ‑> tuple[<a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>, <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a>, list[int]]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>数値的に安定させるため, 与えられた問題と初期点に改良を加えて出力</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>problem_0</code></strong> :&ensp;<code>LPS</code></dt>
+<dd>与えられた最初の問題</dd>
+<dt><strong><code>v_0</code></strong> :&ensp;<code>LPVariables</code></dt>
+<dd>初期点</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>LPS</code></dt>
+<dd>修正した問題</dd>
+<dt><code>LPVariables</code></dt>
+<dd>修正した変数</dd>
+<dt><code>list[int]</code></dt>
+<dd>修正の過程で削除された制約の行の index</dd>
+</dl></div>
+</dd>
+<dt id="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.is_G_and_g_no_less_than_0"><code class="name flex">
+<span>def <span class="ident">is_G_and_g_no_less_than_0</span></span>(<span>self, v_alpha: <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a>, v: <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a>, alpha: float) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>論文上の G^k, g^k が0以上になっているかを判定する関数
+理論的には gamma_2 が適切に設定されていれば中心パスに入るが,
+数値誤差でずれることもあるため正しく計算する</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>v_alpha</code></strong> :&ensp;<code>LPVariables</code></dt>
+<dd>与えられた step size だけ移動したと仮定した場合の変数</dd>
+<dt><strong><code>v</code></strong> :&ensp;<code>LPVariables</code></dt>
+<dd>現在の反復点. 初期点が近傍に入っているかを確認することもある.</dd>
+<dt><strong><code>alpha</code></strong> :&ensp;<code>float</code></dt>
+<dd>step size</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>bool</code></dt>
+<dd>近傍の条件を満たしていれば True</dd>
+</dl></div>
+</dd>
+<dt id="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.is_close_to_optimal"><code class="name flex">
+<span>def <span class="ident">is_close_to_optimal</span></span>(<span>self, v: <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a>, problem: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>最適解に近づいているか.
+最適解に近づくと閾値が低かったり condition number が大きくなったりで inexact solver が求解するのに時間がかかる.
+なので, 十分最適解に近づいたら exact に求解するようにするための判定</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>v</code></strong> :&ensp;<code>LPVariables</code></dt>
+<dd>現在の反復点</dd>
+<dt><strong><code>problem</code></strong> :&ensp;<code>LPS</code></dt>
+<dd>現在の問題</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>bool</code></dt>
+<dd>inexact solver に求められる精度が 10^{-4} 未満であれば True</dd>
+</dl></div>
+</dd>
+<dt id="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.is_h_no_less_than_0"><code class="name flex">
+<span>def <span class="ident">is_h_no_less_than_0</span></span>(<span>self, v_alpha: <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a>, v: <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a>, alpha: float) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>論文上の h^k が0以上になっているかを判定する関数</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>v_alpha</code></strong> :&ensp;<code>LPVariables</code></dt>
+<dd>与えられた step size だけ移動したと仮定した場合の変数</dd>
+<dt><strong><code>v</code></strong> :&ensp;<code>LPVariables</code></dt>
+<dd>現在の反復点</dd>
+<dt><strong><code>alpha</code></strong> :&ensp;<code>float</code></dt>
+<dd>step size</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>bool</code></dt>
+<dd>h^k(alpha) &gt;= 0 なら True</dd>
+</dl></div>
+</dd>
+<dt id="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.is_in_center_path_neighborhood"><code class="name flex">
+<span>def <span class="ident">is_in_center_path_neighborhood</span></span>(<span>self, v: <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a>, problem: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>, gamma_2: float) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>現在の点が論文上の近傍に入っているかを判定する関数</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>v</code></strong> :&ensp;<code>LPVariables</code></dt>
+<dd>現在の反復点. 初期点が近傍に入っているかを確認することもある.</dd>
+<dt><strong><code>problem</code></strong> :&ensp;<code>LPS</code></dt>
+<dd>LP. 制約残差を取得するために使用</dd>
+<dt><strong><code>gamma_2</code></strong> :&ensp;<code>float</code></dt>
+<dd>初期点の時点で計算されるパラメータ</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>bool</code></dt>
+<dd>近傍の条件を満たしていれば True</dd>
+</dl></div>
+</dd>
+<dt id="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.log_constraints_residual_decreasing"><code class="name flex">
+<span>def <span class="ident">log_constraints_residual_decreasing</span></span>(<span>self, v: <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a>, problem: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>, alpha: float, pre_r_b: numpy.ndarray)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>制約残差が減っているかロギング</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>alpha</code></strong> :&ensp;<code>float</code></dt>
+<dd>step size</dd>
+</dl></div>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="src.solver.interior_point_method.InteriorPointMethod" href="interior_point_method.html#src.solver.interior_point_method.InteriorPointMethod">InteriorPointMethod</a></b></code>:
+<ul class="hlist">
+<li><code><a title="src.solver.interior_point_method.InteriorPointMethod.initial_variables" href="solver.html#src.solver.solver.LPSolver.initial_variables">initial_variables</a></code></li>
+<li><code><a title="src.solver.interior_point_method.InteriorPointMethod.is_calculation_time_reached_upper" href="solver.html#src.solver.solver.LPSolver.is_calculation_time_reached_upper">is_calculation_time_reached_upper</a></code></li>
+<li><code><a title="src.solver.interior_point_method.InteriorPointMethod.is_iteration_number_reached_upper" href="interior_point_method.html#src.solver.interior_point_method.InteriorPointMethod.is_iteration_number_reached_upper">is_iteration_number_reached_upper</a></code></li>
+<li><code><a title="src.solver.interior_point_method.InteriorPointMethod.is_not_decrease_residuals" href="interior_point_method.html#src.solver.interior_point_method.InteriorPointMethod.is_not_decrease_residuals">is_not_decrease_residuals</a></code></li>
+<li><code><a title="src.solver.interior_point_method.InteriorPointMethod.is_stopping_criteria_relative" href="solver.html#src.solver.solver.LPSolver.is_stopping_criteria_relative">is_stopping_criteria_relative</a></code></li>
+<li><code><a title="src.solver.interior_point_method.InteriorPointMethod.is_terminate" href="interior_point_method.html#src.solver.interior_point_method.InteriorPointMethod.is_terminate">is_terminate</a></code></li>
+<li><code><a title="src.solver.interior_point_method.InteriorPointMethod.log_initial_problem_information" href="solver.html#src.solver.solver.LPSolver.log_initial_problem_information">log_initial_problem_information</a></code></li>
+<li><code><a title="src.solver.interior_point_method.InteriorPointMethod.log_initial_situation" href="solver.html#src.solver.solver.LPSolver.log_initial_situation">log_initial_situation</a></code></li>
+<li><code><a title="src.solver.interior_point_method.InteriorPointMethod.log_positive_variables_negativity" href="solver.html#src.solver.solver.LPSolver.log_positive_variables_negativity">log_positive_variables_negativity</a></code></li>
+<li><code><a title="src.solver.interior_point_method.InteriorPointMethod.log_solved_data" href="solver.html#src.solver.solver.LPSolver.log_solved_data">log_solved_data</a></code></li>
+<li><code><a title="src.solver.interior_point_method.InteriorPointMethod.make_SolvedSummary" href="solver.html#src.solver.solver.LPSolver.make_SolvedSummary">make_SolvedSummary</a></code></li>
+<li><code><a title="src.solver.interior_point_method.InteriorPointMethod.run" href="solver.html#src.solver.solver.LPSolver.run">run</a></code></li>
+<li><code><a title="src.solver.interior_point_method.InteriorPointMethod.run_algorithm" href="solver.html#src.solver.solver.LPSolver.run_algorithm">run_algorithm</a></code></li>
+<li><code><a title="src.solver.interior_point_method.InteriorPointMethod.scale_step_size" href="solver.html#src.solver.solver.LPSolver.scale_step_size">scale_step_size</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="src.solver.inexact_interior_point_method.InexactLineSearchIPM"><code class="flex name class">
+<span>class <span class="ident">InexactLineSearchIPM</span></span>
+<span>(</span><span>config_section: str = 'DEFAULT', solved_checker: <a title="src.solver.solved_checker.SolvedChecker" href="solved_checker.html#src.solver.solved_checker.SolvedChecker">SolvedChecker</a> | None = None, linear_system_solver: <a title="src.linear_system_solver.exact_linear_system_solver.AbstractLinearSystemSolver" href="../linear_system_solver/exact_linear_system_solver.html#src.linear_system_solver.exact_linear_system_solver.AbstractLinearSystemSolver">AbstractLinearSystemSolver</a> | None = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Inexact に線形方程式を解きながら内点法を実施するクラス</p>
+<p>インスタンス初期化</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>config_section</code></strong> :&ensp;<code>str</code></dt>
+<dd>設定ファイルのセクション名.
+logging にも使用するので文字列で取得しておく</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class InexactLineSearchIPM(InexactInteriorPointMethod):
+    def _validate(self):
+        &#34;&#34;&#34;アルゴリズムが理論通り動くようにパラメータが設定されているか確認
+        もし条件が満たされていなければ, アルゴリズムが収束する保障がないことを warning
+        &#34;&#34;&#34;
+        is_sigma_more_than_eta = self.sigma &gt; self.eta
+        if not is_sigma_more_than_eta:
+            logger.warning(
+                f&#34;sigma must be more than eta! sigma: {self.sigma}, eta: {self.eta}&#34;
+            )
+
+        is_beta_more_than_sigma_plus_eta = self.beta &gt; self.sigma + self.eta
+        if not is_beta_more_than_sigma_plus_eta:
+            logger.warning(
+                f&#34;beta must be more than sigma + eta! beta: {self.beta}, sigma: {self.sigma}, eta: {self.eta}&#34;
+            )
+
+        if not (is_sigma_more_than_eta and is_beta_more_than_sigma_plus_eta):
+            logger.warning(&#34;Algorithm is not satisfied for convergence.&#34;)
+
+    def __init__(
+        self,
+        config_section: str = config_utils.default_section,
+        solved_checker: SolvedChecker | None = None,
+        linear_system_solver: AbstractLinearSystemSolver | None = None,
+    ):
+        super().__init__(config_section, solved_checker, linear_system_solver)
+        self.variable_updater = LineVariableUpdater(self._delta_xs)
+        self._validate()
+
+    def is_iteration_number_reached_upper(self, iter_num: int, problem: LPS) -&gt; bool:
+        &#34;&#34;&#34;反復回数が上限を超えたか
+
+        本来は O(n^1.5 L) だが, 時間がかかって嫌なので設定どおりの値を使用
+
+        Args:
+            iter_num: 反復回数
+        &#34;&#34;&#34;
+        upper = max(
+            self.parameters.ITER_UPPER_COEF * (problem.n**1.5),
+            self.parameters.ITER_UPPER,
+        )
+        # upper = self.parameters.ITER_UPPER
+        return iter_num &gt;= upper
+
+    def run_algorithm(self, problem_0: LPS, v_0: LPVariables) -&gt; SolvedDetail:
+        &#34;&#34;&#34;反復で解く line-saarch の実行, 線形方程式は inexact に解く
+
+        Args:
+            problem_0 (LPS): 問題の最初の状態
+            v_0 (LPVariables): 初期点
+
+        Returns:
+            SolvedDetail: 求解した結果
+        &#34;&#34;&#34;
+        # 実行時間記録開始
+        start_time = time.time()
+
+        problem, v, remove_constraint_rows = self.initial_problem_and_point(
+            problem_0, v_0
+        )
+
+        # 初期点や問題が変わることで状況が変わるのでログ
+        # logger.info(&#34;Logging problem information.&#34;)
+        # self.log_initial_problem_information(problem)
+        logger.info(&#34;Logging initial situation.&#34;)
+        self.log_initial_situation(v, problem)
+
+        mu = v.mu
+        mu_0 = mu
+        r_b = problem.residual_main_constraint(v.x)
+        r_b_0 = r_b
+        r_c = problem.residual_dual_constraint(v.y, v.s)
+        r_c_0 = r_c
+        gamma_2 = self.calculate_gamma_2(v, problem)
+
+        iter_num = 0
+        is_solved = self.solved_checker.run(v_0, problem_0)
+        is_terminated = self.is_terminate(
+            is_solved, iter_num, problem_0, time.time() - start_time
+        )
+
+        # SolvedDetail の出力
+        lst_variables = [v]
+        lst_mu = [mu_0]
+        lst_alpha: list[float] = []
+        lst_norm_vdot: list[float] = []
+        lst_max_norm_main_const = [np.linalg.norm(r_b_0, ord=np.inf)]
+        lst_max_norm_dual_const = [np.linalg.norm(r_c_0, ord=np.inf)]
+        lst_residual_inexact_vdot: list[float] = []
+        lst_tolerance_inexact_vdot: list[float] = []
+
+        # while 文中で使用
+        xs_ddot = np.zeros(problem.n)
+        y_ddot = np.zeros(problem.m)
+
+        # 収束条件を満たすまで反復する
+        while not is_terminated:
+            iter_num += 1
+            logger.info(f&#34;Iteration number: {iter_num}, mu: {mu}&#34;)
+            logger.info(
+                f&#34;{indent}max_r_b: {np.linalg.norm(r_b, ord=np.inf)}, max_r_c: {np.linalg.norm(r_c, ord=np.inf)}&#34;
+            )
+
+            # 探索方向の決定
+            lst_tolerance_inexact_vdot.append(
+                self.calc_tolerance_for_inexact_first_derivative(v, problem)
+            )
+
+            x_dot, y_dot, s_dot, residual_first_derivative = (
+                self.calc_first_derivatives(v, problem)
+            )
+            lst_norm_vdot.append(np.linalg.norm(np.concatenate([x_dot, y_dot, s_dot])))
+            lst_residual_inexact_vdot.append(residual_first_derivative)
+
+            # 近傍に入る step size になるまで Armijo のルールに従う
+            alpha_x_max = self.variable_updater.max_step_size_guarantee_positive(
+                v.x, x_dot, xs_ddot
+            )
+            alpha_s_max = self.variable_updater.max_step_size_guarantee_positive(
+                v.s, s_dot, xs_ddot
+            )
+            alpha = min(alpha_x_max, alpha_s_max)
+            logger.debug(f&#34;{indent}Max step size: {alpha}&#34;)
+            while alpha &gt; self.min_step_size:
+                v_alpha = LPVariables(
+                    self.variable_updater.run(v.x, x_dot, xs_ddot, alpha),
+                    self.variable_updater.run(v.y, y_dot, y_ddot, alpha),
+                    self.variable_updater.run(v.s, s_dot, xs_ddot, alpha),
+                )
+                is_in_neighborhood = self.is_in_center_path_neighborhood(
+                    v_alpha, problem, gamma_2
+                ) and self.is_G_and_g_no_less_than_0(v_alpha, v, alpha)
+                if is_in_neighborhood and self.is_h_no_less_than_0(v_alpha, v, alpha):
+                    break
+                alpha /= 2
+            # while 文入らなかった場合に備えて新しく作成
+            v = LPVariables(
+                self.variable_updater.run(v.x, x_dot, xs_ddot, alpha),
+                self.variable_updater.run(v.y, y_dot, y_ddot, alpha),
+                self.variable_updater.run(v.s, s_dot, xs_ddot, alpha),
+            )
+            logger.info(f&#34;{indent}Step size: {alpha}&#34;)
+
+            # もし x, s が負になってしまった場合アルゴリズムが狂うので, 負になっていないか確認
+            self.log_positive_variables_negativity(v)
+
+            # 制約残渣更新
+            pre_r_b = r_b
+            pre_r_c = r_c
+            r_b = problem.residual_main_constraint(v.x)
+            r_c = problem.residual_dual_constraint(v.y, v.s)
+            # 制約残差がどうなっているかlogging
+            self.log_constraints_residual_decreasing(v, problem, alpha, pre_r_b)
+
+            mu = v.mu
+
+            # 記録用の値追加
+            lst_variables.append(v)
+            lst_mu.append(mu)
+            lst_alpha.append(alpha)
+            lst_max_norm_main_const.append(np.linalg.norm(r_b, ord=np.inf))
+            lst_max_norm_dual_const.append(np.linalg.norm(r_c, ord=np.inf))
+
+            # 停止条件更新
+            is_solved = self.solved_checker.run(v, problem)
+            is_terminated = self.is_terminate(
+                is_solved,
+                iter_num,
+                problem,
+                time.time() - start_time,
+                alpha_x=alpha,
+                alpha_s=alpha,
+                pre_r_b=pre_r_b,
+                pre_r_c=pre_r_c,
+                r_b=r_b,
+                r_c=r_c,
+            )
+
+        # 時間計測終了
+        elapsed_time = time.time() - start_time
+
+        # 出力の作成
+        aSolvedSummary = self.make_SolvedSummary(
+            v,
+            problem,
+            is_solved,
+            iter_num,
+            self.is_iteration_number_reached_upper(iter_num, problem),
+            elapsed_time,
+        )
+        output = SolvedDetail(
+            aSolvedSummary,
+            v,
+            problem,
+            v_0,
+            problem_0,
+            lst_variables_by_iter=lst_variables,
+            lst_main_step_size_by_iter=lst_alpha,
+            lst_dual_step_size_by_iter=lst_alpha,
+            lst_mu_by_iter=lst_mu,
+            lst_norm_vdot_by_iter=lst_norm_vdot,
+            lst_max_norm_main_constraint_by_iter=lst_max_norm_main_const,
+            lst_max_norm_dual_constraint_by_iter=lst_max_norm_dual_const,
+            lst_residual_inexact_vdot=lst_residual_inexact_vdot,
+            lst_tolerance_inexact_vdot=lst_tolerance_inexact_vdot,
+        )
+        return output</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod" href="#src.solver.inexact_interior_point_method.InexactInteriorPointMethod">InexactInteriorPointMethod</a></li>
+<li><a title="src.solver.interior_point_method.InteriorPointMethod" href="interior_point_method.html#src.solver.interior_point_method.InteriorPointMethod">InteriorPointMethod</a></li>
+<li><a title="src.solver.solver.LPSolver" href="solver.html#src.solver.solver.LPSolver">LPSolver</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="src.solver.inexact_interior_point_method.InexactLineSearchIPM.is_iteration_number_reached_upper"><code class="name flex">
+<span>def <span class="ident">is_iteration_number_reached_upper</span></span>(<span>self, iter_num: int, problem: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>反復回数が上限を超えたか</p>
+<p>本来は O(n^1.5 L) だが, 時間がかかって嫌なので設定どおりの値を使用</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>iter_num</code></strong></dt>
+<dd>反復回数</dd>
+</dl></div>
+</dd>
+<dt id="src.solver.inexact_interior_point_method.InexactLineSearchIPM.run_algorithm"><code class="name flex">
+<span>def <span class="ident">run_algorithm</span></span>(<span>self, problem_0: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>, v_0: <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a>) ‑> <a title="src.solver.solved_data.SolvedDetail" href="solved_data.html#src.solver.solved_data.SolvedDetail">SolvedDetail</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>反復で解く line-saarch の実行, 線形方程式は inexact に解く</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>problem_0</code></strong> :&ensp;<code>LPS</code></dt>
+<dd>問題の最初の状態</dd>
+<dt><strong><code>v_0</code></strong> :&ensp;<code>LPVariables</code></dt>
+<dd>初期点</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>SolvedDetail</code></dt>
+<dd>求解した結果</dd>
+</dl></div>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod" href="#src.solver.inexact_interior_point_method.InexactInteriorPointMethod">InexactInteriorPointMethod</a></b></code>:
+<ul class="hlist">
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.calc_first_derivatives" href="#src.solver.inexact_interior_point_method.InexactInteriorPointMethod.calc_first_derivatives">calc_first_derivatives</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.calc_tolerance_for_inexact_first_derivative" href="#src.solver.inexact_interior_point_method.InexactInteriorPointMethod.calc_tolerance_for_inexact_first_derivative">calc_tolerance_for_inexact_first_derivative</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.calculate_gamma_2" href="#src.solver.inexact_interior_point_method.InexactInteriorPointMethod.calculate_gamma_2">calculate_gamma_2</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.initial_problem_and_point" href="#src.solver.inexact_interior_point_method.InexactInteriorPointMethod.initial_problem_and_point">initial_problem_and_point</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.initial_variables" href="solver.html#src.solver.solver.LPSolver.initial_variables">initial_variables</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.is_G_and_g_no_less_than_0" href="#src.solver.inexact_interior_point_method.InexactInteriorPointMethod.is_G_and_g_no_less_than_0">is_G_and_g_no_less_than_0</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.is_calculation_time_reached_upper" href="solver.html#src.solver.solver.LPSolver.is_calculation_time_reached_upper">is_calculation_time_reached_upper</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.is_close_to_optimal" href="#src.solver.inexact_interior_point_method.InexactInteriorPointMethod.is_close_to_optimal">is_close_to_optimal</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.is_h_no_less_than_0" href="#src.solver.inexact_interior_point_method.InexactInteriorPointMethod.is_h_no_less_than_0">is_h_no_less_than_0</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.is_in_center_path_neighborhood" href="#src.solver.inexact_interior_point_method.InexactInteriorPointMethod.is_in_center_path_neighborhood">is_in_center_path_neighborhood</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.is_not_decrease_residuals" href="interior_point_method.html#src.solver.interior_point_method.InteriorPointMethod.is_not_decrease_residuals">is_not_decrease_residuals</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.is_stopping_criteria_relative" href="solver.html#src.solver.solver.LPSolver.is_stopping_criteria_relative">is_stopping_criteria_relative</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.is_terminate" href="interior_point_method.html#src.solver.interior_point_method.InteriorPointMethod.is_terminate">is_terminate</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.log_constraints_residual_decreasing" href="#src.solver.inexact_interior_point_method.InexactInteriorPointMethod.log_constraints_residual_decreasing">log_constraints_residual_decreasing</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.log_initial_problem_information" href="solver.html#src.solver.solver.LPSolver.log_initial_problem_information">log_initial_problem_information</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.log_initial_situation" href="solver.html#src.solver.solver.LPSolver.log_initial_situation">log_initial_situation</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.log_positive_variables_negativity" href="solver.html#src.solver.solver.LPSolver.log_positive_variables_negativity">log_positive_variables_negativity</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.log_solved_data" href="solver.html#src.solver.solver.LPSolver.log_solved_data">log_solved_data</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.make_SolvedSummary" href="solver.html#src.solver.solver.LPSolver.make_SolvedSummary">make_SolvedSummary</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.run" href="solver.html#src.solver.solver.LPSolver.run">run</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.scale_step_size" href="solver.html#src.solver.solver.LPSolver.scale_step_size">scale_step_size</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="src.solver.inexact_interior_point_method.LinearSystemSolverSelectionError"><code class="flex name class">
+<span>class <span class="ident">LinearSystemSolverSelectionError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Common base class for all non-exit exceptions.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class LinearSystemSolverSelectionError(Exception):
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="src.solver.inexact_interior_point_method.SearchDirectionCalculatorSelectionError"><code class="flex name class">
+<span>class <span class="ident">SearchDirectionCalculatorSelectionError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Common base class for all non-exit exceptions.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class SearchDirectionCalculatorSelectionError(Exception):
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="src.solver.inexact_interior_point_method.SelectionBasisError"><code class="flex name class">
+<span>class <span class="ident">SelectionBasisError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Common base class for all non-exit exceptions.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class SelectionBasisError(Exception):
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="src.solver" href="index.html">src.solver</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="src.solver.inexact_interior_point_method.InexactArcSearchIPM" href="#src.solver.inexact_interior_point_method.InexactArcSearchIPM">InexactArcSearchIPM</a></code></h4>
+<ul class="">
+<li><code><a title="src.solver.inexact_interior_point_method.InexactArcSearchIPM.calc_second_derivative" href="#src.solver.inexact_interior_point_method.InexactArcSearchIPM.calc_second_derivative">calc_second_derivative</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactArcSearchIPM.calc_tolerance_for_inexact_second_derivative" href="#src.solver.inexact_interior_point_method.InexactArcSearchIPM.calc_tolerance_for_inexact_second_derivative">calc_tolerance_for_inexact_second_derivative</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactArcSearchIPM.is_iteration_number_reached_upper" href="#src.solver.inexact_interior_point_method.InexactArcSearchIPM.is_iteration_number_reached_upper">is_iteration_number_reached_upper</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactArcSearchIPM.run_algorithm" href="#src.solver.inexact_interior_point_method.InexactArcSearchIPM.run_algorithm">run_algorithm</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod" href="#src.solver.inexact_interior_point_method.InexactInteriorPointMethod">InexactInteriorPointMethod</a></code></h4>
+<ul class="">
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.A_base_indexes" href="#src.solver.inexact_interior_point_method.InexactInteriorPointMethod.A_base_indexes">A_base_indexes</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.beta" href="#src.solver.inexact_interior_point_method.InexactInteriorPointMethod.beta">beta</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.calc_first_derivatives" href="#src.solver.inexact_interior_point_method.InexactInteriorPointMethod.calc_first_derivatives">calc_first_derivatives</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.calc_tolerance_for_inexact_first_derivative" href="#src.solver.inexact_interior_point_method.InexactInteriorPointMethod.calc_tolerance_for_inexact_first_derivative">calc_tolerance_for_inexact_first_derivative</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.calculate_gamma_2" href="#src.solver.inexact_interior_point_method.InexactInteriorPointMethod.calculate_gamma_2">calculate_gamma_2</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.eta" href="#src.solver.inexact_interior_point_method.InexactInteriorPointMethod.eta">eta</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.exact_search_direction_calculator" href="#src.solver.inexact_interior_point_method.InexactInteriorPointMethod.exact_search_direction_calculator">exact_search_direction_calculator</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.gamma_1" href="#src.solver.inexact_interior_point_method.InexactInteriorPointMethod.gamma_1">gamma_1</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.initial_problem_and_point" href="#src.solver.inexact_interior_point_method.InexactInteriorPointMethod.initial_problem_and_point">initial_problem_and_point</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.is_G_and_g_no_less_than_0" href="#src.solver.inexact_interior_point_method.InexactInteriorPointMethod.is_G_and_g_no_less_than_0">is_G_and_g_no_less_than_0</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.is_close_to_optimal" href="#src.solver.inexact_interior_point_method.InexactInteriorPointMethod.is_close_to_optimal">is_close_to_optimal</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.is_h_no_less_than_0" href="#src.solver.inexact_interior_point_method.InexactInteriorPointMethod.is_h_no_less_than_0">is_h_no_less_than_0</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.is_in_center_path_neighborhood" href="#src.solver.inexact_interior_point_method.InexactInteriorPointMethod.is_in_center_path_neighborhood">is_in_center_path_neighborhood</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.log_constraints_residual_decreasing" href="#src.solver.inexact_interior_point_method.InexactInteriorPointMethod.log_constraints_residual_decreasing">log_constraints_residual_decreasing</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.search_direction_calculator" href="#src.solver.inexact_interior_point_method.InexactInteriorPointMethod.search_direction_calculator">search_direction_calculator</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactInteriorPointMethod.sigma" href="#src.solver.inexact_interior_point_method.InexactInteriorPointMethod.sigma">sigma</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="src.solver.inexact_interior_point_method.InexactLineSearchIPM" href="#src.solver.inexact_interior_point_method.InexactLineSearchIPM">InexactLineSearchIPM</a></code></h4>
+<ul class="">
+<li><code><a title="src.solver.inexact_interior_point_method.InexactLineSearchIPM.is_iteration_number_reached_upper" href="#src.solver.inexact_interior_point_method.InexactLineSearchIPM.is_iteration_number_reached_upper">is_iteration_number_reached_upper</a></code></li>
+<li><code><a title="src.solver.inexact_interior_point_method.InexactLineSearchIPM.run_algorithm" href="#src.solver.inexact_interior_point_method.InexactLineSearchIPM.run_algorithm">run_algorithm</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="src.solver.inexact_interior_point_method.LinearSystemSolverSelectionError" href="#src.solver.inexact_interior_point_method.LinearSystemSolverSelectionError">LinearSystemSolverSelectionError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="src.solver.inexact_interior_point_method.SearchDirectionCalculatorSelectionError" href="#src.solver.inexact_interior_point_method.SearchDirectionCalculatorSelectionError">SearchDirectionCalculatorSelectionError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="src.solver.inexact_interior_point_method.SelectionBasisError" href="#src.solver.inexact_interior_point_method.SelectionBasisError">SelectionBasisError</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.1</a>.</p>
+</footer>
+</body>
+</html>

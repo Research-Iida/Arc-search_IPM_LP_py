@@ -1,0 +1,728 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.1">
+<title>src.problem.preprocessor API documentation</title>
+<meta name="description" content="LPに関する前処理を行う module">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>src.problem.preprocessor</code></h1>
+</header>
+<section id="section-intro">
+<p>LPに関する前処理を行う module</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="src.problem.preprocessor.LPPreprocessor"><code class="flex name class">
+<span>class <span class="ident">LPPreprocessor</span></span>
+</code></dt>
+<dd>
+<div class="desc"><p>LPに関する前処理クラス</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class LPPreprocessor:
+    &#34;&#34;&#34;LPに関する前処理クラス&#34;&#34;&#34;
+
+    def _remove_rows_and_columns(
+        self,
+        A: Csr,
+        b: np.ndarray = None,
+        c: np.ndarray = None,
+        rows_remove: set[int] = set(),
+        columns_remove: set[int] = set(),
+    ) -&gt; tuple[np.ndarray, np.ndarray, np.ndarray]:
+        &#34;&#34;&#34;削除する行, 列を指定して, A, b, c から削除する
+
+        Args:
+            b: 制約の右辺. 削除する必要がなければ入力しない
+            c: 目的関数の係数. 削除する必要がなければ入力しない
+            rows_remove: 削除行. 入力されなければ空集合
+            columns_remove: 削除列. 入力されなければ空集合
+        &#34;&#34;&#34;
+        # 残す行, 列を指定
+        rows_out = [i for i in range(A.shape[0]) if i not in rows_remove]
+        columns_out = [i for i in range(A.shape[1]) if i not in columns_remove]
+
+        # 行が削除された結果
+        A_out = A[np.ix_(rows_out, columns_out)]
+        if b is not None:
+            b_out = b[rows_out]
+        else:
+            b_out = None
+        if c is not None:
+            c_out = c[columns_out]
+        else:
+            c_out = None
+
+        return A_out, b_out, c_out
+
+    def remove_empty_row(self, A: Csr, b: np.ndarray) -&gt; tuple[Csr, np.ndarray]:
+        &#34;&#34;&#34;空行で制約が存在しないAの行は削除する
+
+        もしAの係数がないのにbが0以外の場合, どうやってもその制約は満たせないのでエラー
+        &#34;&#34;&#34;
+        rows_remove = set()
+        # A が空行になっているindexに対して処理
+        for i in np.where(np.all(A.todense() == 0, axis=1))[0]:
+            # もしAが空行なのにbが0でなければ実行不可能
+            if b[i] != 0:
+                raise ProblemInfeasibleError
+            rows_remove.add(i)
+
+        A_out, b_out, _ = self._remove_rows_and_columns(A, b=b, rows_remove=rows_remove)
+        return A_out, b_out
+
+    def remove_duplicated_row(self, A: np.ndarray, b: np.ndarray) -&gt; tuple[np.ndarray, np.ndarray]:
+        &#34;&#34;&#34;重複のある制約を削除
+
+        A_i = k*A_j の時, b_i = k*b_j ならば, jの制約はなくても同じなので削除してよい
+        b_i != k*b_j ならば実行不可能になる
+        &#34;&#34;&#34;
+        m = A.shape[0]
+
+        def scalar_times_vector(vec_a: np.ndarray, vec_b: np.ndarray) -&gt; Optional[float]:
+            &#34;&#34;&#34;vec_b が vec_a の定数倍であるならばその値を, そうでなければ None を出力&#34;&#34;&#34;
+            # 0の位置が正しくなければ定数倍ではない
+            idx_not_zero_a = np.where(vec_a != 0)[0]
+            idx_not_zero_b = np.where(vec_b != 0)[0]
+            if len(idx_not_zero_a) != len(idx_not_zero_b):
+                return None
+            if (idx_not_zero_a != idx_not_zero_b).any():
+                return None
+
+            # ベクトル全体で割り算を行い, すべて同じ値でなければ定数倍ではない
+            scalar_vec = vec_a[idx_not_zero_a] / vec_b[idx_not_zero_b]
+            output = scalar_vec[0]
+            if np.all(scalar_vec != output):
+                return None
+            return output
+
+        # 削除する行を保持
+        rows_remove = set()
+        for i in tqdm(range(m - 1)):
+            # すでに削除対象になっている場合省略する
+            if i in rows_remove:
+                continue
+            for j in range(i + 1, m):
+                # すでに削除対象になっている場合省略する
+                if j in rows_remove:
+                    continue
+                # 対象とする行が定数倍になっているか確認
+                k = scalar_times_vector(A[j, :], A[i, :])
+                if k is None:
+                    continue
+                # 対象とする行が定数倍の場合, bの値も同じ定数倍になっていなければ実行不可能
+                if b[j] != b[i] * k:
+                    raise ProblemInfeasibleError
+                # 削除対象として追加し次の添え字へ
+                rows_remove.add(j)
+
+        # 削除対象の行を省いて出力
+        A_out, b_out, _ = self._remove_rows_and_columns(A, b=b, rows_remove=rows_remove)
+        return A_out, b_out
+
+    def remove_empty_column(self, A: Csr, c: np.ndarray) -&gt; tuple[Csr, np.ndarray]:
+        &#34;&#34;&#34;空列で制約が存在しない変数は自由な値を取れるので, 削除する
+
+        自由な値がとれる場合, cが正ならば0が最適値
+        cが負ならばいくらでも小さくできてしまうので発散
+        &#34;&#34;&#34;
+        columns_remove = set()
+        # Aが空列になっている index に対してのみ処理
+        for i in np.where(np.all(A.toarray() == 0, axis=0))[0]:
+            # もしAが空列なのにcが負であれば unbounded
+            if c[i] &lt; 0:
+                raise ProblemUnboundedError
+            columns_remove.add(i)
+
+        A_out, _, c_out = self._remove_rows_and_columns(A, c=c, columns_remove=columns_remove)
+        return A_out, c_out
+
+    def remove_duplicated_column(self, A: np.ndarray, c: np.ndarray) -&gt; tuple[np.ndarray, np.ndarray]:
+        &#34;&#34;&#34;重複する列を削除する
+
+        行の場合と異なり, 全く同じ列でなければ削除をしない
+        &#34;&#34;&#34;
+        n = A.shape[0]
+
+        # 削除する列を保持
+        columns_remove = set()
+        for i in range(n - 1):
+            # すでに削除対象になっている場合省略する
+            if i in columns_remove:
+                continue
+            for j in range(i + 1, n):
+                # すでに削除対象になっている場合省略する
+                if j in columns_remove:
+                    continue
+                if np.all(A[:, i] == A[:, j]):
+                    columns_remove.add(j)
+
+        # 削除対象の列を省いて出力
+        A_out, _, c_out = self._remove_rows_and_columns(A, c=c, columns_remove=columns_remove)
+        return A_out, c_out
+
+    def rows_only_one_nonzero(self, A: Csr) -&gt; list[int]:
+        &#34;&#34;&#34;Aの行のうち1つしか0以外の係数が存在しない行のインデックス取得
+
+        A が1行m列の制約になった場合エラーとなるので, その時は axis を変更する
+        &#34;&#34;&#34;
+        A_dense = A.toarray()
+        if A_dense.shape[1] == 1:
+            output = np.where(np.count_nonzero(A_dense, axis=0) == 1)
+        else:
+            output = np.where(np.count_nonzero(A_dense, axis=1) == 1)
+        return output[0]
+
+    def only_one_nonzero_elements_and_columns(
+        self, A: Csr, row_indexs_only_one_nonzero: list[int]
+    ) -&gt; tuple[Csr, list[int]]:
+        &#34;&#34;&#34;1つしか係数がない行の係数のベクトル形式と, 列のインデックスを取得&#34;&#34;&#34;
+        A_only_one_nonzero = A[row_indexs_only_one_nonzero, :]
+        indexes_tmp = A_only_one_nonzero.indices
+        return A_only_one_nonzero.data, indexes_tmp
+
+    def remove_row_singleton(self, A: Csr, b: np.ndarray, c: np.ndarray) -&gt; tuple[Csr, np.ndarray, np.ndarray]:
+        &#34;&#34;&#34;1つしか係数がかかっていない行は1つの値に定めることで次元数削除&#34;&#34;&#34;
+        # 1つしか係数がない行の特定
+        rows_remove = self.rows_only_one_nonzero(A)
+
+        # 1つしか係数がない行がないならばそのまま出力
+        if len(rows_remove) == 0:
+            return A, b, c
+
+        # 1つしか係数がない行の係数とその列を取得
+        elements, columns_remove = self.only_one_nonzero_elements_and_columns(A, rows_remove)
+
+        # 変数の確定. もし負の値になってしまったら実行不可能
+        x = b[rows_remove] / elements
+        if len(np.where(x &lt; 0)[0]):
+            raise ProblemInfeasibleError
+
+        # 行が削除された結果
+        A_new, _, c_new = self._remove_rows_and_columns(A, c=c, rows_remove=rows_remove, columns_remove=columns_remove)
+        # bのみ値が変わるため, 別で計算する
+        rows_output = [i for i in range(A.shape[0]) if i not in rows_remove]
+        b_new = b[rows_output] - A[np.ix_(rows_output, columns_remove)].dot(x)
+
+        # 行を削除した結果, 再び要素が1つだけの行ができるかもしれないので再度実行
+        A_out, b_out, c_out = self.remove_row_singleton(A_new, b_new, c_new)
+        return A_out, b_out, c_out
+
+    def find_zero_columns_in_A(self, A: np.ndarray, column: int) -&gt; list[int]:
+        &#34;&#34;&#34;Aのj列に対して足して0になる列のリストを取得
+
+        j-1列目までは確認していると考えて, j+1列目以降と比較する
+
+        Args:
+            A: 制約の係数行列
+            column: Aのどの列と他の列が同じか参照するか（j列目）
+        &#34;&#34;&#34;
+        A_j_minus_A = A[:, column].reshape(A.shape[0], 1) + A[:, (column + 1) :]
+        index_0 = np.where(np.all(A_j_minus_A == 0, axis=0))[0]
+        return (index_0 + column + 1).tolist()
+
+    def remove_free_variables(
+        self, A: np.ndarray, b: np.ndarray, c: np.ndarray
+    ) -&gt; tuple[np.ndarray, np.ndarray, np.ndarray]:
+        &#34;&#34;&#34;Aの列が足して0になり, かつcの対応する添え字も同様であれば,
+        2つの変数の差は自由変数として扱うことができるので,
+        値を固定して次元を削減する
+        &#34;&#34;&#34;
+        n = A.shape[1]
+        for i in range(n - 1):
+            logger.debug(f&#34;Reference column: {i}&#34;)
+            # 足して0になるAの列を見つける
+            lst_columns = self.find_zero_columns_in_A(A, i)
+            if not lst_columns:
+                continue
+            # 削除対象となるのは, for文で参照している列と足して0になるAの列の1つ
+            columns_remove = [i, lst_columns[0]]
+            cols_calc = [j for j in range(n) if j not in columns_remove]
+            # 参照している列において係数が0以外である行を見つける
+            lst_rows_nonzero_column = np.where(A[:, i] != 0)[0].tolist()
+            # 係数が0しかない場合, 自由変数の削除としては扱わない
+            if not lst_rows_nonzero_column:
+                continue
+            # 係数が0以外である最初の行のインデックスとその係数を取得
+            row_remove = lst_rows_nonzero_column[0]
+            A_alpha_i = A[row_remove, i]
+            # 係数が0以外である各行に対して, 自由変数の係数と割り算
+            rows_calc = lst_rows_nonzero_column[1:]
+            # 対応する各要素に対して更新
+            c = c - c[i] * A[row_remove, :] / A_alpha_i
+            b = b - A[:, i] * b[row_remove] / A_alpha_i
+            # 下記のAの行列計算は以下のfor文を行っている
+            # for k in range(n):
+            #     if k in columns_remove:
+            #         continue
+            #     tmp = A[rows_calc, i] / A_alpha_i * A[row_remove, k]
+            #     A[rows_calc, k] = A[rows_calc, k] - tmp
+            comb = np.ix_(rows_calc, cols_calc)
+            logger.debug(f&#34;Remove row: {row_remove}&#34;)
+            logger.debug(f&#34;Remove columns: {columns_remove}&#34;)
+            A_beta_i = A[rows_calc, i].reshape(len(rows_calc), 1)
+            A_alpha_k = A[row_remove, cols_calc].reshape(1, len(cols_calc))
+            A_beta_i_A_alpha_k = A_beta_i.dot(A_alpha_k)
+            A[comb] = A[comb] - A_beta_i_A_alpha_k / A_alpha_i
+            A_row_removed = np.delete(A, row_remove, axis=0)
+            A_new = np.delete(A_row_removed, columns_remove, axis=1)
+            b_new = np.delete(b, row_remove, axis=0)
+            c_new = np.delete(c, columns_remove, axis=0)
+            # 自由変数を削除することで新たな自由変数が出現するかもしれないので再帰
+            return self.remove_free_variables(A_new, b_new, c_new)
+        # 足して0になる列の組がなければそのまま返す
+        else:
+            return A, b, c
+
+    def fix_variables_by_single_row(self, A: Csr, b: np.ndarray, c: np.ndarray) -&gt; tuple[Csr, np.ndarray, np.ndarray]:
+        &#34;&#34;&#34;bが負の時に制約が正の係数しか持たない, もしくはbが正の時に制約が負の係数しか
+        もたない場合実行不可能. bが0の時に制約が正 or 負どちらかの係数しか持たない場合,
+        解はすべて0として制約と変数を削除する
+        &#34;&#34;&#34;
+        # 実行不可能性の確認
+        rows_b_negative = np.where(b &lt; 0)[0]
+        if np.any(np.all(A[rows_b_negative, :].toarray() &gt;= 0, axis=1)):
+            raise ProblemInfeasibleError
+        rows_b_positive = np.where(b &gt; 0)[0]
+        if np.any(np.all(A[rows_b_positive, :].toarray() &lt;= 0, axis=1)):
+            raise ProblemInfeasibleError
+
+        # 制約, 変数の削除
+        rows_remove = set()
+        columns_remove = set()
+        rows_b_zero = np.where(b == 0)[0]
+        for row in rows_b_zero:
+            row_A = A[row, :]
+            columns_A_nonzero = row_A.indices
+            # 係数が正 or 負のどちらかしか持たない場合, 解はすべて0とする
+            if np.all(row_A.toarray() &gt;= 0) or np.all(row_A.toarray() &lt;= 0):
+                rows_remove.add(row)
+                columns_remove = columns_remove | set(columns_A_nonzero)
+
+        # もし何も削除されなかった場合, そのまま入力を返す
+        if not (rows_remove or columns_remove):
+            return A, b, c
+
+        # 残す制約, 変数を抽出
+        A_new, b_new, c_new = self._remove_rows_and_columns(
+            A, b=b, c=c, rows_remove=rows_remove, columns_remove=columns_remove
+        )
+
+        # 削除した結果, 再び同じ条件の行列ができるかもしれないので再度実行
+        A_out, b_out, c_out = self.fix_variables_by_single_row(A_new, b_new, c_new)
+        return A_out, b_out, c_out
+
+    def fix_variables_by_multiple_rows(
+        self, A: np.ndarray, b: np.ndarray, c: np.ndarray
+    ) -&gt; tuple[np.ndarray, np.ndarray, np.ndarray]:
+        &#34;&#34;&#34;bの値が同じ制約において, 制約の係数同士を引いた場合に負か正の値しかない場合,
+        その値は0にならなければ実行不可能
+        bの値が足して0になる場合も同様. その場合制約の係数同士を足した場合になる
+        &#34;&#34;&#34;
+        # 削除する行, 列の保持
+        rows_remove = set()
+        columns_remove = set()
+
+        for i, b_i in tqdm(enumerate(b)):
+            if i in rows_remove:
+                continue
+
+            # b が同じだった場合
+            b_i_minus_b = b_i - b[i + 1 :]
+            rows_zero = np.where(b_i_minus_b == 0)[0] + (i + 1)
+            for j in set(rows_zero) - rows_remove:
+                A_i_minus_A_j = A[i, :] - A[j, :]
+                if max(A_i_minus_A_j) &lt;= 0 or min(A_i_minus_A_j) &gt;= 0:
+                    rows_remove.add(j)
+                    columns_non_zero = np.where(A_i_minus_A_j != 0)[0]
+                    columns_remove = columns_remove | set(columns_non_zero)
+
+            # b が足して0だった場合
+            b_i_plus_b = b_i + b[i + 1 :]
+            rows_zero = np.where(b_i_plus_b == 0)[0] + (i + 1)
+            for j in set(rows_zero) - rows_remove:
+                A_i_plus_A_j = A[i, :] + A[j, :]
+                if max(A_i_plus_A_j) &lt;= 0 or min(A_i_plus_A_j) &gt;= 0:
+                    rows_remove.add(j)
+                    columns_non_zero = np.where(A_i_plus_A_j != 0)[0]
+                    columns_remove = columns_remove | set(columns_non_zero)
+
+        # 残す制約, 変数を抽出
+        A_new, b_new, c_new = self._remove_rows_and_columns(
+            A, b=b, c=c, rows_remove=rows_remove, columns_remove=columns_remove
+        )
+
+        return A_new, b_new, c_new
+
+    def fix_positive_variable_by_signs(
+        self, A: Csr, b: np.ndarray, c: np.ndarray, recursive_num: int = 0
+    ) -&gt; tuple[Csr, np.ndarray, np.ndarray]:
+        &#34;&#34;&#34;ある行がbと同じ符号の係数が1つしかなく, それ以外は反対の符号, もしくは0の場合
+        bと同じ符号の変数は他の変数との和で固定する
+
+        Args:
+            recursive_num: 再帰した回数. 再帰しすぎるとメモリエラーになるため, 50回を限度とする
+        &#34;&#34;&#34;
+        if recursive_num &gt; 50:
+            return A, b, c
+
+        # bが0以外の場合について, 条件に合致するAの行を取得
+        for row in np.where(b != 0)[0]:
+            # Aの要素がbの符号と同じ添え字を取得
+            indexs_A_alpha_with_b = np.where(A[row, :].toarray()[0] * b[row] / abs(b[row]) &gt; 0)[0]
+            # 要素が1つのみの場合, indexを取得し走査終了
+            if len(indexs_A_alpha_with_b) == 1:
+                remove_row = row
+                remove_col = indexs_A_alpha_with_b[0]
+                break
+        # 該当する条件の行がなかった場合は入力された行列を出力へ
+        else:
+            return A, b, c
+
+        # 各行, 列に対して値を更新
+        # Aはサイズが大きいことを想定するので, A.toarray() はメモリ観点で実行したくない
+        A_alpha = A[remove_row, :].toarray()[0]
+        A_alpha_i = A_alpha[remove_col]
+        A_beta = A[:, remove_col].toarray()
+        A_new, b_new, c_new = self._remove_rows_and_columns(
+            A=Csr(A - A_beta * A_alpha.reshape(1, A.shape[1]) / A_alpha_i),
+            b=b - A_beta.reshape(-1) * b[remove_row] / A_alpha_i,
+            c=c - c[remove_col] * A_alpha / A_alpha_i,
+            rows_remove={remove_row},
+            columns_remove={remove_col},
+        )
+        # 不要なオブジェクトを削除して再帰
+        del A_alpha, A_beta, A, b, c
+        return self.fix_positive_variable_by_signs(A_new, b_new, c_new, recursive_num + 1)
+
+    def fix_singleton_by_two_rows(
+        self, A: np.ndarray, b: np.ndarray, c: np.ndarray
+    ) -&gt; tuple[np.ndarray, np.ndarray, np.ndarray]:
+        &#34;&#34;&#34;2つの行の差が1列しか非0要素を持たない場合,
+        1つの変数を固定することができるので固定することで変数を削除する
+
+        もし固定した結果が負の値になる場合は実行不可能
+        &#34;&#34;&#34;
+        for i in range(A.shape[0] - 1):
+            A_i_minus_A = A[i, :] - A[(i + 1) :, :]
+            # 各行で非0要素になった数を集計
+            counts_nonzero_by_row = np.count_nonzero(A_i_minus_A != 0, axis=1)
+            # もしなければ次の行へ
+            if 1 not in counts_nonzero_by_row:
+                continue
+            # あれば, その行が何行目か取得して, 変数を固定する
+            index = counts_nonzero_by_row.tolist().index(1)
+            remove_row = index + i + 1
+            remove_column = np.where(A_i_minus_A[index, :] != 0)[0]
+            x_denominator = A[i, remove_column] - A[remove_row, remove_column]
+            x = (b[i] - b[remove_row]) / x_denominator
+            # 固定した値が負であれば実行不可能
+            if x &lt; 0:
+                raise ProblemInfeasibleError
+            # 値の更新
+            b_updated = b - A[:, remove_column].flatten() * x
+            A_new, b_new, c_new = self._remove_rows_and_columns(
+                A, b=b_updated, c=c, rows_remove=[remove_row], columns_remove=[remove_column]
+            )
+            # 削除した結果, 再び同じ条件の行列ができるかもしれないので再度実行
+            return self.fix_singleton_by_two_rows(A_new, b_new, c_new)
+        # 該当する条件の行がなかった場合はそのまま返す
+        else:
+            return A, b, c
+
+    def run(self, problem: LPS) -&gt; LPS:
+        &#34;&#34;&#34;前処理を実行し, 新しいLPのインスタンスを作成する
+
+        一度実行した後にA, b, cが変形していれば, 再び0の行が出るなどして前処理が必要になるかもしれない
+        そのため, 繰り返し出力する
+
+        Returns:
+            LPS: 前処理後の線形計画問題
+        &#34;&#34;&#34;
+        logger.info(&#34;Start preprocessing.&#34;)
+        A: Csr = problem.A.copy()
+        b = problem.b.copy()
+        c = problem.c.copy()
+
+        logger.info(&#34;1. Start removing empty rows.&#34;)
+        A, b = self.remove_empty_row(A, b)
+        # logger.info(&#34;2. Start removing duplicated rows.&#34;)
+        # A, b = self.remove_duplicated_row(A, b)
+        logger.info(&#34;3. Start removing empty columns.&#34;)
+        A, c = self.remove_empty_column(A, c)
+        # logger.info(&#34;4. Start removing duplicated columns.&#34;)
+        # A, c = self.remove_duplicated_column(A, c)
+        logger.info(&#34;5. Start removing row singletons.&#34;)
+        A, b, c = self.remove_row_singleton(A, b, c)
+        # logger.info(&#34;6. Start removing free variables.&#34;)
+        # A, b, c = self.remove_free_variables(A, b, c)
+        logger.info(&#34;7. Start fixing variables by single row.&#34;)
+        A, b, c = self.fix_variables_by_single_row(A, b, c)
+        # logger.info(&#34;8. Start fixing variables by multiple rows.&#34;)
+        # A, b, c = self.fix_variables_by_multiple_rows(A, b, c)
+        logger.info(&#34;9. Start fixing positive variable by sings.&#34;)
+        A, b, c = self.fix_positive_variable_by_signs(A, b, c)
+        # logger.info(&#34;10. Start fixing singleton by two rows.&#34;)
+        # A, b, c = self.fix_singleton_by_two_rows(A, b, c)
+
+        # A, b, c について変更されているか確認し, もしされていなければ出力
+        logger.info(&#34;Checking change...&#34;)
+        # まずは次元の確認から. 一致していることがわかった後に要素の確認をしないとサイズ違いでエラーとなる
+        logger.debug(f&#34;{A.shape}, {b.shape}, {c.shape}&#34;)
+        if A.shape == problem.A.shape and b.shape == problem.b.shape and c.shape == problem.c.shape:
+            logger.debug(f&#34;{(A - problem.A).nnz}, {np.all(b == problem.b)}, {np.all(c == problem.c)}&#34;)
+            # scipy sparse は行列で比較して0以外の要素がなければok
+            if (A - problem.A).nnz == 0 and np.all(b == problem.b) and np.all(c == problem.c):
+                logger.info(&#34;End preprocessing.&#34;)
+                if not problem.is_full_row_rank():
+                    logger.warning(&#34;This problem is not full row rank!&#34;)
+                return problem
+        # されていればもう一度実行
+        logger.info(&#34;Restart Preprocessing for changing coefficients.&#34;)
+        # 不要なオブジェクトはメモリを圧迫するので削除
+        name = problem.name
+        del problem
+        return self.run(LPS(A, b, c, name))</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="src.problem.preprocessor.LPPreprocessor.find_zero_columns_in_A"><code class="name flex">
+<span>def <span class="ident">find_zero_columns_in_A</span></span>(<span>self, A: numpy.ndarray, column: int) ‑> list[int]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Aのj列に対して足して0になる列のリストを取得</p>
+<p>j-1列目までは確認していると考えて, j+1列目以降と比較する</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>A</code></strong></dt>
+<dd>制約の係数行列</dd>
+<dt><strong><code>column</code></strong></dt>
+<dd>Aのどの列と他の列が同じか参照するか（j列目）</dd>
+</dl></div>
+</dd>
+<dt id="src.problem.preprocessor.LPPreprocessor.fix_positive_variable_by_signs"><code class="name flex">
+<span>def <span class="ident">fix_positive_variable_by_signs</span></span>(<span>self, A: scipy.sparse._csr.csr_matrix, b: numpy.ndarray, c: numpy.ndarray, recursive_num: int = 0) ‑> tuple[scipy.sparse._csr.csr_matrix, numpy.ndarray, numpy.ndarray]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>ある行がbと同じ符号の係数が1つしかなく, それ以外は反対の符号, もしくは0の場合
+bと同じ符号の変数は他の変数との和で固定する</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>recursive_num</code></strong></dt>
+<dd>再帰した回数. 再帰しすぎるとメモリエラーになるため, 50回を限度とする</dd>
+</dl></div>
+</dd>
+<dt id="src.problem.preprocessor.LPPreprocessor.fix_singleton_by_two_rows"><code class="name flex">
+<span>def <span class="ident">fix_singleton_by_two_rows</span></span>(<span>self, A: numpy.ndarray, b: numpy.ndarray, c: numpy.ndarray) ‑> tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>2つの行の差が1列しか非0要素を持たない場合,
+1つの変数を固定することができるので固定することで変数を削除する</p>
+<p>もし固定した結果が負の値になる場合は実行不可能</p></div>
+</dd>
+<dt id="src.problem.preprocessor.LPPreprocessor.fix_variables_by_multiple_rows"><code class="name flex">
+<span>def <span class="ident">fix_variables_by_multiple_rows</span></span>(<span>self, A: numpy.ndarray, b: numpy.ndarray, c: numpy.ndarray) ‑> tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>bの値が同じ制約において, 制約の係数同士を引いた場合に負か正の値しかない場合,
+その値は0にならなければ実行不可能
+bの値が足して0になる場合も同様. その場合制約の係数同士を足した場合になる</p></div>
+</dd>
+<dt id="src.problem.preprocessor.LPPreprocessor.fix_variables_by_single_row"><code class="name flex">
+<span>def <span class="ident">fix_variables_by_single_row</span></span>(<span>self, A: scipy.sparse._csr.csr_matrix, b: numpy.ndarray, c: numpy.ndarray) ‑> tuple[scipy.sparse._csr.csr_matrix, numpy.ndarray, numpy.ndarray]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>bが負の時に制約が正の係数しか持たない, もしくはbが正の時に制約が負の係数しか
+もたない場合実行不可能. bが0の時に制約が正 or 負どちらかの係数しか持たない場合,
+解はすべて0として制約と変数を削除する</p></div>
+</dd>
+<dt id="src.problem.preprocessor.LPPreprocessor.only_one_nonzero_elements_and_columns"><code class="name flex">
+<span>def <span class="ident">only_one_nonzero_elements_and_columns</span></span>(<span>self, A: scipy.sparse._csr.csr_matrix, row_indexs_only_one_nonzero: list[int]) ‑> tuple[scipy.sparse._csr.csr_matrix, list[int]]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>1つしか係数がない行の係数のベクトル形式と, 列のインデックスを取得</p></div>
+</dd>
+<dt id="src.problem.preprocessor.LPPreprocessor.remove_duplicated_column"><code class="name flex">
+<span>def <span class="ident">remove_duplicated_column</span></span>(<span>self, A: numpy.ndarray, c: numpy.ndarray) ‑> tuple[numpy.ndarray, numpy.ndarray]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>重複する列を削除する</p>
+<p>行の場合と異なり, 全く同じ列でなければ削除をしない</p></div>
+</dd>
+<dt id="src.problem.preprocessor.LPPreprocessor.remove_duplicated_row"><code class="name flex">
+<span>def <span class="ident">remove_duplicated_row</span></span>(<span>self, A: numpy.ndarray, b: numpy.ndarray) ‑> tuple[numpy.ndarray, numpy.ndarray]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>重複のある制約を削除</p>
+<p>A_i = k<em>A_j の時, b_i = k</em>b_j ならば, jの制約はなくても同じなので削除してよい
+b_i != k*b_j ならば実行不可能になる</p></div>
+</dd>
+<dt id="src.problem.preprocessor.LPPreprocessor.remove_empty_column"><code class="name flex">
+<span>def <span class="ident">remove_empty_column</span></span>(<span>self, A: scipy.sparse._csr.csr_matrix, c: numpy.ndarray) ‑> tuple[scipy.sparse._csr.csr_matrix, numpy.ndarray]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>空列で制約が存在しない変数は自由な値を取れるので, 削除する</p>
+<p>自由な値がとれる場合, cが正ならば0が最適値
+cが負ならばいくらでも小さくできてしまうので発散</p></div>
+</dd>
+<dt id="src.problem.preprocessor.LPPreprocessor.remove_empty_row"><code class="name flex">
+<span>def <span class="ident">remove_empty_row</span></span>(<span>self, A: scipy.sparse._csr.csr_matrix, b: numpy.ndarray) ‑> tuple[scipy.sparse._csr.csr_matrix, numpy.ndarray]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>空行で制約が存在しないAの行は削除する</p>
+<p>もしAの係数がないのにbが0以外の場合, どうやってもその制約は満たせないのでエラー</p></div>
+</dd>
+<dt id="src.problem.preprocessor.LPPreprocessor.remove_free_variables"><code class="name flex">
+<span>def <span class="ident">remove_free_variables</span></span>(<span>self, A: numpy.ndarray, b: numpy.ndarray, c: numpy.ndarray) ‑> tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Aの列が足して0になり, かつcの対応する添え字も同様であれば,
+2つの変数の差は自由変数として扱うことができるので,
+値を固定して次元を削減する</p></div>
+</dd>
+<dt id="src.problem.preprocessor.LPPreprocessor.remove_row_singleton"><code class="name flex">
+<span>def <span class="ident">remove_row_singleton</span></span>(<span>self, A: scipy.sparse._csr.csr_matrix, b: numpy.ndarray, c: numpy.ndarray) ‑> tuple[scipy.sparse._csr.csr_matrix, numpy.ndarray, numpy.ndarray]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>1つしか係数がかかっていない行は1つの値に定めることで次元数削除</p></div>
+</dd>
+<dt id="src.problem.preprocessor.LPPreprocessor.rows_only_one_nonzero"><code class="name flex">
+<span>def <span class="ident">rows_only_one_nonzero</span></span>(<span>self, A: scipy.sparse._csr.csr_matrix) ‑> list[int]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Aの行のうち1つしか0以外の係数が存在しない行のインデックス取得</p>
+<p>A が1行m列の制約になった場合エラーとなるので, その時は axis を変更する</p></div>
+</dd>
+<dt id="src.problem.preprocessor.LPPreprocessor.run"><code class="name flex">
+<span>def <span class="ident">run</span></span>(<span>self, problem: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>) ‑> <a title="src.problem.problem.LinearProgrammingProblemStandard" href="problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>前処理を実行し, 新しいLPのインスタンスを作成する</p>
+<p>一度実行した後にA, b, cが変形していれば, 再び0の行が出るなどして前処理が必要になるかもしれない
+そのため, 繰り返し出力する</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>LPS</code></dt>
+<dd>前処理後の線形計画問題</dd>
+</dl></div>
+</dd>
+</dl>
+</dd>
+<dt id="src.problem.preprocessor.ProblemInfeasibleError"><code class="flex name class">
+<span>class <span class="ident">ProblemInfeasibleError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>前処理により実行不可能な問題であることがわかった場合に出すエラー</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ProblemInfeasibleError(Exception):
+    &#34;&#34;&#34;前処理により実行不可能な問題であることがわかった場合に出すエラー&#34;&#34;&#34;
+
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="src.problem.preprocessor.ProblemUnboundedError"><code class="flex name class">
+<span>class <span class="ident">ProblemUnboundedError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>前処理により最適値が発散してしまうことがわかった場合に出すエラー</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ProblemUnboundedError(Exception):
+    &#34;&#34;&#34;前処理により最適値が発散してしまうことがわかった場合に出すエラー&#34;&#34;&#34;
+
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="src.problem" href="index.html">src.problem</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="src.problem.preprocessor.LPPreprocessor" href="#src.problem.preprocessor.LPPreprocessor">LPPreprocessor</a></code></h4>
+<ul class="">
+<li><code><a title="src.problem.preprocessor.LPPreprocessor.find_zero_columns_in_A" href="#src.problem.preprocessor.LPPreprocessor.find_zero_columns_in_A">find_zero_columns_in_A</a></code></li>
+<li><code><a title="src.problem.preprocessor.LPPreprocessor.fix_positive_variable_by_signs" href="#src.problem.preprocessor.LPPreprocessor.fix_positive_variable_by_signs">fix_positive_variable_by_signs</a></code></li>
+<li><code><a title="src.problem.preprocessor.LPPreprocessor.fix_singleton_by_two_rows" href="#src.problem.preprocessor.LPPreprocessor.fix_singleton_by_two_rows">fix_singleton_by_two_rows</a></code></li>
+<li><code><a title="src.problem.preprocessor.LPPreprocessor.fix_variables_by_multiple_rows" href="#src.problem.preprocessor.LPPreprocessor.fix_variables_by_multiple_rows">fix_variables_by_multiple_rows</a></code></li>
+<li><code><a title="src.problem.preprocessor.LPPreprocessor.fix_variables_by_single_row" href="#src.problem.preprocessor.LPPreprocessor.fix_variables_by_single_row">fix_variables_by_single_row</a></code></li>
+<li><code><a title="src.problem.preprocessor.LPPreprocessor.only_one_nonzero_elements_and_columns" href="#src.problem.preprocessor.LPPreprocessor.only_one_nonzero_elements_and_columns">only_one_nonzero_elements_and_columns</a></code></li>
+<li><code><a title="src.problem.preprocessor.LPPreprocessor.remove_duplicated_column" href="#src.problem.preprocessor.LPPreprocessor.remove_duplicated_column">remove_duplicated_column</a></code></li>
+<li><code><a title="src.problem.preprocessor.LPPreprocessor.remove_duplicated_row" href="#src.problem.preprocessor.LPPreprocessor.remove_duplicated_row">remove_duplicated_row</a></code></li>
+<li><code><a title="src.problem.preprocessor.LPPreprocessor.remove_empty_column" href="#src.problem.preprocessor.LPPreprocessor.remove_empty_column">remove_empty_column</a></code></li>
+<li><code><a title="src.problem.preprocessor.LPPreprocessor.remove_empty_row" href="#src.problem.preprocessor.LPPreprocessor.remove_empty_row">remove_empty_row</a></code></li>
+<li><code><a title="src.problem.preprocessor.LPPreprocessor.remove_free_variables" href="#src.problem.preprocessor.LPPreprocessor.remove_free_variables">remove_free_variables</a></code></li>
+<li><code><a title="src.problem.preprocessor.LPPreprocessor.remove_row_singleton" href="#src.problem.preprocessor.LPPreprocessor.remove_row_singleton">remove_row_singleton</a></code></li>
+<li><code><a title="src.problem.preprocessor.LPPreprocessor.rows_only_one_nonzero" href="#src.problem.preprocessor.LPPreprocessor.rows_only_one_nonzero">rows_only_one_nonzero</a></code></li>
+<li><code><a title="src.problem.preprocessor.LPPreprocessor.run" href="#src.problem.preprocessor.LPPreprocessor.run">run</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="src.problem.preprocessor.ProblemInfeasibleError" href="#src.problem.preprocessor.ProblemInfeasibleError">ProblemInfeasibleError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="src.problem.preprocessor.ProblemUnboundedError" href="#src.problem.preprocessor.ProblemUnboundedError">ProblemUnboundedError</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.1</a>.</p>
+</footer>
+</body>
+</html>

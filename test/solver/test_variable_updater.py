@@ -1,9 +1,7 @@
 import numpy as np
 
-from src.utils import config_utils
-from src.solver.variable_updater import ArcVariableUpdater
-
-config_section = "TEST"
+from src.solver.algorithm.variable_updater import ArcVariableUpdater
+from src.utils.config_utils import read_config, test_section
 
 
 def test_max_alpha_guarantee_positive_with_line():
@@ -27,10 +25,9 @@ def test_update_variable():
 
 def test_max_step_size_guarantee_positive():
     """step size の最大値が各ケースごとに正しく出力されているか"""
-    config_base = config_utils.read_config(section=config_section)
-    config_opt = config_utils.read_config(
-        config_base.get("PATH_CONFIG") + config_base.get("CONFIG_OPTIMIZER"),
-        section=config_section
+    config_base = read_config(section=test_section)
+    config_opt = read_config(
+        config_base.get("PATH_CONFIG") + config_base.get("CONFIG_OPTIMIZER"), section=test_section
     )
     delta_xs = config_opt.getfloat("IPM_COEF_GUARANTEEING_XS_POSITIVENESS")
     # 本テストケースでよく使用する変数・関数の設定
@@ -39,9 +36,7 @@ def test_max_step_size_guarantee_positive():
     x_minus_delta = x * (1 - delta_xs)
 
     def calc_alpha(x_dot: np.array, x_ddot: np.array):
-        output = ArcVariableUpdater(delta_xs).max_step_size_guarantee_positive(
-            x, x_dot, x_ddot
-        )
+        output = ArcVariableUpdater(delta_xs).max_step_size_guarantee_positive(x, x_dot, x_ddot)
         return output
 
     # Case 1

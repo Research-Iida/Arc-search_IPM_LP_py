@@ -1,0 +1,17 @@
+{
+    "python.testing.pytestArgs": [
+        "test"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "cSpell.words": [
+        "Netlib",
+        "Mehrotra",
+        "linalg",
+        "allclose",
+        "qiskit",
+        "sqla",
+        "tolil",
+        "kennington",
+    ],
+}

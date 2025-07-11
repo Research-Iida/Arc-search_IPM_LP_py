@@ -1,13 +1,13 @@
-
+from pathlib import Path
 
 import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib import cm
 from matplotlib.ticker import MaxNLocator
-import numpy as np
 
-from ..utils import str_util
-from ..solver.solver import SolvedDetail
 from ..logger import get_main_logger
+from ..solver.solver import SolvedDetail
+from ..utils import str_util
 
 # logger の設定
 logger = get_main_logger()
@@ -15,24 +15,27 @@ logger = get_main_logger()
 
 def deco_logging(doing: str):
     """実行開始・終了を logging するためのデコレータ"""
+
     def _deco_logging(func):
         def wrapper(*args, **kwargs):
             logger.info(f"Start {doing}...")
             func(*args, **kwargs)
             logger.info(f"Finish {doing}.")
+
         return wrapper
+
     return _deco_logging
 
 
 class Drawer:
     """研究に関するグラフの描画をつかさどるクラス"""
+
     def __init__(
         self,
-        path_output: str,
+        path_output: Path,
     ):
-        """グラフの描画を行う上での初期設定
-        """
-        self.path_output = path_output
+        """グラフの描画を行う上での初期設定"""
+        self.path_output: Path = path_output
 
     @classmethod
     def add_suffix(cls, filename: str) -> str:
@@ -41,11 +44,8 @@ class Drawer:
         return str_util.add_suffix(filename, suffix)
 
     @deco_logging("drawing optimal trajectory")
-    def _draw_optimality_trajectories(
-        self, aSolvedDetail: SolvedDetail,
-        file_name: str = "optimal_trajectories"
-    ):
-        """"duality measure mu など, 最適解に近づいていれば0に収束する値の軌跡を描画する
+    def _draw_optimality_trajectories(self, aSolvedDetail: SolvedDetail, file_name: str = "optimal_trajectories"):
+        """ "duality measure mu など, 最適解に近づいていれば0に収束する値の軌跡を描画する
 
         Args:
             aSolvedDetail: 最適解の詳細. 描画対象となるリストをそれぞれ格納している
@@ -62,7 +62,7 @@ class Drawer:
 
         fig, ax = plt.subplots()
         ax.set_yscale("log")
-        ax.set_xlabel('iteration number')
+        ax.set_xlabel("iteration number")
         ax.xaxis.set_major_locator(MaxNLocator(integer=True))
 
         ax.plot(lst_mu, "-", label="$\mu$")
@@ -71,14 +71,11 @@ class Drawer:
         ax.legend()
         ax.set_title("trajectories for optimal solution")
 
-        fig.savefig(self.add_suffix(f"{self.path_output}{file_name}"))
+        fig.savefig(self.path_output.joinpath(self.add_suffix(file_name)))
 
     @deco_logging("drawing search step trajectory")
-    def _draw_search_step_trajectories(
-        self, aSolvedDetail: SolvedDetail,
-        file_name: str = "search_step_trajectories"
-    ):
-        """"探索方向や step size がどのような軌跡を描いたのか確認する
+    def _draw_search_step_trajectories(self, aSolvedDetail: SolvedDetail, file_name: str = "search_step_trajectories"):
+        """ "探索方向や step size がどのような軌跡を描いたのか確認する
 
         Args:
             aSolvedDetail: 最適解の詳細. 描画対象となるリストをそれぞれ格納している
@@ -92,7 +89,12 @@ class Drawer:
         # 描画内容が存在しなければ何もせず終了
         # TODO: 途中まで step 進んでても singular matirix になったせいで描画するものがなくなるのはおかしくね?
         # CRE-A で描画できなくなったので注意
-        if len(lst_alpha_main) == 0 and len(lst_alpha_dual) == 0 and len(lst_norm_v_dot) == 0 and len(lst_norm_v_ddot) == 0:
+        if (
+            len(lst_alpha_main) == 0
+            and len(lst_alpha_dual) == 0
+            and len(lst_norm_v_dot) == 0
+            and len(lst_norm_v_ddot) == 0
+        ):
             logger.info("No drawing data.")
             return
 
@@ -110,7 +112,7 @@ class Drawer:
             ax1.plot(lst_alpha_dual, "-.", color=cm.Set1.colors[2], label="dual step size")
 
         # 軸の縦線の色を変更
-        ax1.tick_params(axis='y', colors=color_1)
+        ax1.tick_params(axis="y", colors=color_1)
         # step size の幅は 0 ~ pi/2(line は1まで)なので, それよりちょっと大きいところまで目盛りをとる
         ax1.set_ylim(0, 1.6)
         ax1.set_xlabel("Iteration number")
@@ -121,13 +123,9 @@ class Drawer:
 
         # 探索方向のノルムを描画しない場合はそのまま出力
         if len(lst_norm_v_dot) == 0 and len(lst_norm_v_ddot) == 0:
-            ax1.legend(
-                handler1, label1,
-                loc="lower left",
-                borderaxespad=0.
-            )
+            ax1.legend(handler1, label1, loc="lower left", borderaxespad=0.0)
             plt.title("trajectories for step size")
-            plt.savefig(self.add_suffix(f"{self.path_output}{file_name}"))
+            plt.savefig(self.path_output.joinpath(self.add_suffix(file_name)))
             return
 
         color_2 = cm.Set1.colors[1]
@@ -136,28 +134,28 @@ class Drawer:
         ax2.plot(lst_norm_v_ddot, color=cm.Set1.colors[3], label="$\|\ddot{v}\|$")
         # axesオブジェクトに属するSpineオブジェクトの値を変更
         # 図を重ねてる関係で、ax2 のみいじる。
-        ax2.spines['left'].set_color(color_1)
-        ax2.spines['right'].set_color(color_2)
-        ax2.tick_params(axis='y', colors=color_2)
+        ax2.spines["left"].set_color(color_1)
+        ax2.spines["right"].set_color(color_2)
+        ax2.tick_params(axis="y", colors=color_2)
         ax2.set_yscale("log")
         ax2.set_ylabel("search direction norm")
         handler2, label2 = ax2.get_legend_handles_labels()
 
         # 凡例をまとめて出力する
         ax1.legend(
-            handler1 + handler2, label1 + label2,
+            handler1 + handler2,
+            label1 + label2,
             # loc="lower left",
             # borderaxespad=0.
         )
         ax1.set_title("trajectories for search direction and step size")
-        fig.savefig(self.add_suffix(f"{self.path_output}{file_name}"))
+        fig.savefig(self.path_output.joinpath(self.add_suffix(file_name)))
 
     @deco_logging("drawing variable min values trajectory")
     def _draw_variables_min_values_trajectories(
-        self, aSolvedDetail: SolvedDetail,
-        file_name: str = "variable_min_value_trajectories"
+        self, aSolvedDetail: SolvedDetail, file_name: str = "variable_min_value_trajectories"
     ):
-        """"正の値になるべき x,s が本当に正の値のまま反復しているかを確認するための軌跡を描画
+        """ "正の値になるべき x,s が本当に正の値のまま反復しているかを確認するための軌跡を描画
 
         Args:
             aSolvedDetail: 最適解の詳細. 描画対象となるリストをそれぞれ格納している
@@ -180,21 +178,20 @@ class Drawer:
         ax.set_yscale("log")
 
         # 軸ラベル
-        ax.set_xlabel('iteration number')
+        ax.set_xlabel("iteration number")
         ax.xaxis.set_major_locator(MaxNLocator(integer=True))
         ax.plot(lst_min_x, "-", label="min $x$")
         ax.plot(lst_min_s, "--", label="min $s$")
         ax.legend()
         ax.set_title("trajectories of variables min values")
 
-        fig.savefig(self.add_suffix(f"{self.path_output}{file_name}"))
+        fig.savefig(self.path_output.joinpath(self.add_suffix(file_name)))
 
     @deco_logging("drawing variable max values trajectory")
     def _draw_variables_max_norms_trajectories(
-        self, aSolvedDetail: SolvedDetail,
-        file_name: str = "variable_max_value_trajectories"
+        self, aSolvedDetail: SolvedDetail, file_name: str = "variable_max_value_trajectories"
     ):
-        """"変数が発散しないまま反復しているかを確認するための軌跡を描画
+        """ "変数が発散しないまま反復しているかを確認するための軌跡を描画
 
         Args:
             aSolvedDetail: 最適解の詳細. 描画対象となるリストをそれぞれ格納している
@@ -219,7 +216,7 @@ class Drawer:
         ax.set_yscale("log")
 
         # 軸ラベル
-        ax.set_xlabel('iteration number')
+        ax.set_xlabel("iteration number")
         ax.xaxis.set_major_locator(MaxNLocator(integer=True))
         ax.plot(lst_max_x, "-", label="max $x$")
         ax.plot(lst_max_ynorm, "-.", label="max $|y|$")
@@ -227,14 +224,13 @@ class Drawer:
         ax.legend()
         ax.set_title("trajectories of variables max values")
 
-        fig.savefig(self.add_suffix(f"{self.path_output}{file_name}"))
+        fig.savefig(self.path_output.joinpath(self.add_suffix(file_name)))
 
     @deco_logging("drawing residuals inexact solution trajectory")
     def _draw_residuals_inexact_solution_trajectories(
-        self, aSolvedDetail: SolvedDetail,
-        file_name: str = "residuals_inexact_solution"
+        self, aSolvedDetail: SolvedDetail, file_name: str = "residuals_inexact_solution"
     ):
-        """"inexact に解いた時の誤差を描画
+        """ "inexact に解いた時の誤差を描画
 
         Args:
             aSolvedDetail: 最適解の詳細. 描画対象となるリストをそれぞれ格納している
@@ -264,7 +260,9 @@ class Drawer:
 
         lst_tolerance_inexact_vdot = aSolvedDetail.lst_tolerance_inexact_vdot
         lst_tolerance_inexact_vddot = aSolvedDetail.lst_tolerance_inexact_vddot
-        if len(lst_tolerance_inexact_vddot) == 0 or np.all(np.array(lst_tolerance_inexact_vdot) == np.array(lst_tolerance_inexact_vddot)):
+        if len(lst_tolerance_inexact_vddot) == 0 or np.all(
+            np.array(lst_tolerance_inexact_vdot) == np.array(lst_tolerance_inexact_vddot)
+        ):
             ax.plot(lst_tolerance_inexact_vdot, "--", color=color_1, label="tolerance")
         else:
             ax.plot(lst_tolerance_inexact_vdot, "--", color=color_1, label="$\dot{v}$ tolerance")
@@ -272,7 +270,7 @@ class Drawer:
         ax.legend()
         ax.set_title("trajectories for residuals of inexact solution")
 
-        fig.savefig(self.add_suffix(f"{self.path_output}{file_name}"))
+        fig.savefig(self.path_output.joinpath(self.add_suffix(file_name)))
 
     def run(self, aSolvedDetail: SolvedDetail):
         """描画する対象をすべて実行する
@@ -283,6 +281,5 @@ class Drawer:
         for func_name in dir(self):
             if func_name.startswith("_draw_"):
                 eval(f"self.{func_name}(data)", {}, {"self": self, "data": aSolvedDetail})
-
-        plt.clf()
-        plt.close()
+                plt.clf()
+                plt.close()

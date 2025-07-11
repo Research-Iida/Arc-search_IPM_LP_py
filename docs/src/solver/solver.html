@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.1">
+<title>src.solver.solver API documentation</title>
+<meta name="description" content="solver に関する module …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>src.solver.solver</code></h1>
+</header>
+<section id="section-intro">
+<p>solver に関する module</p>
+<p>今後ソルバーの設定を変えることで実験することが頻繁に起こるため,
+インターフェイスを使用して変更に対して柔軟な設計をできるようにしておく</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="src.solver.solver.LPSolver"><code class="flex name class">
+<span>class <span class="ident">LPSolver</span></span>
+<span>(</span><span>config_section: str, solved_checker: <a title="src.solver.solved_checker.SolvedChecker" href="solved_checker.html#src.solver.solved_checker.SolvedChecker">SolvedChecker</a> | None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>LPを解くためのソルバーに関する抽象クラス</p>
+<p>インスタンス初期化</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>config_section</code></strong> :&ensp;<code>str</code></dt>
+<dd>設定ファイルのセクション名.
+logging にも使用するので文字列で取得しておく</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class LPSolver(metaclass=ABCMeta):
+    &#34;&#34;&#34;LPを解くためのソルバーに関する抽象クラス&#34;&#34;&#34;
+
+    solved_checker: SolvedChecker
+
+    def _set_config_and_parameters(self, config_section: str):
+        self.config_section = config_section
+        self.parameters = OptimizationParameters.import_(config_section)
+
+    @property
+    def is_stopping_criteria_relative(self) -&gt; bool:
+        &#34;&#34;&#34;停止条件を relative なもの（数値実験上は効率がよいとされている）に設定するか&#34;&#34;&#34;
+        return self.parameters.IS_STOPPING_CRITERIA_RELATIVE
+
+    def __init__(
+        self,
+        config_section: str,
+        solved_checker: SolvedChecker | None,
+    ):
+        &#34;&#34;&#34;インスタンス初期化
+
+        Args:
+            config_section (str): 設定ファイルのセクション名.
+                logging にも使用するので文字列で取得しておく
+        &#34;&#34;&#34;
+        self._set_config_and_parameters(config_section)
+
+        if solved_checker is None:
+            threshold = self.parameters.STOP_CRITERIA_PARAMETER
+            if self.is_stopping_criteria_relative:
+                self.solved_checker = RelativeSolvedChecker(threshold, self.parameters.THRESHOLD_XS_NEGATIVE)
+            else:
+                self.solved_checker = AbsoluteSolvedChecker(threshold, self.parameters.THRESHOLD_XS_NEGATIVE)
+        else:
+            self.solved_checker = solved_checker
+
+    @property
+    def min_step_size(self) -&gt; float:
+        return self.parameters.MIN_STEP_SIZE
+
+    @property
+    def initial_point_scale(self) -&gt; int:
+        return self.parameters.INITIAL_POINT_SCALE
+
+    def run(self, problem: LPS, v_0: LPVariables = None) -&gt; SolvedDetail:
+        &#34;&#34;&#34;入力されたLPに対してアルゴリズムを実行
+
+        Aの行数とbの次元数, およびAの列数とcの次元数が異なる場合, エラーを起こす
+
+        Args:
+            problem: LPS における係数群をまとめたクラスインスタンス
+            v_0: 初期点
+
+        Returns:
+            SolvedDetail: 最適解に関する情報をまとめたインスタンス
+        &#34;&#34;&#34;
+        solver_name = self.__class__.__name__
+        logger.info(f&#34;[{solver_name}] [{self.config_section}] Start solving {problem.name}.&#34;)
+
+        logger.info(&#34;Logging problem information.&#34;)
+        self.log_initial_problem_information(problem)
+
+        # 初期点が設定されていなければ問題から設定
+        if v_0 is None:
+            v_0 = self.initial_variables(problem)
+
+        # 初期点の設定
+        logger.info(&#34;Logging initial situation.&#34;)
+        self.log_initial_situation(v_0, problem)
+        # 初期点時点で最適解だった場合, そのまま出力
+        if self.solved_checker.run(v_0, problem):
+            logger.info(&#34;Initial point satisfies solved condition.&#34;)
+            aSolvedSummary = self.make_SolvedSummary(v_0, problem, True, 0, False, 0)
+            return SolvedDetail(aSolvedSummary, v_0, problem, v_0, problem)
+
+        # アルゴリズムの実行
+        try:
+            aSolvedDetail = self.run_algorithm(problem, v_0)
+
+            logger.info(f&#34;[{solver_name}] [{self.config_section}] End solving {problem.name}.&#34;)
+            self.log_solved_data(aSolvedDetail)
+        # 計算上でエラーが起きても計算が止まらないようにエラー文を生成だけして結果を書き込む
+        except Exception as e:
+            logger.exception(&#34;Error occured - &#34;, exc_info=e)
+            aSolvedSummary = SolvedSummary(
+                problem.name, solver_name, self.config_section, True, problem.n, problem.m, False
+            )
+            aSolvedDetail = SolvedDetail(aSolvedSummary, v_0, problem, v_0, problem)
+
+        # 求解不可能だった場合, ログに残す
+        if not aSolvedDetail.aSolvedSummary.is_solved:
+            logger.warning(f&#34;{solver_name} cannot solve this problem.&#34;)
+
+        return aSolvedDetail
+
+    def initial_variables(self, problem: LPS) -&gt; LPVariables:
+        &#34;&#34;&#34;初期点の作成
+
+        x,s はともに非負の値になる必要がある
+        複数の決定方法によって初期点を作成し, 制約違反とmuのうちの最大値が最小だった初期点を初期点とする
+        決定方法について詳細は p122 7.3.1 参照
+
+        Returns:
+            LPVariables: 初期点 x, λ, s
+        &#34;&#34;&#34;
+        v_m = self._initial_variables_by_Mehrotra(problem)
+        v_l = self._initial_variables_by_Lustig(problem)
+
+        def max_residual_mu(v_0: LPVariables, problem: LPS) -&gt; float:
+            &#34;&#34;&#34;制約残渣, mu のうち最大の値を出力&#34;&#34;&#34;
+            r_b = problem.residual_main_constraint(v_0.x)
+            r_c = problem.residual_dual_constraint(v_0.y, v_0.s)
+            return max(np.linalg.norm(r_b), np.linalg.norm(r_c), v_0.mu)
+
+        max_residual_mu_m = max_residual_mu(v_m, problem)
+        max_residual_mu_l = max_residual_mu(v_l, problem)
+        if max_residual_mu_m &lt; max_residual_mu_l:
+            return v_m
+        else:
+            return v_l
+
+    def _initial_variables_by_Mehrotra(self, problem: LPS) -&gt; LPVariables:
+        &#34;&#34;&#34;Mehrotra の `On the implementation of a primal-dual interior point method` を
+        参考にした初期点作成
+        &#34;&#34;&#34;
+        A = problem.A
+        c = problem.c
+        AA_T_inv = problem.AA_T_inv
+
+        yhat = AA_T_inv @ A @ c
+        s_hat = c - A.T @ yhat
+        x_hat = A.T @ AA_T_inv @ problem.b
+
+        delta_x = max([-1.1 * min(x_hat), 0])
+        delta_s = max([-1.1 * min(s_hat), 0])
+        x_delta = x_hat + delta_x
+        s_delta = s_hat + delta_s
+
+        delta_hat_x = delta_x
+        if sum(s_delta) != 0:
+            delta_hat_x += 0.5 * (x_delta).T.dot(s_delta) / sum(s_delta)
+        delta_hat_s = delta_s
+        if sum(x_delta) != 0:
+            delta_hat_s += 0.5 * (x_delta).T.dot(s_delta) / sum(x_delta)
+
+        output = LPVariables(x_hat + delta_hat_x, yhat, s_hat + delta_hat_s)
+        return output
+
+    def _initial_variables_by_Lustig(self, problem: LPS) -&gt; LPVariables:
+        &#34;&#34;&#34;Lustig etc. の
+        `On implementing Mehrotra&#39;s predictor corrector interior-point method for linear programming`
+        を参考にした初期点作成
+        &#34;&#34;&#34;
+        A = problem.A
+        b = problem.b
+        c = problem.c
+
+        x_hat = A.T @ problem.AA_T_inv @ b
+        xi_1 = max(-100 * x_hat.min(), 100, np.linalg.norm(b, ord=1) / 100)
+        xi_2 = 1 + np.linalg.norm(c, ord=1)
+        x_0 = x_hat.copy()
+        s_0 = np.tile(xi_2, problem.n)
+        for i in range(problem.n):
+            x_0[i] = max(x_0[i], xi_1)
+            if c[i] &gt; xi_2 or (c[i] &gt;= 0 and c[i] &lt; xi_2):
+                s_0[i] = c[i] + xi_2
+            elif c[i] &lt; -xi_2:
+                s_0[i] = -c[i]
+        return LPVariables(x_0, np.zeros(problem.m), s_0)
+
+    def _initial_variables_constant(self, problem: LPS) -&gt; LPVariables:
+        &#34;&#34;&#34;定数で与えられた初期点の作成
+
+        (x,y,s) = (C,0,C) となる
+
+        Returns:
+            LPVariables: 初期点 x, λ, s
+        &#34;&#34;&#34;
+        return LPVariables(
+            np.ones(problem.n) * self.initial_point_scale,
+            np.zeros(problem.m),
+            np.ones(problem.n) * self.initial_point_scale,
+        )
+
+    def log_initial_problem_information(self, problem_0: LPS):
+        &#34;&#34;&#34;最初の段階での問題に関するロギングの実行&#34;&#34;&#34;
+        logger.info(f&#34;{indent}Dimension of problem n: {problem_0.n}, m: {problem_0.m}&#34;)
+
+        logger.info(f&#34;{indent}Eigen values:&#34;)
+        # logger.info(f&#34;{indent*2}Max: {problem_0.max_sqrt_eigen_value_AAT}, Min: {problem_0.min_sqrt_eigen_value_AAT}&#34;)
+        logger.info(f&#34;{indent*2}Max: {problem_0.max_sqrt_eigen_value_AAT}&#34;)
+
+        logger.info(f&#34;{indent}Abs ratio scaling:&#34;)
+        logger.info(f&#34;{indent*2}Max: {problem_0.max_abs_A}, Min: {problem_0.min_abs_A_nonzero}&#34;)
+
+        logger.info(f&#34;{indent}Condition number: {problem_0.condition_number_A}&#34;)
+        if not problem_0.is_full_row_rank():
+            logger.warning(
+                f&#34;{indent}Constraint matrix is not full row rank! m: {problem_0.m}, rank: {problem_0.row_rank}&#34;
+            )
+
+    def log_initial_situation(self, v_0: LPVariables, problem_0: LPS):
+        &#34;&#34;&#34;最初の段階での変数に関するロギングの実行&#34;&#34;&#34;
+        self.log_positive_variables_negativity(v_0)
+        logger.info(f&#34;{indent}Objective function: {problem_0.objective_main(v_0.x):.2f}&#34;)
+
+        logger.info(f&#34;{indent}Duality parameter: {v_0.mu}&#34;)
+
+        logger.info(f&#34;{indent}Max constraint violation:&#34;)
+        logger.info(f&#34;{indent*2}main: {np.linalg.norm(problem_0.residual_main_constraint(v_0.x), np.inf)}&#34;)
+        logger.info(f&#34;{indent*2}dual: {np.linalg.norm(problem_0.residual_dual_constraint(v_0.y, v_0.s), np.inf)}&#34;)
+
+    def log_positive_variables_negativity(self, v: LPVariables):
+        &#34;&#34;&#34;もし x, s が負になってしまった場合アルゴリズムが狂うので, 負になっていないか確認&#34;&#34;&#34;
+        logger.info(&#34;Check x and s negativity.&#34;)
+        min_x = min(v.x)
+        min_s = min(v.s)
+        logger.info(f&#34;{indent}min x: {min_x}, min s: {min_s}&#34;)
+        if min_x &lt; 0:
+            idx_ = np.where(v.x &lt; 0)[0]
+            logger.warning(f&#34;x is negative! Negative index: {idx_}&#34;)
+        if min_s &lt; 0:
+            idx_ = np.where(v.s &lt; 0)[0]
+            logger.warning(f&#34;s is negative! Negative index: {idx_}&#34;)
+
+    @abstractmethod
+    def run_algorithm(self, problem_0: LPS, v_0: LPVariables) -&gt; SolvedDetail:
+        &#34;&#34;&#34;反復で解くアルゴリズム部分の実行
+
+        Returns:
+            SolvedDetail: 最適解に関する詳細情報を格納したデータ構造
+        &#34;&#34;&#34;
+        pass
+
+    def scale_step_size(self, alpha: float, iter_num: int) -&gt; float:
+        &#34;&#34;&#34;ステップサイズが次の反復点が内点であることを保証するためのスケーリング&#34;&#34;&#34;
+        # beta = 1 - np.exp(-(iter_num + 2))
+        beta = 0.9
+        return beta * alpha
+
+    def is_calculation_time_reached_upper(self, elapsed_time: float) -&gt; bool:
+        &#34;&#34;&#34;計算時間が上限に達したか.
+        もし設定が 0以下の値であれば, 時間無制限とする
+
+        Args:
+            elapsed_time (float): 経過秒数. `time.time()` で得られる秒数を基準
+        &#34;&#34;&#34;
+        upper_bound = self.parameters.CALC_TIME_UPPER
+        if upper_bound &lt;= 0:
+            return False
+        return elapsed_time &gt; upper_bound
+
+    def make_SolvedSummary(
+        self,
+        v: LPVariables,
+        problem: LPS,
+        is_solved: bool,
+        iter_num: int,
+        is_iteration_number_reached_upper: bool,
+        elapsed_time: float,
+    ) -&gt; SolvedSummary:
+        &#34;&#34;&#34;最適化の結果の概要を出力する&#34;&#34;&#34;
+        output = SolvedSummary(
+            problem.name,
+            self.__class__.__name__,
+            self.config_section,
+            False,
+            problem.n,
+            problem.m,
+            is_solved,
+            iter_num,
+            # 反復回数上限に達し, それでもまだ解けてない場合に反復を追加しようとするので over upper
+            is_iteration_number_reached_upper and not is_solved,
+            round(elapsed_time, 2),
+            self.is_calculation_time_reached_upper(elapsed_time) and not is_solved,
+            problem.objective_main(v.x),
+            v.mu,
+            np.linalg.norm(problem.residual_main_constraint(v.x), np.inf),
+            np.linalg.norm(problem.residual_dual_constraint(v.y, v.s), np.inf),
+        )
+        return output
+
+    def log_solved_data(self, aSolvedDetail: SolvedDetail):
+        &#34;&#34;&#34;最適化の結果をロギング.
+        他のソルバーでも使用することが考えられるので関数に
+
+        Args:
+            aSolvedDetail (SolvedDetail): 求解結果
+        &#34;&#34;&#34;
+        aSolvedSummary = aSolvedDetail.aSolvedSummary
+
+        logger.info(f&#34;Needed iteration: {aSolvedSummary.iter_num}&#34;)
+        logger.debug(&#34;Dimension of solved problem:&#34;)
+        logger.debug(f&#34;{indent}n: {aSolvedDetail.problem.n}, m: {aSolvedDetail.problem.m}&#34;)
+        logger.info(f&#34;Objective function: {aSolvedSummary.obj:.2f}&#34;)
+        logger.info(f&#34;Duality parameter: {aSolvedSummary.mu}&#34;)
+        logger.info(&#34;Max constraint violation:&#34;)
+        logger.info(f&#34;{indent}main: {aSolvedSummary.max_r_b}&#34;)
+        logger.info(f&#34;{indent}dual: {aSolvedSummary.max_r_c}&#34;)
+        self.log_positive_variables_negativity(aSolvedDetail.v)</code></pre>
+</details>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="src.solver.interior_point_method.InteriorPointMethod" href="interior_point_method.html#src.solver.interior_point_method.InteriorPointMethod">InteriorPointMethod</a></li>
+<li><a title="src.solver.iterative_refinement.IterativeRefinementMethod" href="iterative_refinement.html#src.solver.iterative_refinement.IterativeRefinementMethod">IterativeRefinementMethod</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="src.solver.solver.LPSolver.solved_checker"><code class="name">var <span class="ident">solved_checker</span> : <a title="src.solver.solved_checker.SolvedChecker" href="solved_checker.html#src.solver.solved_checker.SolvedChecker">SolvedChecker</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="src.solver.solver.LPSolver.initial_point_scale"><code class="name">prop <span class="ident">initial_point_scale</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def initial_point_scale(self) -&gt; int:
+    return self.parameters.INITIAL_POINT_SCALE</code></pre>
+</details>
+</dd>
+<dt id="src.solver.solver.LPSolver.is_stopping_criteria_relative"><code class="name">prop <span class="ident">is_stopping_criteria_relative</span> : bool</code></dt>
+<dd>
+<div class="desc"><p>停止条件を relative なもの（数値実験上は効率がよいとされている）に設定するか</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def is_stopping_criteria_relative(self) -&gt; bool:
+    &#34;&#34;&#34;停止条件を relative なもの（数値実験上は効率がよいとされている）に設定するか&#34;&#34;&#34;
+    return self.parameters.IS_STOPPING_CRITERIA_RELATIVE</code></pre>
+</details>
+</dd>
+<dt id="src.solver.solver.LPSolver.min_step_size"><code class="name">prop <span class="ident">min_step_size</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def min_step_size(self) -&gt; float:
+    return self.parameters.MIN_STEP_SIZE</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="src.solver.solver.LPSolver.initial_variables"><code class="name flex">
+<span>def <span class="ident">initial_variables</span></span>(<span>self, problem: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>) ‑> <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>初期点の作成</p>
+<p>x,s はともに非負の値になる必要がある
+複数の決定方法によって初期点を作成し, 制約違反とmuのうちの最大値が最小だった初期点を初期点とする
+決定方法について詳細は p122 7.3.1 参照</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>LPVariables</code></dt>
+<dd>初期点 x, λ, s</dd>
+</dl></div>
+</dd>
+<dt id="src.solver.solver.LPSolver.is_calculation_time_reached_upper"><code class="name flex">
+<span>def <span class="ident">is_calculation_time_reached_upper</span></span>(<span>self, elapsed_time: float) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>計算時間が上限に達したか.
+もし設定が 0以下の値であれば, 時間無制限とする</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>elapsed_time</code></strong> :&ensp;<code>float</code></dt>
+<dd>経過秒数. <code>time.time()</code> で得られる秒数を基準</dd>
+</dl></div>
+</dd>
+<dt id="src.solver.solver.LPSolver.log_initial_problem_information"><code class="name flex">
+<span>def <span class="ident">log_initial_problem_information</span></span>(<span>self, problem_0: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>最初の段階での問題に関するロギングの実行</p></div>
+</dd>
+<dt id="src.solver.solver.LPSolver.log_initial_situation"><code class="name flex">
+<span>def <span class="ident">log_initial_situation</span></span>(<span>self, v_0: <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a>, problem_0: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>最初の段階での変数に関するロギングの実行</p></div>
+</dd>
+<dt id="src.solver.solver.LPSolver.log_positive_variables_negativity"><code class="name flex">
+<span>def <span class="ident">log_positive_variables_negativity</span></span>(<span>self, v: <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>もし x, s が負になってしまった場合アルゴリズムが狂うので, 負になっていないか確認</p></div>
+</dd>
+<dt id="src.solver.solver.LPSolver.log_solved_data"><code class="name flex">
+<span>def <span class="ident">log_solved_data</span></span>(<span>self, aSolvedDetail: <a title="src.solver.solved_data.SolvedDetail" href="solved_data.html#src.solver.solved_data.SolvedDetail">SolvedDetail</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>最適化の結果をロギング.
+他のソルバーでも使用することが考えられるので関数に</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>aSolvedDetail</code></strong> :&ensp;<code>SolvedDetail</code></dt>
+<dd>求解結果</dd>
+</dl></div>
+</dd>
+<dt id="src.solver.solver.LPSolver.make_SolvedSummary"><code class="name flex">
+<span>def <span class="ident">make_SolvedSummary</span></span>(<span>self, v: <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a>, problem: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>, is_solved: bool, iter_num: int, is_iteration_number_reached_upper: bool, elapsed_time: float) ‑> <a title="src.solver.solved_data.SolvedSummary" href="solved_data.html#src.solver.solved_data.SolvedSummary">SolvedSummary</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>最適化の結果の概要を出力する</p></div>
+</dd>
+<dt id="src.solver.solver.LPSolver.run"><code class="name flex">
+<span>def <span class="ident">run</span></span>(<span>self, problem: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>, v_0: <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a> = None) ‑> <a title="src.solver.solved_data.SolvedDetail" href="solved_data.html#src.solver.solved_data.SolvedDetail">SolvedDetail</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>入力されたLPに対してアルゴリズムを実行</p>
+<p>Aの行数とbの次元数, およびAの列数とcの次元数が異なる場合, エラーを起こす</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>problem</code></strong></dt>
+<dd>LPS における係数群をまとめたクラスインスタンス</dd>
+<dt><strong><code>v_0</code></strong></dt>
+<dd>初期点</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>SolvedDetail</code></dt>
+<dd>最適解に関する情報をまとめたインスタンス</dd>
+</dl></div>
+</dd>
+<dt id="src.solver.solver.LPSolver.run_algorithm"><code class="name flex">
+<span>def <span class="ident">run_algorithm</span></span>(<span>self, problem_0: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>, v_0: <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a>) ‑> <a title="src.solver.solved_data.SolvedDetail" href="solved_data.html#src.solver.solved_data.SolvedDetail">SolvedDetail</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>反復で解くアルゴリズム部分の実行</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>SolvedDetail</code></dt>
+<dd>最適解に関する詳細情報を格納したデータ構造</dd>
+</dl></div>
+</dd>
+<dt id="src.solver.solver.LPSolver.scale_step_size"><code class="name flex">
+<span>def <span class="ident">scale_step_size</span></span>(<span>self, alpha: float, iter_num: int) ‑> float</span>
+</code></dt>
+<dd>
+<div class="desc"><p>ステップサイズが次の反復点が内点であることを保証するためのスケーリング</p></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="src.solver" href="index.html">src.solver</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="src.solver.solver.LPSolver" href="#src.solver.solver.LPSolver">LPSolver</a></code></h4>
+<ul class="">
+<li><code><a title="src.solver.solver.LPSolver.initial_point_scale" href="#src.solver.solver.LPSolver.initial_point_scale">initial_point_scale</a></code></li>
+<li><code><a title="src.solver.solver.LPSolver.initial_variables" href="#src.solver.solver.LPSolver.initial_variables">initial_variables</a></code></li>
+<li><code><a title="src.solver.solver.LPSolver.is_calculation_time_reached_upper" href="#src.solver.solver.LPSolver.is_calculation_time_reached_upper">is_calculation_time_reached_upper</a></code></li>
+<li><code><a title="src.solver.solver.LPSolver.is_stopping_criteria_relative" href="#src.solver.solver.LPSolver.is_stopping_criteria_relative">is_stopping_criteria_relative</a></code></li>
+<li><code><a title="src.solver.solver.LPSolver.log_initial_problem_information" href="#src.solver.solver.LPSolver.log_initial_problem_information">log_initial_problem_information</a></code></li>
+<li><code><a title="src.solver.solver.LPSolver.log_initial_situation" href="#src.solver.solver.LPSolver.log_initial_situation">log_initial_situation</a></code></li>
+<li><code><a title="src.solver.solver.LPSolver.log_positive_variables_negativity" href="#src.solver.solver.LPSolver.log_positive_variables_negativity">log_positive_variables_negativity</a></code></li>
+<li><code><a title="src.solver.solver.LPSolver.log_solved_data" href="#src.solver.solver.LPSolver.log_solved_data">log_solved_data</a></code></li>
+<li><code><a title="src.solver.solver.LPSolver.make_SolvedSummary" href="#src.solver.solver.LPSolver.make_SolvedSummary">make_SolvedSummary</a></code></li>
+<li><code><a title="src.solver.solver.LPSolver.min_step_size" href="#src.solver.solver.LPSolver.min_step_size">min_step_size</a></code></li>
+<li><code><a title="src.solver.solver.LPSolver.run" href="#src.solver.solver.LPSolver.run">run</a></code></li>
+<li><code><a title="src.solver.solver.LPSolver.run_algorithm" href="#src.solver.solver.LPSolver.run_algorithm">run_algorithm</a></code></li>
+<li><code><a title="src.solver.solver.LPSolver.scale_step_size" href="#src.solver.solver.LPSolver.scale_step_size">scale_step_size</a></code></li>
+<li><code><a title="src.solver.solver.LPSolver.solved_checker" href="#src.solver.solver.LPSolver.solved_checker">solved_checker</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.1</a>.</p>
+</footer>
+</body>
+</html>
