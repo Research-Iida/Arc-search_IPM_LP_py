@@ -1,5 +1,4 @@
-"""LP の読み込み・書き込みに関する module
-"""
+"""LP の読み込み・書き込みに関する module"""
 
 import abc
 

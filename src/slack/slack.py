@@ -1,4 +1,5 @@
 """slack への通知を行う Sub module."""
+
 import abc
 import traceback
 
@@ -14,6 +15,7 @@ class SlackInterface(abc.ABC):
     """slack の通知をするための Super class
     メソッドの定義を行う
     """
+
     _slack: WebhookClient
     _mention_id: str
 
@@ -43,6 +45,7 @@ class SlackInterface(abc.ABC):
 
 class SlackImplementation(SlackInterface):
     """Slack Interface への実装"""
+
     def __init__(self, url: str, mentioned_id: str):
         """`SLACK_API_URL` を元にAPIを設定"""
         ssl_context = ssl.create_default_context(cafile=certifi.where())
@@ -75,6 +78,7 @@ class EmptySlack(SlackInterface):
     """設定がされなかった場合に適用される None Class
     メソッド呼び出しが行われても何もしない
     """
+
     def notify(self, text: str) -> None:
         pass
 
