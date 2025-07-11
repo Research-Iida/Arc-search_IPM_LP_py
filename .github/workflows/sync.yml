@@ -57,7 +57,7 @@ jobs:
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
 
-          git remote add public git@github.com:your-user/public-repo.git
+          git remote add public git@github.com:Research-Iida/Arc-search_IPM_LP_py.git
 
           echo "Pushing master branch to public repo..."
           git push public refs/heads/master:refs/heads/master
