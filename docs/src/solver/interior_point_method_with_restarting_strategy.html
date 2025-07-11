@@ -1,0 +1,897 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.1">
+<title>src.solver.interior_point_method_with_restarting_strategy API documentation</title>
+<meta name="description" content="">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>src.solver.interior_point_method_with_restarting_strategy</code></h1>
+</header>
+<section id="section-intro">
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategy"><code class="flex name class">
+<span>class <span class="ident">ArcSearchIPMWithRestartingStrategy</span></span>
+<span>(</span><span>config_section: str, solved_checker: <a title="src.solver.solved_checker.SolvedChecker" href="solved_checker.html#src.solver.solved_checker.SolvedChecker">SolvedChecker</a> | None = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Mehrotra と同じ種類のIPM
+アルゴリズムが異なってくるので別にした</p>
+<p>インスタンス初期化</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>config_section</code></strong> :&ensp;<code>str</code></dt>
+<dd>設定ファイルのセクション名.
+logging にも使用するので文字列で取得しておく</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ArcSearchIPMWithRestartingStrategy(IPMWithRestartingStrategyBase, MehrotraTypeIPM):
+    def __init__(self, config_section: str, solved_checker: SolvedChecker | None = None):
+        super().__init__(config_section, solved_checker)
+        self.variable_updater = ArcVariableUpdater(self._delta_xs)
+
+    def is_iteration_number_reached_upper(self, iter_num: int, problem: LPS) -&gt; bool:
+        &#34;&#34;&#34;O(nL) のため, n倍かけた値
+
+        Args:
+            iter_num: 反復回数
+        &#34;&#34;&#34;
+        return iter_num &gt;= max(self.parameters.ITER_UPPER_COEF * problem.n, self.parameters.ITER_UPPER)
+
+    def restart_variable(
+        self, v_current: LPVariables, problem: LPS, v_previous: LPVariables = None
+    ) -&gt; LPVariables:
+        &#34;&#34;&#34;Nesterov restarting strategy を適用して, 変数の更新を行う
+
+        Args:
+            v_current (LPVariables): 更新前の変数組 (x, y, s)
+            v_previous (LPVariables): v_current から1反復前の変数組.
+                Noneの場合は, v_current をそのまま返す
+
+        Returns:
+            LPVariables: 更新後の変数組 (z, y, s)
+        &#34;&#34;&#34;
+        return super().restart_variable(v_current, problem, v_previous)
+
+    def run_algorithm(self, problem_0: LPS, v_0: LPVariables) -&gt; SolvedDetail:
+        &#34;&#34;&#34;Nesterov の加速法を組み入れた内点法の実行
+
+        変数の対応がわかりづらいのでメモ
+            v: (x^k, y^k, s^k)
+            v_pre: (x^k-1, lambda^k-1, s^k-1)
+            v_restarted: (z^k, y^k, s^k)
+            v_next: (x^k+1, y^k+1, s^k+1)
+        &#34;&#34;&#34;
+        # 実行時間記録開始
+        start_time = time.time()
+
+        # 初期点を現在の点として初期化
+        v = v_0
+        problem = problem_0
+        # 1つ前の反復での点. 最初は何もなし
+        v_pre = None
+
+        mu = v.mu
+        mu_0 = mu
+        r_b = problem.residual_main_constraint(v.x)
+        r_b_0 = r_b
+        r_c = problem.residual_dual_constraint(v.y, v.s)
+        r_c_0 = r_c
+
+        iter_num = 0
+        is_solved = self.solved_checker.run(v_0, problem_0)
+        is_terminated = self.is_terminate(is_solved, iter_num, problem_0, time.time() - start_time)
+
+        # SolvedDetail の出力
+        lst_variables = [v]
+        lst_mu = [mu_0]
+        lst_alpha_z: list[float] = []
+        lst_alpha_s: list[float] = []
+        lst_norm_vdot: list[float] = []
+        lst_max_norm_main_const = [np.linalg.norm(r_b_0, ord=np.inf)]
+        lst_max_norm_dual_const = [np.linalg.norm(r_c_0, ord=np.inf)]
+
+        # 収束条件を満たすまで反復する
+        while not is_terminated:
+            logger.info(f&#34;Iteration number: {iter_num}, mu: {mu}&#34;)
+
+            # 加速法による変数更新
+            v_restarted = self.restart_variable(v, problem, v_pre)
+            logger.debug(f&#34;{indent}mu_z^k = {v_restarted.mu}&#34;)
+
+            # 探索方向の決定
+            z_dot, y_dot, s_dot = self.calc_first_derivatives(v_restarted, problem)
+            lst_norm_vdot.append(np.linalg.norm(np.concatenate([z_dot, y_dot, s_dot])))
+
+            z_ddot, y_ddot, s_ddot = self.calc_second_derivative(v_restarted, z_dot, y_dot, s_dot, problem)
+
+            # step size の決定
+            alpha_z_max = self.variable_updater.max_step_size_guarantee_positive(v_restarted.x, z_dot, z_ddot)
+            alpha_s_max = self.variable_updater.max_step_size_guarantee_positive(v_restarted.s, s_dot, s_ddot)
+
+            # 停止条件を満たしていれば終了
+            v_max_step = LPVariables(
+                self.variable_updater.run(v_restarted.x, z_dot, z_ddot, alpha_z_max),
+                self.variable_updater.run(v_restarted.y, y_dot, y_ddot, alpha_s_max),
+                self.variable_updater.run(v_restarted.s, s_dot, s_ddot, alpha_s_max)
+            )
+            is_solved = self.solved_checker.run(v_max_step, problem, mu_0=mu_0, r_b_0=r_b_0, r_c_0=r_c_0)
+            if self.is_terminate(is_solved, iter_num, problem, time.time() - start_time, alpha_x=alpha_z_max, alpha_s=alpha_s_max):
+                # break しないが, while最後の is_terminate が True になるので問題ない
+                logger.info(f&#34;{indent}Variables satisfy terminate criteria with max step size.&#34;)
+                alpha_z = alpha_z_max
+                alpha_s = alpha_s_max
+                v_next = v_max_step
+            # 停止条件を満たしていなければ scale して次の反復へ
+            else:
+                alpha_z = self.scale_step_size(alpha_z_max, iter_num)
+                alpha_s = self.scale_step_size(alpha_s_max, iter_num)
+                v_next = LPVariables(
+                    self.variable_updater.run(v_restarted.x, z_dot, z_ddot, alpha_z),
+                    self.variable_updater.run(v_restarted.y, y_dot, y_ddot, alpha_s),
+                    self.variable_updater.run(v_restarted.s, s_dot, s_ddot, alpha_s)
+                )
+
+            logger.info(f&#34;{indent}Step size:&#34;)
+            logger.info(f&#34;{indent*2}alpha_z: {alpha_z:.2f}, alpha_s: {alpha_s:.2f}&#34;)
+
+            # もし x, s が負になってしまった場合アルゴリズムが狂うので, 負になっていないか確認
+            self.log_positive_variables_negativity(v_next)
+
+            # 変数の更新
+            v_pre = v
+            v = v_next
+
+            # 制約残差更新
+            pre_r_b = r_b
+            pre_r_c = r_c
+            r_b = problem.residual_main_constraint(v.x)
+            r_c = problem.residual_dual_constraint(v.y, v.s)
+            # 制約残差がどうなっているかlogging
+            rate_reduce = (1 - np.sin(alpha_z))
+            logger.debug(f&#34;{indent}1 - sin(alpha_z) = {rate_reduce}&#34;)
+            for idx, (r_b_j, pre_r_b_j) in enumerate(zip(r_b, pre_r_b)):
+                logger.debug(f&#34;{indent}main residual {idx}: {pre_r_b_j} -&gt; {r_b_j}&#34;)
+                # 残渣が減っているか確認
+                tolerance = 10**(-8)
+                if not abs(r_b_j) &lt; abs(pre_r_b_j) + tolerance:
+                    logger.debug(f&#34;{indent*2}norm of main residual is not decreasing with numerical error!&#34;)
+
+                # 1 - sin(alpha_z) 以下に残差が減っているか確認
+                is_theoretical = (abs(abs(r_b_j) - abs(pre_r_b_j) * rate_reduce) &lt;= tolerance)
+                logger.debug(f&#34;{indent*2}||r_b(x^k+1)| - |r_b(x^k)| * (1 - sin(alpha))| &lt;= 10^-8: {is_theoretical}&#34;)
+                logger.debug(f&#34;{indent*2}sign(r_b(x^k+1)) = sign(r_b(x^k)): {np.sign(r_b_j) == np.sign(pre_r_b_j)}&#34;)
+
+            mu = v.mu
+            # 反復回数追加
+            iter_num += 1
+
+            # 変数の値の記録
+            lst_mu.append(mu)
+            lst_alpha_z.append(alpha_z)
+            lst_alpha_s.append(alpha_s)
+            lst_variables.append(v)
+            lst_max_norm_main_const.append(np.linalg.norm(r_b, ord=np.inf))
+            lst_max_norm_dual_const.append(np.linalg.norm(r_c, ord=np.inf))
+
+            is_solved = self.solved_checker.run(v, problem, mu_0=mu_0, r_b_0=r_b_0, r_c_0=r_c_0)
+            is_terminated = self.is_terminate(
+                is_solved, iter_num, problem, time.time() - start_time,
+                alpha_x=alpha_z, alpha_s=alpha_s,
+                pre_r_b=pre_r_b, pre_r_c=pre_r_c,
+                r_b=r_b, r_c=r_c,
+            )
+
+        # 時間計測終了
+        elapsed_time = time.time() - start_time
+
+        # 出力の作成
+        aSolvedSummary = self.make_SolvedSummary(
+            v, problem, is_solved,
+            iter_num, self.is_iteration_number_reached_upper(iter_num, problem),
+            elapsed_time
+        )
+        output = SolvedDetail(
+            aSolvedSummary, v, problem, v_0, problem_0,
+            lst_variables_by_iter=lst_variables,
+            # lst_merit_function_by_iter=lst_phi,
+            lst_main_step_size_by_iter=lst_alpha_z,
+            lst_dual_step_size_by_iter=lst_alpha_s,
+            lst_mu_by_iter=lst_mu,
+            lst_norm_vdot_by_iter=lst_norm_vdot,
+            lst_max_norm_main_constraint_by_iter=lst_max_norm_main_const,
+            lst_max_norm_dual_constraint_by_iter=lst_max_norm_dual_const,
+        )
+        return output</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase" href="#src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase">IPMWithRestartingStrategyBase</a></li>
+<li><a title="src.solver.interior_point_method.MehrotraTypeIPM" href="interior_point_method.html#src.solver.interior_point_method.MehrotraTypeIPM">MehrotraTypeIPM</a></li>
+<li><a title="src.solver.interior_point_method.ExactInteriorPointMethod" href="interior_point_method.html#src.solver.interior_point_method.ExactInteriorPointMethod">ExactInteriorPointMethod</a></li>
+<li><a title="src.solver.interior_point_method.InteriorPointMethod" href="interior_point_method.html#src.solver.interior_point_method.InteriorPointMethod">InteriorPointMethod</a></li>
+<li><a title="src.solver.solver.LPSolver" href="solver.html#src.solver.solver.LPSolver">LPSolver</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategy.is_iteration_number_reached_upper"><code class="name flex">
+<span>def <span class="ident">is_iteration_number_reached_upper</span></span>(<span>self, iter_num: int, problem: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>O(nL) のため, n倍かけた値</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>iter_num</code></strong></dt>
+<dd>反復回数</dd>
+</dl></div>
+</dd>
+<dt id="src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategy.run_algorithm"><code class="name flex">
+<span>def <span class="ident">run_algorithm</span></span>(<span>self, problem_0: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>, v_0: <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a>) ‑> <a title="src.solver.solved_data.SolvedDetail" href="solved_data.html#src.solver.solved_data.SolvedDetail">SolvedDetail</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Nesterov の加速法を組み入れた内点法の実行</p>
+<p>変数の対応がわかりづらいのでメモ
+v: (x^k, y^k, s^k)
+v_pre: (x^k-1, lambda^k-1, s^k-1)
+v_restarted: (z^k, y^k, s^k)
+v_next: (x^k+1, y^k+1, s^k+1)</p></div>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase" href="#src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase">IPMWithRestartingStrategyBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.beta_k" href="#src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.beta_k">beta_k</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.calc_first_derivatives" href="interior_point_method.html#src.solver.interior_point_method.ExactInteriorPointMethod.calc_first_derivatives">calc_first_derivatives</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.calc_second_derivative" href="interior_point_method.html#src.solver.interior_point_method.ExactInteriorPointMethod.calc_second_derivative">calc_second_derivative</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.centering_parameter" href="interior_point_method.html#src.solver.interior_point_method.ExactInteriorPointMethod.centering_parameter">centering_parameter</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.indexes_x_not_zero_neighborhood" href="interior_point_method.html#src.solver.interior_point_method.ExactInteriorPointMethod.indexes_x_not_zero_neighborhood">indexes_x_not_zero_neighborhood</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.initial_variables" href="solver.html#src.solver.solver.LPSolver.initial_variables">initial_variables</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.is_calculation_time_reached_upper" href="solver.html#src.solver.solver.LPSolver.is_calculation_time_reached_upper">is_calculation_time_reached_upper</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.is_guaranteeing_main_residual_decreasing" href="#src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.is_guaranteeing_main_residual_decreasing">is_guaranteeing_main_residual_decreasing</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.is_not_decrease_residuals" href="interior_point_method.html#src.solver.interior_point_method.InteriorPointMethod.is_not_decrease_residuals">is_not_decrease_residuals</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.is_stopping_criteria_relative" href="solver.html#src.solver.solver.LPSolver.is_stopping_criteria_relative">is_stopping_criteria_relative</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.is_terminate" href="interior_point_method.html#src.solver.interior_point_method.InteriorPointMethod.is_terminate">is_terminate</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.log_initial_problem_information" href="solver.html#src.solver.solver.LPSolver.log_initial_problem_information">log_initial_problem_information</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.log_initial_situation" href="solver.html#src.solver.solver.LPSolver.log_initial_situation">log_initial_situation</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.log_positive_variables_negativity" href="solver.html#src.solver.solver.LPSolver.log_positive_variables_negativity">log_positive_variables_negativity</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.log_solved_data" href="solver.html#src.solver.solver.LPSolver.log_solved_data">log_solved_data</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.make_SolvedSummary" href="solver.html#src.solver.solver.LPSolver.make_SolvedSummary">make_SolvedSummary</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.restart_variable" href="#src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.restart_variable">restart_variable</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.run" href="solver.html#src.solver.solver.LPSolver.run">run</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.scale_step_size" href="solver.html#src.solver.solver.LPSolver.scale_step_size">scale_step_size</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategyProven"><code class="flex name class">
+<span>class <span class="ident">ArcSearchIPMWithRestartingStrategyProven</span></span>
+<span>(</span><span>config_section: str, solved_checker: <a title="src.solver.solved_checker.SolvedChecker" href="solved_checker.html#src.solver.solved_checker.SolvedChecker">SolvedChecker</a> | None = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>arc search restarting strategy の論文で収束することを証明したアルゴリズム</p>
+<p>インスタンス初期化</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>config_section</code></strong> :&ensp;<code>str</code></dt>
+<dd>設定ファイルのセクション名.
+logging にも使用するので文字列で取得しておく</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ArcSearchIPMWithRestartingStrategyProven(IPMWithRestartingStrategyBase):
+    &#34;&#34;&#34;arc search restarting strategy の論文で収束することを証明したアルゴリズム&#34;&#34;&#34;
+    @property
+    def is_stopping_criteria_relative(self) -&gt; bool:
+        &#34;&#34;&#34;停止条件を relative なもの（数値実験上は効率がよいとされている）に設定するか
+
+        Proven クラスで論文の証明に従う場合は False を返すように override
+        &#34;&#34;&#34;
+        return False
+        # return super().is_stopping_criteria_relative
+
+    def __init__(self, config_section: str, solved_checker: SolvedChecker | None = None):
+        super().__init__(config_section, solved_checker)
+        self.variable_updater = ArcVariableUpdater(self._delta_xs)
+
+    @property
+    def is_guaranteeing_main_residual_decreasing(self) -&gt; bool:
+        &#34;&#34;&#34;主制約の減少を保証するように beta_k を決めるかを出力
+
+        Proven クラスでは必ず True を返す
+        &#34;&#34;&#34;
+        return True
+
+    @property
+    def theta(self) -&gt; float:
+        return self.parameters.RESTART_COEF_CENTER_PATH_NEIGHBORHOOD
+
+    def is_in_center_path_neighborhood(self, v: LPVariables) -&gt; bool:
+        &#34;&#34;&#34;中心パスの近傍に入っているか確認&#34;&#34;&#34;
+        return np.linalg.norm(v.x * v.s - v.mu) &lt;= self.theta * v.mu
+
+    def is_iteration_number_reached_upper(self, iter_num: int, problem: LPS) -&gt; bool:
+        &#34;&#34;&#34;O(nL) のため, n倍かけた値
+
+        Args:
+            iter_num: 反復回数
+        &#34;&#34;&#34;
+        return iter_num &gt;= max(self.parameters.ITER_UPPER_COEF * problem.n, self.parameters.ITER_UPPER)
+
+    def run_algorithm(self, problem_0: LPS, v_0: LPVariables) -&gt; SolvedDetail:
+        &#34;&#34;&#34;Nesterov の加速法を組み入れた内点法の実行
+        理論的な証明を施したもの
+
+        変数の対応がわかりづらいのでメモ
+            v: (x^k, y^k, s^k)
+            v_pre: (x^k-1, y^k-1, s^k-1)
+            v_restarted: (z^k, y^k, s^k)
+            v_next: (x^k+1, y^k+1, s^k+1)
+        &#34;&#34;&#34;
+        # 初期点が近傍に入っていなければ, 新しく近傍に入る初期点を作成
+        if not self.is_in_center_path_neighborhood(v_0):
+            logger.info(&#34;Initial points is not in neighborhood! Start with general initial point.&#34;)
+            v_0 = self._initial_variables_constant(problem_0)
+            self.log_initial_situation(v_0, problem_0)
+
+        # 実行時間記録開始
+        start_time = time.time()
+
+        # 初期点を現在の点として初期化
+        v = v_0
+        problem = problem_0
+        # 1つ前の反復での点. 最初は何もなし
+        v_pre = None
+
+        mu = v.mu
+        mu_0 = mu
+        r_b = problem.residual_main_constraint(v.x)
+        r_b_0 = r_b
+        r_c = problem.residual_dual_constraint(v.y, v.s)
+        r_c_0 = r_c
+
+        iter_num = 0
+        is_solved = self.solved_checker.run(v_0, problem_0)
+        is_terminated = self.is_terminate(is_solved, iter_num, problem_0, time.time() - start_time)
+
+        # SolvedDetail の出力
+        lst_variables = [v]
+        # lst_phi = []
+        lst_mu = [mu_0]
+        lst_alpha = []
+        lst_norm_vdot = []
+        lst_max_norm_main_const = [np.linalg.norm(r_b_0, ord=np.inf)]
+        lst_max_norm_dual_const = [np.linalg.norm(r_c_0, ord=np.inf)]
+
+        # 収束条件を満たすまで反復する
+        while not is_terminated:
+            iter_num += 1
+            logger.info(f&#34;Iteration number: {iter_num}, mu: {mu}&#34;)
+            logger.info(f&#34;{indent}In neighborhood: {self.is_in_center_path_neighborhood(v)}&#34;)
+
+            # 加速法による変数更新
+            v_restarted = self.restart_variable(v, problem, v_pre)
+            mu_z = v_restarted.mu
+            logger.info(f&#34;{indent}mu_z^k = {mu_z}&#34;)
+
+            # 進行方向 v_dot のノルム記録
+            v_dot = self.calc_first_derivatives(v_restarted, problem)
+            lst_norm_vdot.append(np.linalg.norm(np.concatenate(v_dot)))
+
+            # 反復点更新
+            z = v_restarted.x
+            # 探索方向の決定
+            z_dot, y_dot, s_dot = self.calc_first_derivatives(v_restarted, problem)
+            # 二階微分における計算は sigma などは不要
+            z_ddot, y_ddot, s_ddot = self.calc_second_derivative(
+                v_restarted, z_dot, y_dot, s_dot, problem,
+                sigma=0
+            )
+
+            # step size の決定, scaling は近傍に入るようにすれば正の値になるので不要
+            alpha_z = self.variable_updater.max_step_size_guarantee_positive(z, z_dot, z_ddot)
+            alpha_s = self.variable_updater.max_step_size_guarantee_positive(v_restarted.s, s_dot, s_ddot)
+            alpha = min(alpha_z, alpha_s)
+
+            # 近傍に入る step size になるまでアルミホのルールに従う
+            while alpha &gt; self.min_step_size:
+                v_alpha = LPVariables(
+                    self.variable_updater.run(z, z_dot, z_ddot, alpha),
+                    self.variable_updater.run(v_restarted.y, y_dot, y_ddot, alpha),
+                    self.variable_updater.run(v_restarted.s, s_dot, s_ddot, alpha)
+                )
+                if self.is_in_center_path_neighborhood_on_next_point(v_alpha, alpha, mu_z):
+                    break
+                alpha /= 2
+            logger.info(f&#34;{indent}Step size:&#34;)
+            logger.info(f&#34;{indent*2} alpha: {alpha:.2f}&#34;)
+
+            # mu の減少性を担保するために修正
+            v_next = self.next_iteration_point_with_mu_decreasing(v_alpha, problem, alpha, mu)
+
+            # もし x, s が負になってしまった場合アルゴリズムが狂うので, 負になっていないか確認
+            self.log_positive_variables_negativity(v_next)
+            logger.debug(f&#34;mu_k+1 = {v_next.mu}, mu_k * (1 - sin(alpha)) = {mu * (1 - np.sin(alpha))}&#34;)
+
+            # 変数の更新
+            v_pre = v
+            v = v_next
+
+            # 制約残差更新
+            pre_r_b = r_b
+            pre_r_c = r_c
+            r_b = problem.residual_main_constraint(v.x)
+            r_c = problem.residual_dual_constraint(v.y, v.s)
+            for i, (r_b_i, pre_r_b_i) in enumerate(zip(r_b, pre_r_b)):
+                logger.debug(f&#34;{indent}main constraint residual {i}: {pre_r_b_i} -&gt; {r_b_i}&#34;)
+                if pre_r_b_i != 0:
+                    logger.debug(f&#34;{indent}r_b(x^k)_{i} / r_b(x^k-1)_{i} : {r_b_i / pre_r_b_i}&#34;)
+                    logger.debug(f&#34;{indent*2}sign(r_b(x^k+1)) = sign(r_b(x^k)): {np.sign(r_b_i) == np.sign(pre_r_b_i)}&#34;)
+
+            mu = v.mu
+
+            # 変数の値の記録
+            lst_mu.append(mu)
+            lst_alpha.append(alpha)
+            lst_variables.append(v)
+            lst_max_norm_main_const.append(np.linalg.norm(r_b, ord=np.inf))
+            lst_max_norm_dual_const.append(np.linalg.norm(r_c, ord=np.inf))
+
+            # 停止条件更新
+            is_solved = self.solved_checker.run(v, problem, mu_0=mu_0, r_b_0=r_b_0, r_c_0=r_c_0)
+            is_terminated = self.is_terminate(
+                is_solved, iter_num, problem, time.time() - start_time,
+                alpha_x=alpha, alpha_s=alpha,
+                pre_r_b=pre_r_b, pre_r_c=pre_r_c,
+                r_b=r_b, r_c=r_c,
+            )
+
+        # 時間計測終了
+        elapsed_time = time.time() - start_time
+
+        logger.debug(f&#34;x: {v.x}&#34;)
+        logger.debug(f&#34;lambda: {v.y}&#34;)
+        logger.debug(f&#34;s: {v.s}&#34;)
+
+        # 出力の作成
+        aSolvedSummary = self.make_SolvedSummary(
+            v, problem, is_solved,
+            iter_num, self.is_iteration_number_reached_upper(iter_num, problem),
+            elapsed_time
+        )
+        output = SolvedDetail(
+            aSolvedSummary, v, problem, v_0, problem_0,
+            lst_variables_by_iter=lst_variables,
+            # lst_merit_function_by_iter=lst_phi,
+            lst_main_step_size_by_iter=lst_alpha,
+            lst_dual_step_size_by_iter=lst_alpha,
+            lst_mu_by_iter=lst_mu,
+            lst_norm_vdot_by_iter=lst_norm_vdot,
+            lst_max_norm_main_constraint_by_iter=lst_max_norm_main_const,
+            lst_max_norm_dual_constraint_by_iter=lst_max_norm_dual_const,
+        )
+        return output
+
+    def restart_variable(
+        self, v_current: LPVariables, problem: LPS, v_previous: LPVariables = None
+    ) -&gt; LPVariables:
+        &#34;&#34;&#34;Nesterov restarting strategy を適用して, 変数の更新を行う
+
+        Args:
+            v_current (LPVariables): 更新前の変数組 (x, y, s)
+            v_previous (LPVariables): v_current から1反復前の変数組.
+                Noneの場合は, v_current をそのまま返す
+
+        Returns:
+            LPVariables: 更新後の変数組 (z, y, s)
+        &#34;&#34;&#34;
+        v_restarted = super().restart_variable(v_current, problem, v_previous)
+
+        # 次の反復点が近傍に入っていれば, 変数の更新を行う
+        if self.is_in_center_path_neighborhood(v_restarted):
+            return v_restarted
+        logger.info(&#34;Restarted point is not in neighborhood. Current point is used.&#34;)
+        return v_current
+
+    def is_in_center_path_neighborhood_on_next_point(self, v_alpha: LPVariables, alpha: float, mu_z: float) -&gt; bool:
+        &#34;&#34;&#34;alpha によって更新された値が近傍に入っているかを確認&#34;&#34;&#34;
+        base_mu = (1 - np.sin(alpha)) * mu_z
+        return np.linalg.norm(v_alpha.x * v_alpha.s - base_mu) &lt;= 2 * self.theta * base_mu
+
+    def next_iteration_point_with_mu_decreasing(self, v_alpha: LPVariables, problem: LPS, alpha: float, mu: float) -&gt; LPVariables:
+        &#34;&#34;&#34;step size alpha で移動させた後に mu が減少することを保証するために移動させた点&#34;&#34;&#34;
+        right_hand_side = np.concatenate([np.zeros(problem.m + problem.n), ((1 - np.sin(alpha)) * mu - v_alpha.x * v_alpha.s)])
+        delta_x, delta_lambda, delta_s, _ = self.search_direction_calculator.run(v_alpha, problem, right_hand_side)
+        return LPVariables(v_alpha.x + delta_x, v_alpha.y + delta_lambda, v_alpha.s + delta_s)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase" href="#src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase">IPMWithRestartingStrategyBase</a></li>
+<li><a title="src.solver.interior_point_method.ExactInteriorPointMethod" href="interior_point_method.html#src.solver.interior_point_method.ExactInteriorPointMethod">ExactInteriorPointMethod</a></li>
+<li><a title="src.solver.interior_point_method.InteriorPointMethod" href="interior_point_method.html#src.solver.interior_point_method.InteriorPointMethod">InteriorPointMethod</a></li>
+<li><a title="src.solver.solver.LPSolver" href="solver.html#src.solver.solver.LPSolver">LPSolver</a></li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategyProven.is_guaranteeing_main_residual_decreasing"><code class="name">prop <span class="ident">is_guaranteeing_main_residual_decreasing</span> : bool</code></dt>
+<dd>
+<div class="desc"><p>主制約の減少を保証するように beta_k を決めるかを出力</p>
+<p>Proven クラスでは必ず True を返す</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def is_guaranteeing_main_residual_decreasing(self) -&gt; bool:
+    &#34;&#34;&#34;主制約の減少を保証するように beta_k を決めるかを出力
+
+    Proven クラスでは必ず True を返す
+    &#34;&#34;&#34;
+    return True</code></pre>
+</details>
+</dd>
+<dt id="src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategyProven.is_stopping_criteria_relative"><code class="name">prop <span class="ident">is_stopping_criteria_relative</span> : bool</code></dt>
+<dd>
+<div class="desc"><p>停止条件を relative なもの（数値実験上は効率がよいとされている）に設定するか</p>
+<p>Proven クラスで論文の証明に従う場合は False を返すように override</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def is_stopping_criteria_relative(self) -&gt; bool:
+    &#34;&#34;&#34;停止条件を relative なもの（数値実験上は効率がよいとされている）に設定するか
+
+    Proven クラスで論文の証明に従う場合は False を返すように override
+    &#34;&#34;&#34;
+    return False
+    # return super().is_stopping_criteria_relative</code></pre>
+</details>
+</dd>
+<dt id="src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategyProven.theta"><code class="name">prop <span class="ident">theta</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def theta(self) -&gt; float:
+    return self.parameters.RESTART_COEF_CENTER_PATH_NEIGHBORHOOD</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategyProven.is_in_center_path_neighborhood"><code class="name flex">
+<span>def <span class="ident">is_in_center_path_neighborhood</span></span>(<span>self, v: <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a>) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>中心パスの近傍に入っているか確認</p></div>
+</dd>
+<dt id="src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategyProven.is_in_center_path_neighborhood_on_next_point"><code class="name flex">
+<span>def <span class="ident">is_in_center_path_neighborhood_on_next_point</span></span>(<span>self, v_alpha: <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a>, alpha: float, mu_z: float) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>alpha によって更新された値が近傍に入っているかを確認</p></div>
+</dd>
+<dt id="src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategyProven.is_iteration_number_reached_upper"><code class="name flex">
+<span>def <span class="ident">is_iteration_number_reached_upper</span></span>(<span>self, iter_num: int, problem: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>O(nL) のため, n倍かけた値</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>iter_num</code></strong></dt>
+<dd>反復回数</dd>
+</dl></div>
+</dd>
+<dt id="src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategyProven.next_iteration_point_with_mu_decreasing"><code class="name flex">
+<span>def <span class="ident">next_iteration_point_with_mu_decreasing</span></span>(<span>self, v_alpha: <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a>, problem: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>, alpha: float, mu: float) ‑> <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>step size alpha で移動させた後に mu が減少することを保証するために移動させた点</p></div>
+</dd>
+<dt id="src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategyProven.run_algorithm"><code class="name flex">
+<span>def <span class="ident">run_algorithm</span></span>(<span>self, problem_0: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>, v_0: <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a>) ‑> <a title="src.solver.solved_data.SolvedDetail" href="solved_data.html#src.solver.solved_data.SolvedDetail">SolvedDetail</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Nesterov の加速法を組み入れた内点法の実行
+理論的な証明を施したもの</p>
+<p>変数の対応がわかりづらいのでメモ
+v: (x^k, y^k, s^k)
+v_pre: (x^k-1, y^k-1, s^k-1)
+v_restarted: (z^k, y^k, s^k)
+v_next: (x^k+1, y^k+1, s^k+1)</p></div>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase" href="#src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase">IPMWithRestartingStrategyBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.beta_k" href="#src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.beta_k">beta_k</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.calc_first_derivatives" href="interior_point_method.html#src.solver.interior_point_method.ExactInteriorPointMethod.calc_first_derivatives">calc_first_derivatives</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.calc_second_derivative" href="interior_point_method.html#src.solver.interior_point_method.ExactInteriorPointMethod.calc_second_derivative">calc_second_derivative</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.centering_parameter" href="interior_point_method.html#src.solver.interior_point_method.ExactInteriorPointMethod.centering_parameter">centering_parameter</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.indexes_x_not_zero_neighborhood" href="interior_point_method.html#src.solver.interior_point_method.ExactInteriorPointMethod.indexes_x_not_zero_neighborhood">indexes_x_not_zero_neighborhood</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.initial_variables" href="solver.html#src.solver.solver.LPSolver.initial_variables">initial_variables</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.is_calculation_time_reached_upper" href="solver.html#src.solver.solver.LPSolver.is_calculation_time_reached_upper">is_calculation_time_reached_upper</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.is_not_decrease_residuals" href="interior_point_method.html#src.solver.interior_point_method.InteriorPointMethod.is_not_decrease_residuals">is_not_decrease_residuals</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.is_terminate" href="interior_point_method.html#src.solver.interior_point_method.InteriorPointMethod.is_terminate">is_terminate</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.log_initial_problem_information" href="solver.html#src.solver.solver.LPSolver.log_initial_problem_information">log_initial_problem_information</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.log_initial_situation" href="solver.html#src.solver.solver.LPSolver.log_initial_situation">log_initial_situation</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.log_positive_variables_negativity" href="solver.html#src.solver.solver.LPSolver.log_positive_variables_negativity">log_positive_variables_negativity</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.log_solved_data" href="solver.html#src.solver.solver.LPSolver.log_solved_data">log_solved_data</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.make_SolvedSummary" href="solver.html#src.solver.solver.LPSolver.make_SolvedSummary">make_SolvedSummary</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.restart_variable" href="#src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.restart_variable">restart_variable</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.run" href="solver.html#src.solver.solver.LPSolver.run">run</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.scale_step_size" href="solver.html#src.solver.solver.LPSolver.scale_step_size">scale_step_size</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase"><code class="flex name class">
+<span>class <span class="ident">IPMWithRestartingStrategyBase</span></span>
+<span>(</span><span>config_section: str, solved_checker: <a title="src.solver.solved_checker.SolvedChecker" href="solved_checker.html#src.solver.solved_checker.SolvedChecker">SolvedChecker</a> | None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>線形方程式を正確に解くことを前提とした内点法</p>
+<p>インスタンス初期化</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>config_section</code></strong> :&ensp;<code>str</code></dt>
+<dd>設定ファイルのセクション名.
+logging にも使用するので文字列で取得しておく</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class IPMWithRestartingStrategyBase(ExactInteriorPointMethod, metaclass=ABCMeta):
+    @property
+    def beta(self) -&gt; float:
+        return self.parameters.RESTART_COEF_RESTARTING
+
+    @property
+    def is_guaranteeing_main_residual_decreasing(self) -&gt; bool:
+        &#34;&#34;&#34;主制約の減少を保証するように beta_k を決めるかを出力
+
+        Proven クラスでは必ず True を返す必要があるのでパラメータ化
+        &#34;&#34;&#34;
+        return self.parameters.RESTART_IS_GUARANTEEING_MAIN_RESIDUAL_DECREASING
+
+    def beta_k(
+        self, current_point: np.ndarray, previous_point: np.ndarray, problem: LPS,
+        is_guaranteeing_main_residual_decreasing: bool
+    ) -&gt; float:
+        &#34;&#34;&#34;restarting parameter に対象の値をかけ合わせたものを出力
+
+        更新後の値が0に近すぎると探索方向において特異行列になってしまうため, 最低限正の値になるように修正を行う
+        理論的には current_point が0より大きければ問題ないが, 計算上そのようになってしまう
+        &#34;&#34;&#34;
+        delta = current_point - previous_point
+        # TODO: 更新後の値が0に近づきすぎないような例外処理（発生は確認されていないが）
+        result = self.beta / np.linalg.norm(delta / current_point, ord=np.inf)
+
+        # 主問題の制約残差を減らすことを保証する場合にはさらに値を減少
+        if is_guaranteeing_main_residual_decreasing:
+            logger.debug(f&#34;{indent}beta_k guarantees main residual decreasing&#34;)
+            current_residual = problem.residual_main_constraint(current_point)
+            diff_residual = current_residual - problem.residual_main_constraint(previous_point)
+            idx_nonzero_diff = np.where(np.abs(diff_residual) &gt; 10**(-6))
+            if len(idx_nonzero_diff[0]):
+                min_guaranteed_main_residual_decreasing_beta = min(np.abs(current_residual[idx_nonzero_diff] / diff_residual[idx_nonzero_diff]))
+                result = min(result, min_guaranteed_main_residual_decreasing_beta)
+
+        return result
+
+    @abstractmethod
+    def restart_variable(
+        self, v_current: LPVariables, problem: LPS, v_previous: LPVariables = None
+    ) -&gt; LPVariables:
+        &#34;&#34;&#34;Nesterov restarting strategy を適用して, 変数の更新を行う
+
+        Args:
+            v_current (LPVariables): 更新前の変数組 (x, y, s)
+            v_previous (LPVariables): v_current から1反復前の変数組.
+                Noneの場合は, v_current をそのまま返す
+
+        Returns:
+            LPVariables: 更新後の変数組 (z, y, s)
+        &#34;&#34;&#34;
+        if v_previous is None:
+            return v_current
+
+        beta_k = self.beta_k(v_current.x, v_previous.x, problem, self.is_guaranteeing_main_residual_decreasing)
+        logger.info(f&#34;{indent*2}beta_k: {beta_k}&#34;)
+        if beta_k &lt; 0:
+            logger.warning(&#34;beta_k is negative!&#34;)
+        z = v_current.x + beta_k * (v_current.x - v_previous.x)
+        zero_indexes = np.where(z == 0)[0]
+        if len(zero_indexes):
+            logger.warning(f&#34;{indent*2} zero indexes of z: {zero_indexes}&#34;)
+        return LPVariables(z, v_current.y, v_current.s)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="src.solver.interior_point_method.ExactInteriorPointMethod" href="interior_point_method.html#src.solver.interior_point_method.ExactInteriorPointMethod">ExactInteriorPointMethod</a></li>
+<li><a title="src.solver.interior_point_method.InteriorPointMethod" href="interior_point_method.html#src.solver.interior_point_method.InteriorPointMethod">InteriorPointMethod</a></li>
+<li><a title="src.solver.solver.LPSolver" href="solver.html#src.solver.solver.LPSolver">LPSolver</a></li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategy" href="#src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategy">ArcSearchIPMWithRestartingStrategy</a></li>
+<li><a title="src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategyProven" href="#src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategyProven">ArcSearchIPMWithRestartingStrategyProven</a></li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.beta"><code class="name">prop <span class="ident">beta</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def beta(self) -&gt; float:
+    return self.parameters.RESTART_COEF_RESTARTING</code></pre>
+</details>
+</dd>
+<dt id="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.is_guaranteeing_main_residual_decreasing"><code class="name">prop <span class="ident">is_guaranteeing_main_residual_decreasing</span> : bool</code></dt>
+<dd>
+<div class="desc"><p>主制約の減少を保証するように beta_k を決めるかを出力</p>
+<p>Proven クラスでは必ず True を返す必要があるのでパラメータ化</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def is_guaranteeing_main_residual_decreasing(self) -&gt; bool:
+    &#34;&#34;&#34;主制約の減少を保証するように beta_k を決めるかを出力
+
+    Proven クラスでは必ず True を返す必要があるのでパラメータ化
+    &#34;&#34;&#34;
+    return self.parameters.RESTART_IS_GUARANTEEING_MAIN_RESIDUAL_DECREASING</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.beta_k"><code class="name flex">
+<span>def <span class="ident">beta_k</span></span>(<span>self, current_point: numpy.ndarray, previous_point: numpy.ndarray, problem: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>, is_guaranteeing_main_residual_decreasing: bool) ‑> float</span>
+</code></dt>
+<dd>
+<div class="desc"><p>restarting parameter に対象の値をかけ合わせたものを出力</p>
+<p>更新後の値が0に近すぎると探索方向において特異行列になってしまうため, 最低限正の値になるように修正を行う
+理論的には current_point が0より大きければ問題ないが, 計算上そのようになってしまう</p></div>
+</dd>
+<dt id="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.restart_variable"><code class="name flex">
+<span>def <span class="ident">restart_variable</span></span>(<span>self, v_current: <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a>, problem: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>, v_previous: <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a> = None) ‑> <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Nesterov restarting strategy を適用して, 変数の更新を行う</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>v_current</code></strong> :&ensp;<code>LPVariables</code></dt>
+<dd>更新前の変数組 (x, y, s)</dd>
+<dt><strong><code>v_previous</code></strong> :&ensp;<code>LPVariables</code></dt>
+<dd>v_current から1反復前の変数組.
+Noneの場合は, v_current をそのまま返す</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>LPVariables</code></dt>
+<dd>更新後の変数組 (z, y, s)</dd>
+</dl></div>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="src.solver.interior_point_method.ExactInteriorPointMethod" href="interior_point_method.html#src.solver.interior_point_method.ExactInteriorPointMethod">ExactInteriorPointMethod</a></b></code>:
+<ul class="hlist">
+<li><code><a title="src.solver.interior_point_method.ExactInteriorPointMethod.calc_first_derivatives" href="interior_point_method.html#src.solver.interior_point_method.ExactInteriorPointMethod.calc_first_derivatives">calc_first_derivatives</a></code></li>
+<li><code><a title="src.solver.interior_point_method.ExactInteriorPointMethod.calc_second_derivative" href="interior_point_method.html#src.solver.interior_point_method.ExactInteriorPointMethod.calc_second_derivative">calc_second_derivative</a></code></li>
+<li><code><a title="src.solver.interior_point_method.ExactInteriorPointMethod.centering_parameter" href="interior_point_method.html#src.solver.interior_point_method.ExactInteriorPointMethod.centering_parameter">centering_parameter</a></code></li>
+<li><code><a title="src.solver.interior_point_method.ExactInteriorPointMethod.indexes_x_not_zero_neighborhood" href="interior_point_method.html#src.solver.interior_point_method.ExactInteriorPointMethod.indexes_x_not_zero_neighborhood">indexes_x_not_zero_neighborhood</a></code></li>
+<li><code><a title="src.solver.interior_point_method.ExactInteriorPointMethod.initial_variables" href="solver.html#src.solver.solver.LPSolver.initial_variables">initial_variables</a></code></li>
+<li><code><a title="src.solver.interior_point_method.ExactInteriorPointMethod.is_calculation_time_reached_upper" href="solver.html#src.solver.solver.LPSolver.is_calculation_time_reached_upper">is_calculation_time_reached_upper</a></code></li>
+<li><code><a title="src.solver.interior_point_method.ExactInteriorPointMethod.is_iteration_number_reached_upper" href="interior_point_method.html#src.solver.interior_point_method.InteriorPointMethod.is_iteration_number_reached_upper">is_iteration_number_reached_upper</a></code></li>
+<li><code><a title="src.solver.interior_point_method.ExactInteriorPointMethod.is_not_decrease_residuals" href="interior_point_method.html#src.solver.interior_point_method.InteriorPointMethod.is_not_decrease_residuals">is_not_decrease_residuals</a></code></li>
+<li><code><a title="src.solver.interior_point_method.ExactInteriorPointMethod.is_stopping_criteria_relative" href="solver.html#src.solver.solver.LPSolver.is_stopping_criteria_relative">is_stopping_criteria_relative</a></code></li>
+<li><code><a title="src.solver.interior_point_method.ExactInteriorPointMethod.is_terminate" href="interior_point_method.html#src.solver.interior_point_method.InteriorPointMethod.is_terminate">is_terminate</a></code></li>
+<li><code><a title="src.solver.interior_point_method.ExactInteriorPointMethod.log_initial_problem_information" href="solver.html#src.solver.solver.LPSolver.log_initial_problem_information">log_initial_problem_information</a></code></li>
+<li><code><a title="src.solver.interior_point_method.ExactInteriorPointMethod.log_initial_situation" href="solver.html#src.solver.solver.LPSolver.log_initial_situation">log_initial_situation</a></code></li>
+<li><code><a title="src.solver.interior_point_method.ExactInteriorPointMethod.log_positive_variables_negativity" href="solver.html#src.solver.solver.LPSolver.log_positive_variables_negativity">log_positive_variables_negativity</a></code></li>
+<li><code><a title="src.solver.interior_point_method.ExactInteriorPointMethod.log_solved_data" href="solver.html#src.solver.solver.LPSolver.log_solved_data">log_solved_data</a></code></li>
+<li><code><a title="src.solver.interior_point_method.ExactInteriorPointMethod.make_SolvedSummary" href="solver.html#src.solver.solver.LPSolver.make_SolvedSummary">make_SolvedSummary</a></code></li>
+<li><code><a title="src.solver.interior_point_method.ExactInteriorPointMethod.run" href="solver.html#src.solver.solver.LPSolver.run">run</a></code></li>
+<li><code><a title="src.solver.interior_point_method.ExactInteriorPointMethod.run_algorithm" href="solver.html#src.solver.solver.LPSolver.run_algorithm">run_algorithm</a></code></li>
+<li><code><a title="src.solver.interior_point_method.ExactInteriorPointMethod.scale_step_size" href="solver.html#src.solver.solver.LPSolver.scale_step_size">scale_step_size</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="src.solver" href="index.html">src.solver</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategy" href="#src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategy">ArcSearchIPMWithRestartingStrategy</a></code></h4>
+<ul class="">
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategy.is_iteration_number_reached_upper" href="#src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategy.is_iteration_number_reached_upper">is_iteration_number_reached_upper</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategy.run_algorithm" href="#src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategy.run_algorithm">run_algorithm</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategyProven" href="#src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategyProven">ArcSearchIPMWithRestartingStrategyProven</a></code></h4>
+<ul class="">
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategyProven.is_guaranteeing_main_residual_decreasing" href="#src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategyProven.is_guaranteeing_main_residual_decreasing">is_guaranteeing_main_residual_decreasing</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategyProven.is_in_center_path_neighborhood" href="#src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategyProven.is_in_center_path_neighborhood">is_in_center_path_neighborhood</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategyProven.is_in_center_path_neighborhood_on_next_point" href="#src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategyProven.is_in_center_path_neighborhood_on_next_point">is_in_center_path_neighborhood_on_next_point</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategyProven.is_iteration_number_reached_upper" href="#src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategyProven.is_iteration_number_reached_upper">is_iteration_number_reached_upper</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategyProven.is_stopping_criteria_relative" href="#src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategyProven.is_stopping_criteria_relative">is_stopping_criteria_relative</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategyProven.next_iteration_point_with_mu_decreasing" href="#src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategyProven.next_iteration_point_with_mu_decreasing">next_iteration_point_with_mu_decreasing</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategyProven.run_algorithm" href="#src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategyProven.run_algorithm">run_algorithm</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategyProven.theta" href="#src.solver.interior_point_method_with_restarting_strategy.ArcSearchIPMWithRestartingStrategyProven.theta">theta</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase" href="#src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase">IPMWithRestartingStrategyBase</a></code></h4>
+<ul class="">
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.beta" href="#src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.beta">beta</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.beta_k" href="#src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.beta_k">beta_k</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.is_guaranteeing_main_residual_decreasing" href="#src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.is_guaranteeing_main_residual_decreasing">is_guaranteeing_main_residual_decreasing</a></code></li>
+<li><code><a title="src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.restart_variable" href="#src.solver.interior_point_method_with_restarting_strategy.IPMWithRestartingStrategyBase.restart_variable">restart_variable</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.1</a>.</p>
+</footer>
+</body>
+</html>

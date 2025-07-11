@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.1">
+<title>src.solver.variable_updater API documentation</title>
+<meta name="description" content="変数の更新方法について管理するモジュール
+arc-search, line-search の2通り">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>src.solver.variable_updater</code></h1>
+</header>
+<section id="section-intro">
+<p>変数の更新方法について管理するモジュール
+arc-search, line-search の2通り</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="src.solver.variable_updater.ArcVariableUpdater"><code class="flex name class">
+<span>class <span class="ident">ArcVariableUpdater</span></span>
+<span>(</span><span>delta_xs: float)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>初期化</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>delta_xs</code></strong> :&ensp;<code>float</code></dt>
+<dd>x, もしくは s の正値性を保証するため, どの程度まで0より大きくとるか</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ArcVariableUpdater(VariableUpdater):
+    max_step_size: float = np.pi / 2
+
+    def max_step_size_guarantee_positive(
+        self, xs: np.ndarray, xs_dot: np.ndarray, xs_ddot: np.ndarray
+    ) -&gt; float:
+        &#34;&#34;&#34;arc-search の更新で x, s が非負になる最大の alpha の出力
+
+        xs は負の値になってはいけないため, 少量分の割合を差し引いてからstep size を決定する
+        &#34;&#34;&#34;
+        # 出力の最大値は pi/2. 変数の各要素に応じてこの値が変化
+        alpha = self.max_step_size
+        xs_pos = xs * (1 - self._delta_xs)
+        # Case 番号は論文参照
+        for xs_i, xs_dot_i, xs_ddot_i in zip(xs_pos, xs_dot, xs_ddot):
+            # Case 1. 一次微分が0, 二次微分が0でない場合
+            if xs_dot_i == 0:
+                if (xs_plus_xs_ddot := (xs_i + xs_ddot_i)) &lt; 0:
+                    alpha = min(alpha, np.arccos(xs_plus_xs_ddot / xs_ddot_i))
+            # Case 2. 二次微分が0, 一次微分が0でない場合
+            if xs_ddot_i == 0:
+                if xs_dot_i &gt; xs_i:
+                    alpha = min(alpha, np.arcsin(xs_i / xs_dot_i))
+            # Case 3,4. 一次微分が正の場合
+            if xs_dot_i &gt; 0:
+                denominator = np.sqrt(xs_dot_i**2 + xs_ddot_i**2)
+                if (xs_plus_xs_ddot := xs_i + xs_ddot_i) &lt; denominator:
+                    alpha_pos = np.arcsin(xs_plus_xs_ddot / denominator)
+                    # Case 3. 一次微分, 二次微分がともに正の場合
+                    if xs_ddot_i &gt; 0:
+                        alpha_neg = np.arcsin(xs_ddot_i / denominator)
+                        alpha = min(alpha, alpha_pos - alpha_neg)
+                    # Case 4. 一次微分が正, 二次微分が負の場合
+                    else:
+                        alpha_neg = np.arcsin(-xs_ddot_i / denominator)
+                        alpha = min(alpha, alpha_pos + alpha_neg)
+            # Case 5. 一次微分, 二次微分がともに負の場合
+            if xs_dot_i &lt; 0 and xs_ddot_i &lt; 0:
+                denominator = np.sqrt(xs_dot_i**2 + xs_ddot_i**2)
+                if abs(xs_plus_xs_ddot := xs_i + xs_ddot_i) &lt; denominator:
+                    alpha_1 = np.arcsin(-xs_plus_xs_ddot / denominator)
+                    alpha_2 = np.arcsin(-xs_ddot_i / denominator)
+                    alpha = min(alpha, np.pi - alpha_1 - alpha_2)
+            # Case 6,7 については π/2 になるため, 計算する必要がない
+        return alpha
+
+    def run(self, v: np.ndarray, v_dot: np.ndarray, v_ddot: np.ndarray, alpha: float) -&gt; np.ndarray:
+        &#34;&#34;&#34;arc search に従った変数の更新
+
+        Args:
+            v: x, s, もしくは λ
+            v_dot: x, s, もしくはλの一次微分
+            v_ddot: x, s, もしくはλの二次微分
+            alpha: 対応する step size
+        &#34;&#34;&#34;
+        return v - v_dot * np.sin(alpha) + v_ddot * (1 - np.cos(alpha))</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="src.solver.variable_updater.VariableUpdater" href="#src.solver.variable_updater.VariableUpdater">VariableUpdater</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="src.solver.variable_updater.ArcVariableUpdater.max_step_size"><code class="name">var <span class="ident">max_step_size</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="src.solver.variable_updater.ArcVariableUpdater.max_step_size_guarantee_positive"><code class="name flex">
+<span>def <span class="ident">max_step_size_guarantee_positive</span></span>(<span>self, xs: numpy.ndarray, xs_dot: numpy.ndarray, xs_ddot: numpy.ndarray) ‑> float</span>
+</code></dt>
+<dd>
+<div class="desc"><p>arc-search の更新で x, s が非負になる最大の alpha の出力</p>
+<p>xs は負の値になってはいけないため, 少量分の割合を差し引いてからstep size を決定する</p></div>
+</dd>
+<dt id="src.solver.variable_updater.ArcVariableUpdater.run"><code class="name flex">
+<span>def <span class="ident">run</span></span>(<span>self, v: numpy.ndarray, v_dot: numpy.ndarray, v_ddot: numpy.ndarray, alpha: float) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>arc search に従った変数の更新</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>v</code></strong></dt>
+<dd>x, s, もしくは λ</dd>
+<dt><strong><code>v_dot</code></strong></dt>
+<dd>x, s, もしくはλの一次微分</dd>
+<dt><strong><code>v_ddot</code></strong></dt>
+<dd>x, s, もしくはλの二次微分</dd>
+<dt><strong><code>alpha</code></strong></dt>
+<dd>対応する step size</dd>
+</dl></div>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="src.solver.variable_updater.VariableUpdater" href="#src.solver.variable_updater.VariableUpdater">VariableUpdater</a></b></code>:
+<ul class="hlist">
+<li><code><a title="src.solver.variable_updater.VariableUpdater.max_alpha_guarantee_positive_with_line" href="#src.solver.variable_updater.VariableUpdater.max_alpha_guarantee_positive_with_line">max_alpha_guarantee_positive_with_line</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="src.solver.variable_updater.LineVariableUpdater"><code class="flex name class">
+<span>class <span class="ident">LineVariableUpdater</span></span>
+<span>(</span><span>delta_xs: float)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>初期化</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>delta_xs</code></strong> :&ensp;<code>float</code></dt>
+<dd>x, もしくは s の正値性を保証するため, どの程度まで0より大きくとるか</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class LineVariableUpdater(VariableUpdater):
+    max_step_size: float = 1
+
+    def max_step_size_guarantee_positive(
+        self, xs: np.ndarray, xs_dot: np.ndarray, xs_ddot: np.ndarray
+    ) -&gt; float:
+        &#34;&#34;&#34;line search の更新で x, s が非負になる最大のステップサイズの取得
+
+        xs は負の値になってはいけないため, 少量分の割合を差し引いてからstep size を決定する
+
+        Args:
+            xs: x, もしくは s
+            xs_dot: x, もしくは s の一次微分値
+            xs_ddot: x, もしくは s の二次微分値
+
+        Return:
+            float: `xs - alpha * (xs_dot - xs_ddot)` のすべての値が0以上となる最大の `alpha`
+        &#34;&#34;&#34;
+        # （一次微分 - 二次微分）が0より大きい場合のみ alpha の出力対象となる
+        xs_dot_minus_xs_ddot = xs_dot - xs_ddot
+        target_positive = xs_dot_minus_xs_ddot[xs_dot_minus_xs_ddot &gt; 0]
+        # もし alpha の出力対象がない場合は1を返す
+        if len(target_positive) == 0:
+            return self.max_step_size
+
+        # すべての要素が0以上となる最大のalphaの出力
+        xs_positive = xs[xs_dot_minus_xs_ddot &gt; 0] * (1 - self._delta_xs)
+        output = min(xs_positive / target_positive)
+        return min([output, self.max_step_size])
+
+    def run(self, v: np.ndarray, v_dot: np.ndarray, v_ddot: np.ndarray, alpha: float) -&gt; np.ndarray:
+        &#34;&#34;&#34;line search に従って変数の更新
+
+        Args:
+            v: x, s, もしくは λ
+            v_dot: x, s, もしくはλの一次微分
+            v_ddot: x, s, もしくはλの二次微分
+            alpha: 対応する step size
+        &#34;&#34;&#34;
+        return v - alpha * (v_dot - v_ddot)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="src.solver.variable_updater.VariableUpdater" href="#src.solver.variable_updater.VariableUpdater">VariableUpdater</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="src.solver.variable_updater.LineVariableUpdater.max_step_size"><code class="name">var <span class="ident">max_step_size</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="src.solver.variable_updater.LineVariableUpdater.max_step_size_guarantee_positive"><code class="name flex">
+<span>def <span class="ident">max_step_size_guarantee_positive</span></span>(<span>self, xs: numpy.ndarray, xs_dot: numpy.ndarray, xs_ddot: numpy.ndarray) ‑> float</span>
+</code></dt>
+<dd>
+<div class="desc"><p>line search の更新で x, s が非負になる最大のステップサイズの取得</p>
+<p>xs は負の値になってはいけないため, 少量分の割合を差し引いてからstep size を決定する</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>xs</code></strong></dt>
+<dd>x, もしくは s</dd>
+<dt><strong><code>xs_dot</code></strong></dt>
+<dd>x, もしくは s の一次微分値</dd>
+<dt><strong><code>xs_ddot</code></strong></dt>
+<dd>x, もしくは s の二次微分値</dd>
+</dl>
+<h2 id="return">Return</h2>
+<p>float: <code>xs - alpha * (xs_dot - xs_ddot)</code> のすべての値が0以上となる最大の <code>alpha</code></p></div>
+</dd>
+<dt id="src.solver.variable_updater.LineVariableUpdater.run"><code class="name flex">
+<span>def <span class="ident">run</span></span>(<span>self, v: numpy.ndarray, v_dot: numpy.ndarray, v_ddot: numpy.ndarray, alpha: float) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>line search に従って変数の更新</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>v</code></strong></dt>
+<dd>x, s, もしくは λ</dd>
+<dt><strong><code>v_dot</code></strong></dt>
+<dd>x, s, もしくはλの一次微分</dd>
+<dt><strong><code>v_ddot</code></strong></dt>
+<dd>x, s, もしくはλの二次微分</dd>
+<dt><strong><code>alpha</code></strong></dt>
+<dd>対応する step size</dd>
+</dl></div>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="src.solver.variable_updater.VariableUpdater" href="#src.solver.variable_updater.VariableUpdater">VariableUpdater</a></b></code>:
+<ul class="hlist">
+<li><code><a title="src.solver.variable_updater.VariableUpdater.max_alpha_guarantee_positive_with_line" href="#src.solver.variable_updater.VariableUpdater.max_alpha_guarantee_positive_with_line">max_alpha_guarantee_positive_with_line</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="src.solver.variable_updater.VariableUpdater"><code class="flex name class">
+<span>class <span class="ident">VariableUpdater</span></span>
+<span>(</span><span>delta_xs: float)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>初期化</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>delta_xs</code></strong> :&ensp;<code>float</code></dt>
+<dd>x, もしくは s の正値性を保証するため, どの程度まで0より大きくとるか</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class VariableUpdater(metaclass=ABCMeta):
+    max_step_size: float
+
+    def __init__(self, delta_xs: float):
+        &#34;&#34;&#34;初期化
+
+        Args:
+            delta_xs (float): x, もしくは s の正値性を保証するため, どの程度まで0より大きくとるか
+        &#34;&#34;&#34;
+        self._delta_xs = delta_xs
+
+    def is_max_step_size(self, step_size: float) -&gt; bool:
+        return step_size == self.max_step_size
+
+    def max_alpha_guarantee_positive_with_line(self, xs: np.ndarray, xs_dot: np.ndarray) -&gt; float:
+        &#34;&#34;&#34;x-x_dot, s-s_dot が0以上となることを保証する最大のステップサイズの取得
+
+        Args:
+            xs: x, もしくは s
+            xs_dot: x, もしくは s の一次微分値
+
+        Return:
+            float: `xs - alpha * xs_dot` のすべての値が0以上となる最大の `alpha`
+        &#34;&#34;&#34;
+        # 一次微分が0より大きい場合のみ alpha の出力対象となる
+        xs_dot_positive = xs_dot[xs_dot &gt; 0]
+        # もし alpha の出力対象がない場合は1を返す
+        if len(xs_dot_positive) == 0:
+            return 1
+
+        # xs - xs_dot のすべての要素が0以上となる最大のalphaの出力
+        xs_positive = xs[xs_dot &gt; 0]
+        output = min(xs_positive / xs_dot_positive)
+        return min([output, 1])
+
+    @abstractmethod
+    def run(self, v: np.ndarray, v_dot: np.ndarray, v_ddot: np.ndarray, alpha: float) -&gt; np.ndarray:
+        &#34;&#34;&#34;変数の更新の実行
+
+        Args:
+            v: x, s, もしくは λ
+            v_dot: x, s, もしくはλの一次微分
+            v_ddot: x, s, もしくはλの二次微分
+            alpha: 対応する step size
+        &#34;&#34;&#34;
+        pass
+
+    @abstractmethod
+    def max_step_size_guarantee_positive(
+        self, xs: np.ndarray, xs_dot: np.ndarray, xs_ddot: np.ndarray
+    ) -&gt; float:
+        pass</code></pre>
+</details>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="src.solver.variable_updater.ArcVariableUpdater" href="#src.solver.variable_updater.ArcVariableUpdater">ArcVariableUpdater</a></li>
+<li><a title="src.solver.variable_updater.LineVariableUpdater" href="#src.solver.variable_updater.LineVariableUpdater">LineVariableUpdater</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="src.solver.variable_updater.VariableUpdater.max_step_size"><code class="name">var <span class="ident">max_step_size</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="src.solver.variable_updater.VariableUpdater.is_max_step_size"><code class="name flex">
+<span>def <span class="ident">is_max_step_size</span></span>(<span>self, step_size: float) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.solver.variable_updater.VariableUpdater.max_alpha_guarantee_positive_with_line"><code class="name flex">
+<span>def <span class="ident">max_alpha_guarantee_positive_with_line</span></span>(<span>self, xs: numpy.ndarray, xs_dot: numpy.ndarray) ‑> float</span>
+</code></dt>
+<dd>
+<div class="desc"><p>x-x_dot, s-s_dot が0以上となることを保証する最大のステップサイズの取得</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>xs</code></strong></dt>
+<dd>x, もしくは s</dd>
+<dt><strong><code>xs_dot</code></strong></dt>
+<dd>x, もしくは s の一次微分値</dd>
+</dl>
+<h2 id="return">Return</h2>
+<p>float: <code>xs - alpha * xs_dot</code> のすべての値が0以上となる最大の <code>alpha</code></p></div>
+</dd>
+<dt id="src.solver.variable_updater.VariableUpdater.max_step_size_guarantee_positive"><code class="name flex">
+<span>def <span class="ident">max_step_size_guarantee_positive</span></span>(<span>self, xs: numpy.ndarray, xs_dot: numpy.ndarray, xs_ddot: numpy.ndarray) ‑> float</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.solver.variable_updater.VariableUpdater.run"><code class="name flex">
+<span>def <span class="ident">run</span></span>(<span>self, v: numpy.ndarray, v_dot: numpy.ndarray, v_ddot: numpy.ndarray, alpha: float) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>変数の更新の実行</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>v</code></strong></dt>
+<dd>x, s, もしくは λ</dd>
+<dt><strong><code>v_dot</code></strong></dt>
+<dd>x, s, もしくはλの一次微分</dd>
+<dt><strong><code>v_ddot</code></strong></dt>
+<dd>x, s, もしくはλの二次微分</dd>
+<dt><strong><code>alpha</code></strong></dt>
+<dd>対応する step size</dd>
+</dl></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="src.solver" href="index.html">src.solver</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="src.solver.variable_updater.ArcVariableUpdater" href="#src.solver.variable_updater.ArcVariableUpdater">ArcVariableUpdater</a></code></h4>
+<ul class="">
+<li><code><a title="src.solver.variable_updater.ArcVariableUpdater.max_step_size" href="#src.solver.variable_updater.ArcVariableUpdater.max_step_size">max_step_size</a></code></li>
+<li><code><a title="src.solver.variable_updater.ArcVariableUpdater.max_step_size_guarantee_positive" href="#src.solver.variable_updater.ArcVariableUpdater.max_step_size_guarantee_positive">max_step_size_guarantee_positive</a></code></li>
+<li><code><a title="src.solver.variable_updater.ArcVariableUpdater.run" href="#src.solver.variable_updater.ArcVariableUpdater.run">run</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="src.solver.variable_updater.LineVariableUpdater" href="#src.solver.variable_updater.LineVariableUpdater">LineVariableUpdater</a></code></h4>
+<ul class="">
+<li><code><a title="src.solver.variable_updater.LineVariableUpdater.max_step_size" href="#src.solver.variable_updater.LineVariableUpdater.max_step_size">max_step_size</a></code></li>
+<li><code><a title="src.solver.variable_updater.LineVariableUpdater.max_step_size_guarantee_positive" href="#src.solver.variable_updater.LineVariableUpdater.max_step_size_guarantee_positive">max_step_size_guarantee_positive</a></code></li>
+<li><code><a title="src.solver.variable_updater.LineVariableUpdater.run" href="#src.solver.variable_updater.LineVariableUpdater.run">run</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="src.solver.variable_updater.VariableUpdater" href="#src.solver.variable_updater.VariableUpdater">VariableUpdater</a></code></h4>
+<ul class="">
+<li><code><a title="src.solver.variable_updater.VariableUpdater.is_max_step_size" href="#src.solver.variable_updater.VariableUpdater.is_max_step_size">is_max_step_size</a></code></li>
+<li><code><a title="src.solver.variable_updater.VariableUpdater.max_alpha_guarantee_positive_with_line" href="#src.solver.variable_updater.VariableUpdater.max_alpha_guarantee_positive_with_line">max_alpha_guarantee_positive_with_line</a></code></li>
+<li><code><a title="src.solver.variable_updater.VariableUpdater.max_step_size" href="#src.solver.variable_updater.VariableUpdater.max_step_size">max_step_size</a></code></li>
+<li><code><a title="src.solver.variable_updater.VariableUpdater.max_step_size_guarantee_positive" href="#src.solver.variable_updater.VariableUpdater.max_step_size_guarantee_positive">max_step_size_guarantee_positive</a></code></li>
+<li><code><a title="src.solver.variable_updater.VariableUpdater.run" href="#src.solver.variable_updater.VariableUpdater.run">run</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.1</a>.</p>
+</footer>
+</body>
+</html>

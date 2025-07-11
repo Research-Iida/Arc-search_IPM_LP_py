@@ -1,9 +1,10 @@
 """Preprocessor class test"""
+
 import numpy as np
 import pytest
+from scipy.sparse import csr_matrix as Csr
 
-from src.problem.preprocessor import (LPPreprocessor, ProblemInfeasibleError,
-                                      ProblemUnboundedError)
+from src.problem.preprocessor import LPPreprocessor, ProblemInfeasibleError, ProblemUnboundedError
 
 
 @pytest.fixture
@@ -16,10 +17,10 @@ def test_remove_empty_row(aPreprocessor):
     0でなければ実行不可能エラーが出されることを確認
     """
     test_sol = [1, 0]
-    A = np.array([test_sol, [0, 0]])
+    A = Csr(np.array([test_sol, [0, 0]]))
     b = np.array([2, 0])
     test_A, test_b = aPreprocessor.remove_empty_row(A, b)
-    np.testing.assert_array_equal(test_A, [test_sol])
+    np.testing.assert_array_equal(test_A.todense(), [test_sol])
     assert len(test_b) == 1
 
     b_error = np.array([1, 1])
@@ -50,11 +51,11 @@ def test_remove_empty_column(aPreprocessor):
     負であれば実行不可能エラーが出されることを確認
     """
     test_sol = [1, 0]
-    A = np.array([test_sol, [0, 0]]).T
+    A = Csr(np.array([test_sol, [0, 0]]).T)
     c = np.array([2, 0])
     test_A, test_c = aPreprocessor.remove_empty_column(A, c)
     # Aは2行1列の行列であることが正しい
-    np.testing.assert_array_equal(test_A, np.array([test_sol]).T)
+    np.testing.assert_array_equal(test_A.toarray(), np.array([test_sol]).T)
     assert len(test_c) == 1
 
     c_error = np.array([1, -1])
@@ -74,18 +75,16 @@ def test_remove_duplicated_column(aPreprocessor):
 
 def test_rows_only_one_nonzero(aPreprocessor):
     """Aの第一行目が0以外の係数が1つしかない場合にindex 0 を出力できるか"""
-    A = np.array([[2, 0, 0], [1, 3, 1]])
+    A = Csr(np.array([[2, 0, 0], [1, 3, 1]]))
     test_lst = aPreprocessor.rows_only_one_nonzero(A)
     assert test_lst == [0]
 
 
 def test_only_one_nonzero_elements_and_columns(aPreprocessor):
     """Aの第一行目が0以外の係数が1つしかない場合にindex 0 を出力できるか"""
-    A = np.array([[2, 0, 0], [1, 3, 1]])
+    A = Csr(np.array([[2, 0, 0], [1, 3, 1]]))
     lst_id = aPreprocessor.rows_only_one_nonzero(A)
-    vec, ids = aPreprocessor.only_one_nonzero_elements_and_columns(
-        A, lst_id
-    )
+    vec, ids = aPreprocessor.only_one_nonzero_elements_and_columns(A, lst_id)
     np.testing.assert_array_equal(vec, [2])
     assert ids == [0]
 
@@ -93,11 +92,11 @@ def test_only_one_nonzero_elements_and_columns(aPreprocessor):
 def test_remove_row_singleton(aPreprocessor):
     """Aの行の要素が1つしかないときは削除されることを確認"""
     test_sol = [3, 1]
-    A = np.array([[2, 0, 0], [1] + test_sol])
+    A = Csr(np.array([[2, 0, 0], [1] + test_sol]))
     b = np.array([4, 3])
     c = np.ones(A.shape[1])
     test_A, test_b, test_c = aPreprocessor.remove_row_singleton(A, b, c)
-    np.testing.assert_array_equal(test_A, [test_sol])
+    np.testing.assert_array_equal(test_A.toarray(), [test_sol])
     assert test_b == 3 - 2
     np.testing.assert_array_equal(test_c, np.ones(test_A.shape[1]))
 
@@ -135,7 +134,7 @@ def test_remove_free_variables(aPreprocessor):
 def test_fix_variables_by_single_row(aPreprocessor):
     """bが0で制約の係数が正のみ, もしくは負のみの時に削除されることを確認"""
     test_sol = [3]
-    A = np.array([[2, 1, 0], [1, 3] + test_sol])
+    A = Csr(np.array([[2, 1, 0], [1, 3] + test_sol]))
     b = np.array([0, 3])
     c = np.ones(A.shape[1])
     test_A, test_b, test_c = aPreprocessor.fix_variables_by_single_row(A, b, c)
@@ -149,7 +148,7 @@ def test_fix_variables_by_single_row(aPreprocessor):
         aPreprocessor.fix_variables_by_single_row(A, b, c)
 
     # bが正の時に制約が負の係数しか持たない場合実行不可能
-    A = np.array([[-2, 1, 1], [-1, 0, -3]])
+    A = Csr(np.array([[-2, 1, 1], [-1, 0, -3]]))
     with pytest.raises(ProblemInfeasibleError):
         aPreprocessor.fix_variables_by_single_row(A, b, c)
 
@@ -161,9 +160,7 @@ def test_fix_variables_by_multiple_rows(aPreprocessor):
     A = np.array([[2, 1], [2, 2], [1, 3]])
     b = np.array([1, 1, 3])
     c = np.ones(A.shape[1])
-    test_A, test_b, test_c = aPreprocessor.fix_variables_by_multiple_rows(
-        A, b, c
-    )
+    test_A, test_b, test_c = aPreprocessor.fix_variables_by_multiple_rows(A, b, c)
     np.testing.assert_array_equal(test_A, [[2], [1]])
     np.testing.assert_array_equal(test_b, [1, 3])
     np.testing.assert_array_equal(test_c, np.ones(test_A.shape[1]))
@@ -171,24 +168,18 @@ def test_fix_variables_by_multiple_rows(aPreprocessor):
     A = np.array([[2, 1], [-2, -2], [1, 3]])
     b = np.array([1, -1, 3])
     c = np.ones(A.shape[1])
-    test_A, test_b, test_c = aPreprocessor.fix_variables_by_multiple_rows(
-        A, b, c
-    )
+    test_A, test_b, test_c = aPreprocessor.fix_variables_by_multiple_rows(A, b, c)
     np.testing.assert_array_equal(test_A, [[2], [1]])
     np.testing.assert_array_equal(test_b, [1, 3])
     np.testing.assert_array_equal(test_c, np.ones(test_A.shape[1]))
 
 
 def test_fix_positive_variable_by_signs(aPreprocessor):
-    A = np.array([[1, -1, -2], [3, 1, -1], [0, 2, -1]])
+    A = Csr(np.array([[1, -1, -2], [3, 1, -1], [0, 2, -1]]))
     b = np.array([1, 4, 0])
     c = np.ones(A.shape[1])
-    test_A, test_b, test_c = aPreprocessor.fix_positive_variable_by_signs(
-        A, b, c
-    )
-    np.testing.assert_array_equal(
-        test_A, [[1 - 3 * (-1) / 1, -1 - 3 * (-2) / 1], [2, -1]]
-    )
+    test_A, test_b, test_c = aPreprocessor.fix_positive_variable_by_signs(A, b, c)
+    np.testing.assert_array_equal(test_A.toarray(), [[1 - 3 * (-1) / 1, -1 - 3 * (-2) / 1], [2, -1]])
     np.testing.assert_array_equal(test_b, [4 - 3 * 1 / 1, 0])
     np.testing.assert_array_equal(test_c, [1 - 1 * (-1) / 1, 1 - 1 * (-2) / 1])
 

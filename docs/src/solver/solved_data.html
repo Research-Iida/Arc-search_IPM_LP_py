@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.1">
+<title>src.solver.solved_data API documentation</title>
+<meta name="description" content="">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>src.solver.solved_data</code></h1>
+</header>
+<section id="section-intro">
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="src.solver.solved_data.SolvedDetail"><code class="flex name class">
+<span>class <span class="ident">SolvedDetail</span></span>
+<span>(</span><span>aSolvedSummary: <a title="src.solver.solved_data.SolvedSummary" href="#src.solver.solved_data.SolvedSummary">SolvedSummary</a>, v: <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a>, problem: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>, v_0: <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a>, problem_0: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>, lst_variables_by_iter: list[<a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a>] = &lt;factory&gt;, lst_merit_function_by_iter: list[float] = &lt;factory&gt;, lst_main_step_size_by_iter: list[float] = &lt;factory&gt;, lst_dual_step_size_by_iter: list[float] = &lt;factory&gt;, lst_mu_by_iter: list[float] = &lt;factory&gt;, lst_norm_vdot_by_iter: list[float] = &lt;factory&gt;, lst_norm_vddot_by_iter: list[float] = &lt;factory&gt;, lst_max_norm_main_constraint_by_iter: list[float] = &lt;factory&gt;, lst_max_norm_dual_constraint_by_iter: list[float] = &lt;factory&gt;, lst_iteration_number_updated_by_iterative_refinement: list[float] = &lt;factory&gt;, lst_residual_inexact_vdot: list[float] = &lt;factory&gt;, lst_tolerance_inexact_vdot: list[float] = &lt;factory&gt;, lst_residual_inexact_vddot: list[float] = &lt;factory&gt;, lst_tolerance_inexact_vddot: list[float] = &lt;factory&gt;)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>最適化された際の結果を詳細にまとめるクラス</p>
+<p>csv に書き込む際に出力が難しいリストなどをこちらにまとめる</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>aSolvedSummary</code></strong></dt>
+<dd>結果の概要</dd>
+<dt><strong><code>v</code></strong></dt>
+<dd>最適解</dd>
+<dt><strong><code>problem</code></strong></dt>
+<dd>対象となった問題. 変形された場合は変形後の結果が格納される</dd>
+<dt><strong><code>v_0</code></strong></dt>
+<dd>初期解</dd>
+<dt><strong><code>problem_0</code></strong></dt>
+<dd>初期問題. 変形される前が格納される</dd>
+<dt><strong><code>lst_variables_by_iter</code></strong></dt>
+<dd>各反復ごとにとられた変数. 使用する変数をすべてまとめている</dd>
+<dt><strong><code>lst_merit_func_by_iter</code></strong></dt>
+<dd>各反復ごとの merit function の値をまとめたリスト</dd>
+<dt><strong><code>lst_main_step_size_by_iter</code></strong></dt>
+<dd>各反復ごとの主変数に関する step size の値をまとめたリスト</dd>
+<dt><strong><code>lst_dual_step_size_by_iter</code></strong></dt>
+<dd>各反復ごとの双対変数に関する step size の値をまとめたリスト</dd>
+<dt><strong><code>lst_mu_by_iter</code></strong></dt>
+<dd>各反復ごとの mu をまとめたリスト</dd>
+<dt><strong><code>lst_norm_vdot_by_iter</code></strong></dt>
+<dd>各反復ごとの一階微分のノルムをまとめたリスト</dd>
+<dt><strong><code>lst_norm_vddot_by_iter</code></strong></dt>
+<dd>各反復ごとの二階微分のノルムをまとめたリスト</dd>
+<dt><strong><code>lst_max_norm_main_constraint_by_iter</code></strong></dt>
+<dd>各反復ごとの主問題制約残差の最大値をまとめたリスト</dd>
+<dt><strong><code>lst_max_norm_dual_constraint_by_iter</code></strong></dt>
+<dd>各反復ごとの双対問題制約残差の最大値をまとめたリスト</dd>
+<dt><strong><code>lst_iteration_number_updated_by_iterative_refinement</code></strong></dt>
+<dd>iterative refinement によって問題が更新された際の反復</dd>
+<dt><strong><code>lst_residual_inexact_vdot</code></strong></dt>
+<dd>inexact に一階微分を求めた際の誤差</dd>
+<dt><strong><code>lst_tolerance_inexact_vdot</code></strong></dt>
+<dd>inexact に一階微分を求める際の誤差許容度</dd>
+<dt><strong><code>lst_residual_inexact_vddot</code></strong></dt>
+<dd>inexact に二階微分を求めた際の誤差</dd>
+<dt><strong><code>lst_tolerance_inexact_vddot</code></strong></dt>
+<dd>inexact に二階微分を求める際の誤差許容度</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class SolvedDetail:
+    &#34;&#34;&#34;最適化された際の結果を詳細にまとめるクラス
+
+    csv に書き込む際に出力が難しいリストなどをこちらにまとめる
+
+    Attributes:
+        aSolvedSummary: 結果の概要
+        v: 最適解
+        problem: 対象となった問題. 変形された場合は変形後の結果が格納される
+        v_0: 初期解
+        problem_0: 初期問題. 変形される前が格納される
+        lst_variables_by_iter: 各反復ごとにとられた変数. 使用する変数をすべてまとめている
+        lst_merit_func_by_iter: 各反復ごとの merit function の値をまとめたリスト
+        lst_main_step_size_by_iter: 各反復ごとの主変数に関する step size の値をまとめたリスト
+        lst_dual_step_size_by_iter: 各反復ごとの双対変数に関する step size の値をまとめたリスト
+        lst_mu_by_iter: 各反復ごとの mu をまとめたリスト
+        lst_norm_vdot_by_iter: 各反復ごとの一階微分のノルムをまとめたリスト
+        lst_norm_vddot_by_iter: 各反復ごとの二階微分のノルムをまとめたリスト
+        lst_max_norm_main_constraint_by_iter: 各反復ごとの主問題制約残差の最大値をまとめたリスト
+        lst_max_norm_dual_constraint_by_iter: 各反復ごとの双対問題制約残差の最大値をまとめたリスト
+        lst_iteration_number_updated_by_iterative_refinement: iterative refinement によって問題が更新された際の反復
+        lst_residual_inexact_vdot: inexact に一階微分を求めた際の誤差
+        lst_tolerance_inexact_vdot: inexact に一階微分を求める際の誤差許容度
+        lst_residual_inexact_vddot: inexact に二階微分を求めた際の誤差
+        lst_tolerance_inexact_vddot: inexact に二階微分を求める際の誤差許容度
+    &#34;&#34;&#34;
+    aSolvedSummary: SolvedSummary
+    v: LPVariables
+    problem: LinearProgrammingProblemStandard
+    v_0: LPVariables
+    problem_0: LinearProgrammingProblemStandard
+    lst_variables_by_iter: list[LPVariables] = field(default_factory=list)
+    lst_merit_function_by_iter: list[float] = field(default_factory=list)
+    lst_main_step_size_by_iter: list[float] = field(default_factory=list)
+    lst_dual_step_size_by_iter: list[float] = field(default_factory=list)
+    lst_mu_by_iter: list[float] = field(default_factory=list)
+    lst_norm_vdot_by_iter: list[float] = field(default_factory=list)
+    lst_norm_vddot_by_iter: list[float] = field(default_factory=list)
+    lst_max_norm_main_constraint_by_iter: list[float] = field(default_factory=list)
+    lst_max_norm_dual_constraint_by_iter: list[float] = field(default_factory=list)
+    lst_iteration_number_updated_by_iterative_refinement: list[float] = field(default_factory=list)
+    lst_residual_inexact_vdot: list[float] = field(default_factory=list)
+    lst_tolerance_inexact_vdot: list[float] = field(default_factory=list)
+    lst_residual_inexact_vddot: list[float] = field(default_factory=list)
+    lst_tolerance_inexact_vddot: list[float] = field(default_factory=list)
+
+    @property
+    def mu_0(self):
+        &#34;&#34;&#34;問題が解かれる前 mu.
+        &#34;&#34;&#34;
+        return self.v_0.mu
+
+    @property
+    def max_r_b_0(self):
+        &#34;&#34;&#34;主問題の制約に関する, 問題が解かれる前の infeasibility
+        &#34;&#34;&#34;
+        return np.linalg.norm(self.problem_0.residual_main_constraint(self.v_0.x), np.inf),
+
+    @property
+    def max_r_c_0(self):
+        &#34;&#34;&#34;双対問題の制約に関する, 問題が解かれる前の infeasibility
+        &#34;&#34;&#34;
+        return np.linalg.norm(self.problem_0.residual_dual_constraint(self.v_0.y, self.v_0.s), np.inf)</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="src.solver.solved_data.SolvedDetail.aSolvedSummary"><code class="name">var <span class="ident">aSolvedSummary</span> : <a title="src.solver.solved_data.SolvedSummary" href="#src.solver.solved_data.SolvedSummary">SolvedSummary</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.solver.solved_data.SolvedDetail.lst_dual_step_size_by_iter"><code class="name">var <span class="ident">lst_dual_step_size_by_iter</span> : list[float]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.solver.solved_data.SolvedDetail.lst_iteration_number_updated_by_iterative_refinement"><code class="name">var <span class="ident">lst_iteration_number_updated_by_iterative_refinement</span> : list[float]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.solver.solved_data.SolvedDetail.lst_main_step_size_by_iter"><code class="name">var <span class="ident">lst_main_step_size_by_iter</span> : list[float]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.solver.solved_data.SolvedDetail.lst_max_norm_dual_constraint_by_iter"><code class="name">var <span class="ident">lst_max_norm_dual_constraint_by_iter</span> : list[float]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.solver.solved_data.SolvedDetail.lst_max_norm_main_constraint_by_iter"><code class="name">var <span class="ident">lst_max_norm_main_constraint_by_iter</span> : list[float]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.solver.solved_data.SolvedDetail.lst_merit_function_by_iter"><code class="name">var <span class="ident">lst_merit_function_by_iter</span> : list[float]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.solver.solved_data.SolvedDetail.lst_mu_by_iter"><code class="name">var <span class="ident">lst_mu_by_iter</span> : list[float]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.solver.solved_data.SolvedDetail.lst_norm_vddot_by_iter"><code class="name">var <span class="ident">lst_norm_vddot_by_iter</span> : list[float]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.solver.solved_data.SolvedDetail.lst_norm_vdot_by_iter"><code class="name">var <span class="ident">lst_norm_vdot_by_iter</span> : list[float]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.solver.solved_data.SolvedDetail.lst_residual_inexact_vddot"><code class="name">var <span class="ident">lst_residual_inexact_vddot</span> : list[float]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.solver.solved_data.SolvedDetail.lst_residual_inexact_vdot"><code class="name">var <span class="ident">lst_residual_inexact_vdot</span> : list[float]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.solver.solved_data.SolvedDetail.lst_tolerance_inexact_vddot"><code class="name">var <span class="ident">lst_tolerance_inexact_vddot</span> : list[float]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.solver.solved_data.SolvedDetail.lst_tolerance_inexact_vdot"><code class="name">var <span class="ident">lst_tolerance_inexact_vdot</span> : list[float]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.solver.solved_data.SolvedDetail.lst_variables_by_iter"><code class="name">var <span class="ident">lst_variables_by_iter</span> : list[<a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.solver.solved_data.SolvedDetail.problem"><code class="name">var <span class="ident">problem</span> : <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.solver.solved_data.SolvedDetail.problem_0"><code class="name">var <span class="ident">problem_0</span> : <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.solver.solved_data.SolvedDetail.v"><code class="name">var <span class="ident">v</span> : <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.solver.solved_data.SolvedDetail.v_0"><code class="name">var <span class="ident">v_0</span> : <a title="src.solver.variables.LPVariables" href="variables.html#src.solver.variables.LPVariables">LPVariables</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="src.solver.solved_data.SolvedDetail.max_r_b_0"><code class="name">prop <span class="ident">max_r_b_0</span></code></dt>
+<dd>
+<div class="desc"><p>主問題の制約に関する, 問題が解かれる前の infeasibility</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def max_r_b_0(self):
+    &#34;&#34;&#34;主問題の制約に関する, 問題が解かれる前の infeasibility
+    &#34;&#34;&#34;
+    return np.linalg.norm(self.problem_0.residual_main_constraint(self.v_0.x), np.inf),</code></pre>
+</details>
+</dd>
+<dt id="src.solver.solved_data.SolvedDetail.max_r_c_0"><code class="name">prop <span class="ident">max_r_c_0</span></code></dt>
+<dd>
+<div class="desc"><p>双対問題の制約に関する, 問題が解かれる前の infeasibility</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def max_r_c_0(self):
+    &#34;&#34;&#34;双対問題の制約に関する, 問題が解かれる前の infeasibility
+    &#34;&#34;&#34;
+    return np.linalg.norm(self.problem_0.residual_dual_constraint(self.v_0.y, self.v_0.s), np.inf)</code></pre>
+</details>
+</dd>
+<dt id="src.solver.solved_data.SolvedDetail.mu_0"><code class="name">prop <span class="ident">mu_0</span></code></dt>
+<dd>
+<div class="desc"><p>問題が解かれる前 mu.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def mu_0(self):
+    &#34;&#34;&#34;問題が解かれる前 mu.
+    &#34;&#34;&#34;
+    return self.v_0.mu</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="src.solver.solved_data.SolvedSummary"><code class="flex name class">
+<span>class <span class="ident">SolvedSummary</span></span>
+<span>(</span><span>problem_name: str, solver_name: str, config_section: str, is_error: bool, n: int, m: int, is_solved: bool, iter_num: int | None = None, is_iter_over_upper: bool | None = None, elapsed_time: float | None = None, is_calc_time_over_upper: bool | None = None, obj: float | None = None, mu: float | None = None, max_r_b: float | None = None, max_r_c: float | None = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>最適化された際の結果を概要でまとめるクラス</p>
+<p>csv に書き込みすることができるように, list などarray型の要素は入れない.
+入れる場合は <code><a title="src.solver.solved_data.SolvedDetail" href="#src.solver.solved_data.SolvedDetail">SolvedDetail</a></code> クラスへ</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>problem_name</code></strong></dt>
+<dd>問題名</dd>
+<dt><strong><code>solver_name</code></strong></dt>
+<dd>使用したソルバーの名前</dd>
+<dt><strong><code>config_section</code></strong></dt>
+<dd>使用したパラメータのセクション名</dd>
+<dt><strong><code>is_error</code></strong></dt>
+<dd>エラーが起きた問題かどうか</dd>
+<dt><strong><code>n</code></strong></dt>
+<dd>問題の変数次元数</dd>
+<dt><strong><code>m</code></strong></dt>
+<dd>問題の制約数</dd>
+<dt><strong><code>is_solved</code></strong></dt>
+<dd>最適化されたか否か</dd>
+<dt><strong><code>iter_num</code></strong></dt>
+<dd>反復回数</dd>
+<dt><strong><code>is_iter_over_upper</code></strong></dt>
+<dd>反復回数上限に達したか</dd>
+<dt><strong><code>elapsed_time</code></strong></dt>
+<dd>アルゴリズムが動いていた時間</dd>
+<dt><strong><code>is_calc_time_over_upper</code></strong></dt>
+<dd>計算時間が上限を超えたか</dd>
+<dt><strong><code>obj</code></strong></dt>
+<dd>目的関数値</dd>
+<dt><strong><code>mu</code></strong></dt>
+<dd>duality measure or barrier function coef. この値が0に近ければ最適解</dd>
+<dt><strong><code>max_r_b</code></strong></dt>
+<dd>主問題の制約に関する infeasiblity. 絶対値の最大値</dd>
+<dt><strong><code>max_r_c</code></strong></dt>
+<dd>双対問題の制約に関する infeasiblity. 絶対値の最大値</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class SolvedSummary:
+    &#34;&#34;&#34;最適化された際の結果を概要でまとめるクラス
+
+    csv に書き込みすることができるように, list などarray型の要素は入れない.
+    入れる場合は `SolvedDetail` クラスへ
+
+    Attributes:
+        problem_name: 問題名
+        solver_name: 使用したソルバーの名前
+        config_section: 使用したパラメータのセクション名
+        is_error: エラーが起きた問題かどうか
+        n: 問題の変数次元数
+        m: 問題の制約数
+        is_solved: 最適化されたか否か
+        iter_num: 反復回数
+        is_iter_over_upper: 反復回数上限に達したか
+        elapsed_time: アルゴリズムが動いていた時間
+        is_calc_time_over_upper: 計算時間が上限を超えたか
+        obj: 目的関数値
+        mu: duality measure or barrier function coef. この値が0に近ければ最適解
+        max_r_b: 主問題の制約に関する infeasiblity. 絶対値の最大値
+        max_r_c: 双対問題の制約に関する infeasiblity. 絶対値の最大値
+    &#34;&#34;&#34;
+    problem_name: str
+    solver_name: str
+    config_section: str
+    is_error: bool
+    n: int
+    m: int
+    is_solved: bool
+    iter_num: int | None = None
+    is_iter_over_upper: bool | None = None
+    elapsed_time: float | None = None
+    is_calc_time_over_upper: bool | None = None
+    obj: float | None = None
+    mu: float | None = None
+    max_r_b: float | None = None
+    max_r_c: float | None = None</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="src.solver.solved_data.SolvedSummary.config_section"><code class="name">var <span class="ident">config_section</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.solver.solved_data.SolvedSummary.elapsed_time"><code class="name">var <span class="ident">elapsed_time</span> : float | None</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.solver.solved_data.SolvedSummary.is_calc_time_over_upper"><code class="name">var <span class="ident">is_calc_time_over_upper</span> : bool | None</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.solver.solved_data.SolvedSummary.is_error"><code class="name">var <span class="ident">is_error</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.solver.solved_data.SolvedSummary.is_iter_over_upper"><code class="name">var <span class="ident">is_iter_over_upper</span> : bool | None</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.solver.solved_data.SolvedSummary.is_solved"><code class="name">var <span class="ident">is_solved</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.solver.solved_data.SolvedSummary.iter_num"><code class="name">var <span class="ident">iter_num</span> : int | None</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.solver.solved_data.SolvedSummary.m"><code class="name">var <span class="ident">m</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.solver.solved_data.SolvedSummary.max_r_b"><code class="name">var <span class="ident">max_r_b</span> : float | None</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.solver.solved_data.SolvedSummary.max_r_c"><code class="name">var <span class="ident">max_r_c</span> : float | None</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.solver.solved_data.SolvedSummary.mu"><code class="name">var <span class="ident">mu</span> : float | None</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.solver.solved_data.SolvedSummary.n"><code class="name">var <span class="ident">n</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.solver.solved_data.SolvedSummary.obj"><code class="name">var <span class="ident">obj</span> : float | None</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.solver.solved_data.SolvedSummary.problem_name"><code class="name">var <span class="ident">problem_name</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.solver.solved_data.SolvedSummary.solver_name"><code class="name">var <span class="ident">solver_name</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="src.solver" href="index.html">src.solver</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="src.solver.solved_data.SolvedDetail" href="#src.solver.solved_data.SolvedDetail">SolvedDetail</a></code></h4>
+<ul class="">
+<li><code><a title="src.solver.solved_data.SolvedDetail.aSolvedSummary" href="#src.solver.solved_data.SolvedDetail.aSolvedSummary">aSolvedSummary</a></code></li>
+<li><code><a title="src.solver.solved_data.SolvedDetail.lst_dual_step_size_by_iter" href="#src.solver.solved_data.SolvedDetail.lst_dual_step_size_by_iter">lst_dual_step_size_by_iter</a></code></li>
+<li><code><a title="src.solver.solved_data.SolvedDetail.lst_iteration_number_updated_by_iterative_refinement" href="#src.solver.solved_data.SolvedDetail.lst_iteration_number_updated_by_iterative_refinement">lst_iteration_number_updated_by_iterative_refinement</a></code></li>
+<li><code><a title="src.solver.solved_data.SolvedDetail.lst_main_step_size_by_iter" href="#src.solver.solved_data.SolvedDetail.lst_main_step_size_by_iter">lst_main_step_size_by_iter</a></code></li>
+<li><code><a title="src.solver.solved_data.SolvedDetail.lst_max_norm_dual_constraint_by_iter" href="#src.solver.solved_data.SolvedDetail.lst_max_norm_dual_constraint_by_iter">lst_max_norm_dual_constraint_by_iter</a></code></li>
+<li><code><a title="src.solver.solved_data.SolvedDetail.lst_max_norm_main_constraint_by_iter" href="#src.solver.solved_data.SolvedDetail.lst_max_norm_main_constraint_by_iter">lst_max_norm_main_constraint_by_iter</a></code></li>
+<li><code><a title="src.solver.solved_data.SolvedDetail.lst_merit_function_by_iter" href="#src.solver.solved_data.SolvedDetail.lst_merit_function_by_iter">lst_merit_function_by_iter</a></code></li>
+<li><code><a title="src.solver.solved_data.SolvedDetail.lst_mu_by_iter" href="#src.solver.solved_data.SolvedDetail.lst_mu_by_iter">lst_mu_by_iter</a></code></li>
+<li><code><a title="src.solver.solved_data.SolvedDetail.lst_norm_vddot_by_iter" href="#src.solver.solved_data.SolvedDetail.lst_norm_vddot_by_iter">lst_norm_vddot_by_iter</a></code></li>
+<li><code><a title="src.solver.solved_data.SolvedDetail.lst_norm_vdot_by_iter" href="#src.solver.solved_data.SolvedDetail.lst_norm_vdot_by_iter">lst_norm_vdot_by_iter</a></code></li>
+<li><code><a title="src.solver.solved_data.SolvedDetail.lst_residual_inexact_vddot" href="#src.solver.solved_data.SolvedDetail.lst_residual_inexact_vddot">lst_residual_inexact_vddot</a></code></li>
+<li><code><a title="src.solver.solved_data.SolvedDetail.lst_residual_inexact_vdot" href="#src.solver.solved_data.SolvedDetail.lst_residual_inexact_vdot">lst_residual_inexact_vdot</a></code></li>
+<li><code><a title="src.solver.solved_data.SolvedDetail.lst_tolerance_inexact_vddot" href="#src.solver.solved_data.SolvedDetail.lst_tolerance_inexact_vddot">lst_tolerance_inexact_vddot</a></code></li>
+<li><code><a title="src.solver.solved_data.SolvedDetail.lst_tolerance_inexact_vdot" href="#src.solver.solved_data.SolvedDetail.lst_tolerance_inexact_vdot">lst_tolerance_inexact_vdot</a></code></li>
+<li><code><a title="src.solver.solved_data.SolvedDetail.lst_variables_by_iter" href="#src.solver.solved_data.SolvedDetail.lst_variables_by_iter">lst_variables_by_iter</a></code></li>
+<li><code><a title="src.solver.solved_data.SolvedDetail.max_r_b_0" href="#src.solver.solved_data.SolvedDetail.max_r_b_0">max_r_b_0</a></code></li>
+<li><code><a title="src.solver.solved_data.SolvedDetail.max_r_c_0" href="#src.solver.solved_data.SolvedDetail.max_r_c_0">max_r_c_0</a></code></li>
+<li><code><a title="src.solver.solved_data.SolvedDetail.mu_0" href="#src.solver.solved_data.SolvedDetail.mu_0">mu_0</a></code></li>
+<li><code><a title="src.solver.solved_data.SolvedDetail.problem" href="#src.solver.solved_data.SolvedDetail.problem">problem</a></code></li>
+<li><code><a title="src.solver.solved_data.SolvedDetail.problem_0" href="#src.solver.solved_data.SolvedDetail.problem_0">problem_0</a></code></li>
+<li><code><a title="src.solver.solved_data.SolvedDetail.v" href="#src.solver.solved_data.SolvedDetail.v">v</a></code></li>
+<li><code><a title="src.solver.solved_data.SolvedDetail.v_0" href="#src.solver.solved_data.SolvedDetail.v_0">v_0</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="src.solver.solved_data.SolvedSummary" href="#src.solver.solved_data.SolvedSummary">SolvedSummary</a></code></h4>
+<ul class="">
+<li><code><a title="src.solver.solved_data.SolvedSummary.config_section" href="#src.solver.solved_data.SolvedSummary.config_section">config_section</a></code></li>
+<li><code><a title="src.solver.solved_data.SolvedSummary.elapsed_time" href="#src.solver.solved_data.SolvedSummary.elapsed_time">elapsed_time</a></code></li>
+<li><code><a title="src.solver.solved_data.SolvedSummary.is_calc_time_over_upper" href="#src.solver.solved_data.SolvedSummary.is_calc_time_over_upper">is_calc_time_over_upper</a></code></li>
+<li><code><a title="src.solver.solved_data.SolvedSummary.is_error" href="#src.solver.solved_data.SolvedSummary.is_error">is_error</a></code></li>
+<li><code><a title="src.solver.solved_data.SolvedSummary.is_iter_over_upper" href="#src.solver.solved_data.SolvedSummary.is_iter_over_upper">is_iter_over_upper</a></code></li>
+<li><code><a title="src.solver.solved_data.SolvedSummary.is_solved" href="#src.solver.solved_data.SolvedSummary.is_solved">is_solved</a></code></li>
+<li><code><a title="src.solver.solved_data.SolvedSummary.iter_num" href="#src.solver.solved_data.SolvedSummary.iter_num">iter_num</a></code></li>
+<li><code><a title="src.solver.solved_data.SolvedSummary.m" href="#src.solver.solved_data.SolvedSummary.m">m</a></code></li>
+<li><code><a title="src.solver.solved_data.SolvedSummary.max_r_b" href="#src.solver.solved_data.SolvedSummary.max_r_b">max_r_b</a></code></li>
+<li><code><a title="src.solver.solved_data.SolvedSummary.max_r_c" href="#src.solver.solved_data.SolvedSummary.max_r_c">max_r_c</a></code></li>
+<li><code><a title="src.solver.solved_data.SolvedSummary.mu" href="#src.solver.solved_data.SolvedSummary.mu">mu</a></code></li>
+<li><code><a title="src.solver.solved_data.SolvedSummary.n" href="#src.solver.solved_data.SolvedSummary.n">n</a></code></li>
+<li><code><a title="src.solver.solved_data.SolvedSummary.obj" href="#src.solver.solved_data.SolvedSummary.obj">obj</a></code></li>
+<li><code><a title="src.solver.solved_data.SolvedSummary.problem_name" href="#src.solver.solved_data.SolvedSummary.problem_name">problem_name</a></code></li>
+<li><code><a title="src.solver.solved_data.SolvedSummary.solver_name" href="#src.solver.solved_data.SolvedSummary.solver_name">solver_name</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.1</a>.</p>
+</footer>
+</body>
+</html>

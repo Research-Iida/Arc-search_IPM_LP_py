@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.1">
+<title>src.drawer API documentation</title>
+<meta name="description" content="">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>src.drawer</code></h1>
+</header>
+<section id="section-intro">
+</section>
+<section>
+<h2 class="section-title" id="header-submodules">Sub-modules</h2>
+<dl>
+<dt><code class="name"><a title="src.drawer.drawer" href="drawer.html">src.drawer.drawer</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="src.drawer.Drawer"><code class="flex name class">
+<span>class <span class="ident">Drawer</span></span>
+<span>(</span><span>path_output: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>研究に関するグラフの描画をつかさどるクラス</p>
+<p>グラフの描画を行う上での初期設定</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Drawer:
+    &#34;&#34;&#34;研究に関するグラフの描画をつかさどるクラス&#34;&#34;&#34;
+    def __init__(
+        self,
+        path_output: str,
+    ):
+        &#34;&#34;&#34;グラフの描画を行う上での初期設定
+        &#34;&#34;&#34;
+        self.path_output = path_output
+
+    @classmethod
+    def add_suffix(cls, filename: str) -&gt; str:
+        &#34;&#34;&#34;`.png` がファイル名についていなければ追加する&#34;&#34;&#34;
+        suffix = &#34;.png&#34;
+        return str_util.add_suffix(filename, suffix)
+
+    @deco_logging(&#34;drawing optimal trajectory&#34;)
+    def _draw_optimality_trajectories(
+        self, aSolvedDetail: SolvedDetail,
+        file_name: str = &#34;optimal_trajectories&#34;
+    ):
+        &#34;&#34;&#34;&#34;duality measure mu など, 最適解に近づいていれば0に収束する値の軌跡を描画する
+
+        Args:
+            aSolvedDetail: 最適解の詳細. 描画対象となるリストをそれぞれ格納している
+            file_name: 描画するファイルの名前. `.png` を含まなくともよい
+        &#34;&#34;&#34;
+        lst_mu = aSolvedDetail.lst_mu_by_iter
+        lst_norm_main = aSolvedDetail.lst_max_norm_main_constraint_by_iter
+        lst_norm_dual = aSolvedDetail.lst_max_norm_dual_constraint_by_iter
+
+        # 描画内容が存在しなければ何もせず終了
+        if len(lst_mu) == 0 and len(lst_norm_main) == 0 and len(lst_norm_dual) == 0:
+            logger.info(&#34;No drawing data.&#34;)
+            return
+
+        fig, ax = plt.subplots()
+        ax.set_yscale(&#34;log&#34;)
+        ax.set_xlabel(&#39;iteration number&#39;)
+        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+
+        ax.plot(lst_mu, &#34;-&#34;, label=&#34;$\mu$&#34;)
+        ax.plot(lst_norm_main, &#34;--&#34;, label=&#34;primal constraint max norm&#34;)
+        ax.plot(lst_norm_dual, &#34;-.&#34;, label=&#34;dual constraint max norm&#34;)
+        ax.legend()
+        ax.set_title(&#34;trajectories for optimal solution&#34;)
+
+        fig.savefig(self.add_suffix(f&#34;{self.path_output}{file_name}&#34;))
+
+    @deco_logging(&#34;drawing search step trajectory&#34;)
+    def _draw_search_step_trajectories(
+        self, aSolvedDetail: SolvedDetail,
+        file_name: str = &#34;search_step_trajectories&#34;
+    ):
+        &#34;&#34;&#34;&#34;探索方向や step size がどのような軌跡を描いたのか確認する
+
+        Args:
+            aSolvedDetail: 最適解の詳細. 描画対象となるリストをそれぞれ格納している
+            file_name: 描画するファイルの名前. `.png` を含まなくともよい
+        &#34;&#34;&#34;
+        lst_alpha_main = aSolvedDetail.lst_main_step_size_by_iter
+        lst_alpha_dual = aSolvedDetail.lst_dual_step_size_by_iter
+        lst_norm_v_dot = aSolvedDetail.lst_norm_vdot_by_iter
+        lst_norm_v_ddot = aSolvedDetail.lst_norm_vddot_by_iter
+
+        # 描画内容が存在しなければ何もせず終了
+        # TODO: 途中まで step 進んでても singular matirix になったせいで描画するものがなくなるのはおかしくね?
+        # CRE-A で描画できなくなったので注意
+        if len(lst_alpha_main) == 0 and len(lst_alpha_dual) == 0 and len(lst_norm_v_dot) == 0 and len(lst_norm_v_ddot) == 0:
+            logger.info(&#34;No drawing data.&#34;)
+            return
+
+        fig, ax1 = plt.subplots()
+        # グラフのグリッドをグラフの本体の下にずらす
+        ax1.set_axisbelow(True)
+        color_1 = cm.Set1.colors[0]
+
+        # 2軸グラフの本体設定
+        # もし main と dual で同じ step size であれば, 一つに統一
+        if all(lst_alpha_main[i] == lst_alpha_dual[i] for i in range(len(lst_alpha_main))):
+            ax1.plot(lst_alpha_main, &#34;--&#34;, color=color_1, label=&#34;step size&#34;)
+        else:
+            ax1.plot(lst_alpha_main, &#34;--&#34;, color=color_1, label=&#34;primal step size&#34;)
+            ax1.plot(lst_alpha_dual, &#34;-.&#34;, color=cm.Set1.colors[2], label=&#34;dual step size&#34;)
+
+        # 軸の縦線の色を変更
+        ax1.tick_params(axis=&#39;y&#39;, colors=color_1)
+        # step size の幅は 0 ~ pi/2(line は1まで)なので, それよりちょっと大きいところまで目盛りをとる
+        ax1.set_ylim(0, 1.6)
+        ax1.set_xlabel(&#34;Iteration number&#34;)
+        ax1.xaxis.set_major_locator(MaxNLocator(integer=True))
+        ax1.set_ylabel(&#34;alpha&#34;)
+        # グラフの本体設定時に, ラベルを手動で設定する必要があるのは barplot のみ. plotは自動で設定される
+        handler1, label1 = ax1.get_legend_handles_labels()
+
+        # 探索方向のノルムを描画しない場合はそのまま出力
+        if len(lst_norm_v_dot) == 0 and len(lst_norm_v_ddot) == 0:
+            ax1.legend(
+                handler1, label1,
+                loc=&#34;lower left&#34;,
+                borderaxespad=0.
+            )
+            plt.title(&#34;trajectories for step size&#34;)
+            plt.savefig(self.add_suffix(f&#34;{self.path_output}{file_name}&#34;))
+            return
+
+        color_2 = cm.Set1.colors[1]
+        ax2 = ax1.twinx()
+        ax2.plot(lst_norm_v_dot, color=color_2, label=&#34;$\|\dot{v}\|$&#34;)
+        ax2.plot(lst_norm_v_ddot, color=cm.Set1.colors[3], label=&#34;$\|\ddot{v}\|$&#34;)
+        # axesオブジェクトに属するSpineオブジェクトの値を変更
+        # 図を重ねてる関係で、ax2 のみいじる。
+        ax2.spines[&#39;left&#39;].set_color(color_1)
+        ax2.spines[&#39;right&#39;].set_color(color_2)
+        ax2.tick_params(axis=&#39;y&#39;, colors=color_2)
+        ax2.set_yscale(&#34;log&#34;)
+        ax2.set_ylabel(&#34;search direction norm&#34;)
+        handler2, label2 = ax2.get_legend_handles_labels()
+
+        # 凡例をまとめて出力する
+        ax1.legend(
+            handler1 + handler2, label1 + label2,
+            # loc=&#34;lower left&#34;,
+            # borderaxespad=0.
+        )
+        ax1.set_title(&#34;trajectories for search direction and step size&#34;)
+        fig.savefig(self.add_suffix(f&#34;{self.path_output}{file_name}&#34;))
+
+    @deco_logging(&#34;drawing variable min values trajectory&#34;)
+    def _draw_variables_min_values_trajectories(
+        self, aSolvedDetail: SolvedDetail,
+        file_name: str = &#34;variable_min_value_trajectories&#34;
+    ):
+        &#34;&#34;&#34;&#34;正の値になるべき x,s が本当に正の値のまま反復しているかを確認するための軌跡を描画
+
+        Args:
+            aSolvedDetail: 最適解の詳細. 描画対象となるリストをそれぞれ格納している
+            file_name: 描画するファイルの名前. `.png` を含まなくともよい
+        &#34;&#34;&#34;
+        lst_variables = aSolvedDetail.lst_variables_by_iter
+
+        # 描画内容が存在しなければ何もせず終了
+        if len(lst_variables) == 0:
+            logger.info(&#34;No drawing data.&#34;)
+            return
+
+        # x,s のそれぞれの最小値を取得
+        lst_min_x = [min(v.x) for v in lst_variables]
+        lst_min_s = [min(v.s) for v in lst_variables]
+
+        fig, ax = plt.subplots()
+
+        # y軸を対数に
+        ax.set_yscale(&#34;log&#34;)
+
+        # 軸ラベル
+        ax.set_xlabel(&#39;iteration number&#39;)
+        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+        ax.plot(lst_min_x, &#34;-&#34;, label=&#34;min $x$&#34;)
+        ax.plot(lst_min_s, &#34;--&#34;, label=&#34;min $s$&#34;)
+        ax.legend()
+        ax.set_title(&#34;trajectories of variables min values&#34;)
+
+        fig.savefig(self.add_suffix(f&#34;{self.path_output}{file_name}&#34;))
+
+    @deco_logging(&#34;drawing variable max values trajectory&#34;)
+    def _draw_variables_max_norms_trajectories(
+        self, aSolvedDetail: SolvedDetail,
+        file_name: str = &#34;variable_max_value_trajectories&#34;
+    ):
+        &#34;&#34;&#34;&#34;変数が発散しないまま反復しているかを確認するための軌跡を描画
+
+        Args:
+            aSolvedDetail: 最適解の詳細. 描画対象となるリストをそれぞれ格納している
+            file_name: 描画するファイルの名前. `.png` を含まなくともよい
+        &#34;&#34;&#34;
+        lst_variables = aSolvedDetail.lst_variables_by_iter
+
+        # 描画内容が存在しなければ何もせず終了
+        if len(lst_variables) == 0:
+            logger.info(&#34;No drawing data.&#34;)
+            return
+
+        # それぞれの最大値を取得
+        lst_max_x = [max(v.x) for v in lst_variables]
+        lst_max_s = [max(v.s) for v in lst_variables]
+        # y は負の値になりうるのでノルムを取る
+        lst_max_ynorm = [np.linalg.norm(v.y, np.inf) for v in lst_variables]
+
+        fig, ax = plt.subplots()
+
+        # y軸を対数に
+        ax.set_yscale(&#34;log&#34;)
+
+        # 軸ラベル
+        ax.set_xlabel(&#39;iteration number&#39;)
+        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+        ax.plot(lst_max_x, &#34;-&#34;, label=&#34;max $x$&#34;)
+        ax.plot(lst_max_ynorm, &#34;-.&#34;, label=&#34;max $|y|$&#34;)
+        ax.plot(lst_max_s, &#34;--&#34;, label=&#34;max $s$&#34;)
+        ax.legend()
+        ax.set_title(&#34;trajectories of variables max values&#34;)
+
+        fig.savefig(self.add_suffix(f&#34;{self.path_output}{file_name}&#34;))
+
+    @deco_logging(&#34;drawing residuals inexact solution trajectory&#34;)
+    def _draw_residuals_inexact_solution_trajectories(
+        self, aSolvedDetail: SolvedDetail,
+        file_name: str = &#34;residuals_inexact_solution&#34;
+    ):
+        &#34;&#34;&#34;&#34;inexact に解いた時の誤差を描画
+
+        Args:
+            aSolvedDetail: 最適解の詳細. 描画対象となるリストをそれぞれ格納している
+            file_name: 描画するファイルの名前. `.png` を含まなくともよい
+        &#34;&#34;&#34;
+        lst_residual_inexact_vdot = aSolvedDetail.lst_residual_inexact_vdot
+        lst_residual_inexact_vddot = aSolvedDetail.lst_residual_inexact_vddot
+
+        # 描画内容が存在しなければ何もせず終了
+        if len(lst_residual_inexact_vdot) == 0 and len(lst_residual_inexact_vddot) == 0:
+            logger.info(&#34;No drawing data.&#34;)
+            return
+
+        fig, ax = plt.subplots()
+
+        # 軸のスケールを対数に
+        ax.set_yscale(&#34;log&#34;)
+        # 軸ラベル
+        ax.set_xlabel(&#34;Iteration number&#34;)
+        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+
+        color_1 = cm.Set1.colors[0]
+        ax.plot(lst_residual_inexact_vdot, &#34;-&#34;, color=color_1, label=&#34;$\dot{v}$ residual&#34;)
+        if len(lst_residual_inexact_vddot) &gt; 0:
+            color_2 = cm.Set1.colors[1]
+            ax.plot(lst_residual_inexact_vddot, &#34;-&#34;, color=color_2, label=&#34;$\ddot{v}$ residual&#34;)
+
+        lst_tolerance_inexact_vdot = aSolvedDetail.lst_tolerance_inexact_vdot
+        lst_tolerance_inexact_vddot = aSolvedDetail.lst_tolerance_inexact_vddot
+        if len(lst_tolerance_inexact_vddot) == 0 or np.all(np.array(lst_tolerance_inexact_vdot) == np.array(lst_tolerance_inexact_vddot)):
+            ax.plot(lst_tolerance_inexact_vdot, &#34;--&#34;, color=color_1, label=&#34;tolerance&#34;)
+        else:
+            ax.plot(lst_tolerance_inexact_vdot, &#34;--&#34;, color=color_1, label=&#34;$\dot{v}$ tolerance&#34;)
+            ax.plot(lst_tolerance_inexact_vddot, &#34;--&#34;, color=color_2, label=&#34;$\ddot{v}$ tolerance&#34;)
+        ax.legend()
+        ax.set_title(&#34;trajectories for residuals of inexact solution&#34;)
+
+        fig.savefig(self.add_suffix(f&#34;{self.path_output}{file_name}&#34;))
+
+    def run(self, aSolvedDetail: SolvedDetail):
+        &#34;&#34;&#34;描画する対象をすべて実行する
+
+        ファイル名はデフォルトのまま.
+        &#39;_draw_&#39; で始まる関数をすべて実行する
+        &#34;&#34;&#34;
+        for func_name in dir(self):
+            if func_name.startswith(&#34;_draw_&#34;):
+                eval(f&#34;self.{func_name}(data)&#34;, {}, {&#34;self&#34;: self, &#34;data&#34;: aSolvedDetail})
+
+        plt.clf()
+        plt.close()</code></pre>
+</details>
+<h3>Static methods</h3>
+<dl>
+<dt id="src.drawer.Drawer.add_suffix"><code class="name flex">
+<span>def <span class="ident">add_suffix</span></span>(<span>filename: str) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p><code>.png</code> がファイル名についていなければ追加する</p></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="src.drawer.Drawer.run"><code class="name flex">
+<span>def <span class="ident">run</span></span>(<span>self, aSolvedDetail: <a title="src.solver.solved_data.SolvedDetail" href="../solver/solved_data.html#src.solver.solved_data.SolvedDetail">SolvedDetail</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>描画する対象をすべて実行する</p>
+<p>ファイル名はデフォルトのまま.
+'<em>draw</em>' で始まる関数をすべて実行する</p></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="src" href="../index.html">src</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-submodules">Sub-modules</a></h3>
+<ul>
+<li><code><a title="src.drawer.drawer" href="drawer.html">src.drawer.drawer</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="src.drawer.Drawer" href="#src.drawer.Drawer">Drawer</a></code></h4>
+<ul class="">
+<li><code><a title="src.drawer.Drawer.add_suffix" href="#src.drawer.Drawer.add_suffix">add_suffix</a></code></li>
+<li><code><a title="src.drawer.Drawer.run" href="#src.drawer.Drawer.run">run</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.1</a>.</p>
+</footer>
+</body>
+</html>

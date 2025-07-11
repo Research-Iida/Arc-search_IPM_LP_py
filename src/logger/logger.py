@@ -3,21 +3,22 @@
 `config/logging.conf` からロガーに関する情報を読み込む.
 ファイルに出力する際は `{日付}_{指定した名前}.log` という形になるよう設定
 """
-import os
-from datetime import date
+
+import glob
 import logging
 import logging.config
-import glob
+import os
+from datetime import date
+from pathlib import Path
 
-from ..utils import config_utils
-from ..utils import file_util
+from ..utils import config_utils, file_util
 from ..utils.str_util import add_suffix_log
 
 config_ini = config_utils.read_config()
-path_config = config_ini.get("PATH_CONFIG")
+path_config = Path(config_ini.get("PATH_CONFIG"))
 name_logging_conf = config_ini.get("CONFIG_LOGGING")
-logging.config.fileConfig(f"{path_config}{name_logging_conf}")
-path_log = config_ini.get("PATH_LOG")
+logging.config.fileConfig(path_config.joinpath(name_logging_conf))
+path_log = Path(config_ini.get("PATH_LOG"))
 
 
 def get_main_logger():
@@ -33,7 +34,7 @@ def setup_logger(
     name: str,
     *,
     batch_date: date = date.today(),
-    path_log: str = path_log,
+    path_log: Path = path_log,
 ):
     """logger のセットアップ
 
@@ -47,7 +48,7 @@ def setup_logger(
 
     # logファイルの出力名設定
     str_batch_date = batch_date.strftime("%Y%m%d")
-    logfile = add_suffix_log(f"{path_log}{str_batch_date}_{name}")
+    logfile = add_suffix_log(str(path_log.joinpath(f"{str_batch_date}_{name}")))
     # もし既に同じ名前のファイルがある場合は書き直し
     if file_util.exists_file(logfile):
         file_util.remove_files_and_dirs([logfile])
@@ -55,9 +56,7 @@ def setup_logger(
     # create file handler which logs
     fh = logging.FileHandler(logfile)
     fh.setLevel(logging.DEBUG)
-    fh_formatter = logging.Formatter(
-        ' %(asctime)s : %(filename)s:%(lineno)s [%(levelname)s] %(message)s'
-    )
+    fh_formatter = logging.Formatter(" %(asctime)s : %(filename)s:%(lineno)s [%(levelname)s] %(message)s")
     fh.setFormatter(fh_formatter)
 
     # add the handlers to the logger
@@ -75,10 +74,7 @@ def idx_date_start_end_from_filename(path_log: str):
     return start_date_idx, end_date_idx
 
 
-def remove_log_files(
-    end_date_to_be_deleted: str,
-    path_log: str = path_log
-):
+def remove_log_files(end_date_to_be_deleted: str, path_log: str = path_log):
     """古くなったログファイルの削除
 
     Args:

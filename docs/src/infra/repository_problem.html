@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.1">
+<title>src.infra.repository_problem API documentation</title>
+<meta name="description" content="LP の読み込み・書き込みに関する module">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>src.infra.repository_problem</code></h1>
+</header>
+<section id="section-intro">
+<p>LP の読み込み・書き込みに関する module</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="src.infra.repository_problem.LPRepository"><code class="flex name class">
+<span>class <span class="ident">LPRepository</span></span>
+<span>(</span><span>config_section: str = 'DEFAULT')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>LPを読み込む際に必要になる処理についてまとめたクラス</p>
+<p>SIF file は制約ごとに上限, 下限が設定されていたり, box constraint が存在したりする
+標準形式に起こす必要がある</p>
+<p>初期化. <code>data</code> ディレクトリへのパスを設定する</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class LPRepository(ILPRepository):
+    &#34;&#34;&#34;LPを読み込む際に必要になる処理についてまとめたクラス
+
+    SIF file は制約ごとに上限, 下限が設定されていたり, box constraint が存在したりする
+    標準形式に起こす必要がある
+    &#34;&#34;&#34;
+
+    def __init__(self, config_section: str = config_utils.default_section):
+        &#34;&#34;&#34;初期化. `data` ディレクトリへのパスを設定する&#34;&#34;&#34;
+        path_generator = PathGenerator(config_section=config_section)
+
+        self._path_netlib: Path = path_generator.generate_path_netlib()
+        self._path_processed: Path = path_generator.generate_path_data_processed()
+
+    def get_problem_names(self) -&gt; list[str]:
+        &#34;&#34;&#34;参照しているディレクトリに存在する `SIF` ファイルの一覧を取得
+
+        問題名のみ取り出したいので, `.SIF` を削除して出力する
+        &#34;&#34;&#34;
+        return [fullpath.name[:-4] for fullpath in self._path_netlib.glob(&#34;*.SIF&#34;)]
+
+    def separate_by_constraint_type(self, types_constraint: list[str], A: lil_matrix, b_origin: np.ndarray):
+        &#34;&#34;&#34;制約の種類（等式, 上限, 下限）によって A,b のインスタンスを分ける
+
+        Args:
+            types_constraint: A, b の制約の種類. E or G or L
+        &#34;&#34;&#34;
+        lst_index_eq = [idx for idx, val in enumerate(types_constraint) if val == &#34;E&#34;]
+        A_E = A[lst_index_eq, :]
+        b_E = b_origin[lst_index_eq]
+        lst_index_ge = [idx for idx, val in enumerate(types_constraint) if val == &#34;G&#34;]
+        A_G = A[lst_index_ge, :]
+        b_G = b_origin[lst_index_ge]
+        lst_index_le = [idx for idx, val in enumerate(types_constraint) if val == &#34;L&#34;]
+        A_L = A[lst_index_le, :]
+        b_L = b_origin[lst_index_le]
+        return A_E, A_G, A_L, b_E, b_G, b_L
+
+    def read_raw_LP(self, problem_name: str) -&gt; LP:
+        &#34;&#34;&#34;MPS ファイルを読み込んで線形計画問題インスタンスを出力する
+
+        Args:
+            problem_name: 問題名. パスは含まない. `.SIF` はついていてもいなくてもよい
+
+        Returns:
+            LP: 線形計画問題のインスタンス
+        &#34;&#34;&#34;
+        problem_filename = str_util.add_suffix(problem_name, &#34;.SIF&#34;)
+        mps_obj = smps.load_mps(self._path_netlib.joinpath(problem_filename))
+
+        # 制約数
+        m_origin = len(mps_obj[2])
+        A_origin = coo_matrix(mps_obj[7]).tolil()
+
+        # 変数次元数
+        n_origin = len(mps_obj[3])
+        c_origin = mps_obj[6]
+
+        # すべて0であれば SIF file への記載が省略されるため, 明示的に設定
+        if not len(c_origin):
+            c_origin = np.zeros(n_origin)
+
+        # 制約
+        name_constraints = mps_obj[8]
+        # 制約の右辺がすべて0の場合省略されるため, 明示的に設定
+        if name_constraints:
+            b_origin = mps_obj[9][name_constraints[0]]
+        else:
+            b_origin = np.zeros(m_origin)
+        # 変数の上下限制約
+        name_bounds = mps_obj[10]
+        # 上下限制約がない場合記載が省略されるため, 明示的に設定
+        if name_bounds:
+            dct_bound = mps_obj[11][name_bounds[0]]
+            lb_origin = dct_bound[&#34;LO&#34;]
+            ub_origin = dct_bound[&#34;UP&#34;]
+        else:
+            lb_origin = np.zeros(n_origin)
+            ub_origin = np.full(n_origin, np.inf)
+
+        # 変数上限は制約に追加されるので, 上限があるものを取得しておく
+        lst_index_lb = np.where(lb_origin != -np.inf)[0]
+        lst_index_ub = np.where(ub_origin != np.inf)[0]
+        lb = lb_origin[lst_index_lb]
+        ub = ub_origin[lst_index_ub]
+
+        # 等式制約, 上限 or 下限不等式制約に分ける
+        types_constraint = mps_obj[5]
+        A_E, A_G, A_L, b_E, b_G, b_L = self.separate_by_constraint_type(types_constraint, A_origin, b_origin)
+
+        output = LP(A_E, b_E, A_G, b_G, A_L, b_L, lst_index_lb, lb, lst_index_ub, ub, c_origin, problem_name)
+        return output
+
+    def write_LP(self, aLP: LPS, problem_name: str):
+        &#34;&#34;&#34;線形計画問題を csvファイルに書き出す
+
+        前処理したものを書き出す前提のため, `processed` ディレクトリに書き出す
+
+        TODO:
+            * 0は書き下すとファイルサイズが大きくなるので, 欠損させるようにしたい
+        &#34;&#34;&#34;
+        # Aの書き出し, scipy.sparce の型なので別で書き出しする
+        save_npz(self._path_processed.joinpath(f&#34;{problem_name}_A.npz&#34;), aLP.A)
+
+        np.save(self._path_processed.joinpath(f&#34;{problem_name}_b.npy&#34;), aLP.b)
+        np.save(self._path_processed.joinpath(f&#34;{problem_name}_c.npy&#34;), aLP.c)
+
+        logger.info(f&#34;&#39;{problem_name}&#39; is written in {self._path_processed}.&#34;)
+
+    def can_read_processed_LP(self, problem_name: str) -&gt; bool:
+        &#34;&#34;&#34;指定した問題がディレクトリに存在し, 読み取ることが可能か&#34;&#34;&#34;
+        is_exist_A = os.path.exists(self._path_processed.joinpath(f&#34;{problem_name}_A.npz&#34;))
+        is_exist_b = os.path.exists(self._path_processed.joinpath(f&#34;{problem_name}_b.npy&#34;))
+        is_exist_c = os.path.exists(self._path_processed.joinpath(f&#34;{problem_name}_c.npy&#34;))
+        return is_exist_A and is_exist_b and is_exist_c
+
+    def read_processed_LP(self, problem_name: str) -&gt; LPS:
+        &#34;&#34;&#34;線形計画問題に関するcsvファイルを読み込み, 問題のクラスインスタンスを出力
+
+        csv上で欠損している箇所は0を代入する
+        &#34;&#34;&#34;
+        # 読み込めない場合, エラーを返す
+        if not self.can_read_processed_LP(problem_name):
+            raise CannotReadError(f&#34;{self._path_processed} 以下に前処理済みの &#39;{problem_name}&#39; data が存在しません.&#34;)
+
+        A = load_npz(self._path_processed.joinpath(f&#34;{problem_name}_A.npz&#34;))
+
+        b = np.load(self._path_processed.joinpath(f&#34;{problem_name}_b.npy&#34;))
+        c = np.load(self._path_processed.joinpath(f&#34;{problem_name}_c.npy&#34;))
+
+        return LPS(A, b, c, problem_name)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="src.problem.repository.ILPRepository" href="../problem/repository.html#src.problem.repository.ILPRepository">ILPRepository</a></li>
+<li>abc.ABC</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="src.infra.repository_problem.LPRepository.get_problem_names"><code class="name flex">
+<span>def <span class="ident">get_problem_names</span></span>(<span>self) ‑> list[str]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>参照しているディレクトリに存在する <code>SIF</code> ファイルの一覧を取得</p>
+<p>問題名のみ取り出したいので, <code>.SIF</code> を削除して出力する</p></div>
+</dd>
+<dt id="src.infra.repository_problem.LPRepository.read_processed_LP"><code class="name flex">
+<span>def <span class="ident">read_processed_LP</span></span>(<span>self, problem_name: str) ‑> <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>線形計画問題に関するcsvファイルを読み込み, 問題のクラスインスタンスを出力</p>
+<p>csv上で欠損している箇所は0を代入する</p></div>
+</dd>
+<dt id="src.infra.repository_problem.LPRepository.separate_by_constraint_type"><code class="name flex">
+<span>def <span class="ident">separate_by_constraint_type</span></span>(<span>self, types_constraint: list[str], A: scipy.sparse._lil.lil_matrix, b_origin: numpy.ndarray)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>制約の種類（等式, 上限, 下限）によって A,b のインスタンスを分ける</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>types_constraint</code></strong></dt>
+<dd>A, b の制約の種類. E or G or L</dd>
+</dl></div>
+</dd>
+<dt id="src.infra.repository_problem.LPRepository.write_LP"><code class="name flex">
+<span>def <span class="ident">write_LP</span></span>(<span>self, aLP: <a title="src.problem.problem.LinearProgrammingProblemStandard" href="../problem/problem.html#src.problem.problem.LinearProgrammingProblemStandard">LinearProgrammingProblemStandard</a>, problem_name: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>線形計画問題を csvファイルに書き出す</p>
+<p>前処理したものを書き出す前提のため, <code>processed</code> ディレクトリに書き出す</p>
+<h2 id="todo">Todo</h2>
+<ul>
+<li>0は書き下すとファイルサイズが大きくなるので, 欠損させるようにしたい</li>
+</ul></div>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="src.problem.repository.ILPRepository" href="../problem/repository.html#src.problem.repository.ILPRepository">ILPRepository</a></b></code>:
+<ul class="hlist">
+<li><code><a title="src.problem.repository.ILPRepository.can_read_processed_LP" href="../problem/repository.html#src.problem.repository.ILPRepository.can_read_processed_LP">can_read_processed_LP</a></code></li>
+<li><code><a title="src.problem.repository.ILPRepository.read_raw_LP" href="../problem/repository.html#src.problem.repository.ILPRepository.read_raw_LP">read_raw_LP</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="src.infra" href="index.html">src.infra</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="src.infra.repository_problem.LPRepository" href="#src.infra.repository_problem.LPRepository">LPRepository</a></code></h4>
+<ul class="">
+<li><code><a title="src.infra.repository_problem.LPRepository.get_problem_names" href="#src.infra.repository_problem.LPRepository.get_problem_names">get_problem_names</a></code></li>
+<li><code><a title="src.infra.repository_problem.LPRepository.read_processed_LP" href="#src.infra.repository_problem.LPRepository.read_processed_LP">read_processed_LP</a></code></li>
+<li><code><a title="src.infra.repository_problem.LPRepository.separate_by_constraint_type" href="#src.infra.repository_problem.LPRepository.separate_by_constraint_type">separate_by_constraint_type</a></code></li>
+<li><code><a title="src.infra.repository_problem.LPRepository.write_LP" href="#src.infra.repository_problem.LPRepository.write_LP">write_LP</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.1</a>.</p>
+</footer>
+</body>
+</html>

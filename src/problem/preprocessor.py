@@ -1,31 +1,39 @@
 """LPに関する前処理を行う module"""
-from typing import Optional
+
+from collections import Counter
 
 import numpy as np
+from scipy.sparse import csr_matrix as Csr
 from tqdm import tqdm
 
-from src.problem import LinearProgrammingProblemStandard as LPS
-from src.logger import get_main_logger
-
+from ..logger import get_main_logger, indent
+from .problem import LinearProgrammingProblemStandard as LPS
 
 logger = get_main_logger()
 
 
 class ProblemInfeasibleError(Exception):
     """前処理により実行不可能な問題であることがわかった場合に出すエラー"""
+
     pass
 
 
 class ProblemUnboundedError(Exception):
     """前処理により最適値が発散してしまうことがわかった場合に出すエラー"""
+
     pass
 
 
 class LPPreprocessor:
     """LPに関する前処理クラス"""
+
     def _remove_rows_and_columns(
-        self, A: np.ndarray, b: np.ndarray = None, c: np.ndarray = None,
-        rows_remove: set[int] = set(), columns_remove: set[int] = set()
+        self,
+        A: Csr,
+        b: np.ndarray = None,
+        c: np.ndarray = None,
+        rows_remove: set[int] = set(),
+        columns_remove: set[int] = set(),
     ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """削除する行, 列を指定して, A, b, c から削除する
 
@@ -35,6 +43,11 @@ class LPPreprocessor:
             rows_remove: 削除行. 入力されなければ空集合
             columns_remove: 削除列. 入力されなければ空集合
         """
+        if len(rows_remove) > 0:
+            logger.debug(f"{indent}Remove rows: {rows_remove}")
+        if len(columns_remove) > 0:
+            logger.debug(f"{indent}Remove columns: {columns_remove}")
+
         # 残す行, 列を指定
         rows_out = [i for i in range(A.shape[0]) if i not in rows_remove]
         columns_out = [i for i in range(A.shape[1]) if i not in columns_remove]
@@ -52,29 +65,24 @@ class LPPreprocessor:
 
         return A_out, b_out, c_out
 
-    def remove_empty_row(
-        self, A: np.ndarray, b: np.ndarray
-    ) -> tuple[np.ndarray, np.ndarray]:
+    def remove_empty_row(self, A: Csr, b: np.ndarray) -> tuple[Csr, np.ndarray]:
         """空行で制約が存在しないAの行は削除する
 
         もしAの係数がないのにbが0以外の場合, どうやってもその制約は満たせないのでエラー
         """
         rows_remove = set()
         # A が空行になっているindexに対して処理
-        for i in np.where(np.all(A == 0, axis=1))[0]:
+        empty_rows_of_A = {i for i in range(A.shape[0])} - set(A.nonzero()[0].tolist())
+        for i in empty_rows_of_A:
             # もしAが空行なのにbが0でなければ実行不可能
             if b[i] != 0:
-                raise ProblemInfeasibleError
+                raise ProblemInfeasibleError(f"{i}-th row of A is empty, but b[{i}] == {b[i]} != 0.")
             rows_remove.add(i)
 
-        A_out, b_out, _ = self._remove_rows_and_columns(
-            A, b=b, rows_remove=rows_remove
-        )
+        A_out, b_out, _ = self._remove_rows_and_columns(A, b=b, rows_remove=rows_remove)
         return A_out, b_out
 
-    def remove_duplicated_row(
-        self, A: np.ndarray, b: np.ndarray
-    ) -> tuple[np.ndarray, np.ndarray]:
+    def remove_duplicated_row(self, A: np.ndarray, b: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         """重複のある制約を削除
 
         A_i = k*A_j の時, b_i = k*b_j ならば, jの制約はなくても同じなので削除してよい
@@ -82,9 +90,7 @@ class LPPreprocessor:
         """
         m = A.shape[0]
 
-        def scalar_times_vector(
-            vec_a: np.ndarray, vec_b: np.ndarray
-        ) -> Optional[float]:
+        def scalar_times_vector(vec_a: np.ndarray, vec_b: np.ndarray) -> float | None:
             """vec_b が vec_a の定数倍であるならばその値を, そうでなければ None を出力"""
             # 0の位置が正しくなければ定数倍ではない
             idx_not_zero_a = np.where(vec_a != 0)[0]
@@ -122,14 +128,10 @@ class LPPreprocessor:
                 rows_remove.add(j)
 
         # 削除対象の行を省いて出力
-        A_out, b_out, _ = self._remove_rows_and_columns(
-            A, b=b, rows_remove=rows_remove
-        )
+        A_out, b_out, _ = self._remove_rows_and_columns(A, b=b, rows_remove=rows_remove)
         return A_out, b_out
 
-    def remove_empty_column(
-        self, A: np.ndarray, c: np.ndarray
-    ) -> tuple[np.ndarray, np.ndarray]:
+    def remove_empty_column(self, A: Csr, c: np.ndarray) -> tuple[Csr, np.ndarray]:
         """空列で制約が存在しない変数は自由な値を取れるので, 削除する
 
         自由な値がとれる場合, cが正ならば0が最適値
@@ -137,20 +139,17 @@ class LPPreprocessor:
         """
         columns_remove = set()
         # Aが空列になっている index に対してのみ処理
-        for i in np.where(np.all(A == 0, axis=0))[0]:
+        empty_cols_of_A = {i for i in range(A.shape[1])} - set(A.nonzero()[1].tolist())
+        for i in empty_cols_of_A:
             # もしAが空列なのにcが負であれば unbounded
             if c[i] < 0:
-                raise ProblemUnboundedError
+                raise ProblemUnboundedError(f"{i}-th col of A is empty, but c[{i}] == {c[i]} < 0.")
             columns_remove.add(i)
 
-        A_out, _, c_out = self._remove_rows_and_columns(
-            A, c=c, columns_remove=columns_remove
-        )
+        A_out, _, c_out = self._remove_rows_and_columns(A, c=c, columns_remove=columns_remove)
         return A_out, c_out
 
-    def remove_duplicated_column(
-        self, A: np.ndarray, c: np.ndarray
-    ) -> tuple[np.ndarray, np.ndarray]:
+    def remove_duplicated_column(self, A: np.ndarray, c: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         """重複する列を削除する
 
         行の場合と異なり, 全く同じ列でなければ削除をしない
@@ -171,33 +170,24 @@ class LPPreprocessor:
                     columns_remove.add(j)
 
         # 削除対象の列を省いて出力
-        A_out, _, c_out = self._remove_rows_and_columns(
-            A, c=c, columns_remove=columns_remove
-        )
+        A_out, _, c_out = self._remove_rows_and_columns(A, c=c, columns_remove=columns_remove)
         return A_out, c_out
 
-    def rows_only_one_nonzero(self, A: np.ndarray) -> list[int]:
-        """Aの行のうち1つしか0以外の係数が存在しない行のインデックス取得
-
-        A が1行m列の制約になった場合エラーとなるので, その時は axis を変更する
-        """
-        if A.shape[1] == 1:
-            output = np.where(np.count_nonzero(A, axis=0) == 1)
-        else:
-            output = np.where(np.count_nonzero(A, axis=1) == 1)
-        return output[0]
+    def rows_only_one_nonzero(self, A: Csr) -> list[int]:
+        """Aの行のうち1つしか0以外の係数が存在しない行のインデックス取得"""
+        row_element_counter = Counter(A.nonzero()[0].tolist())
+        result = [row for row, count in row_element_counter.items() if count == 1]
+        return result
 
     def only_one_nonzero_elements_and_columns(
-        self, A: np.ndarray, row_indexs_only_one_nonzero: list[int]
-    ) -> tuple[np.ndarray, list[int]]:
+        self, A: Csr, row_indexs_only_one_nonzero: list[int]
+    ) -> tuple[Csr, list[int]]:
         """1つしか係数がない行の係数のベクトル形式と, 列のインデックスを取得"""
         A_only_one_nonzero = A[row_indexs_only_one_nonzero, :]
-        indexes_tmp = np.nonzero(A_only_one_nonzero)
-        return A_only_one_nonzero[indexes_tmp], indexes_tmp[1]
+        indexes_tmp = A_only_one_nonzero.indices
+        return A_only_one_nonzero.data, indexes_tmp
 
-    def remove_row_singleton(
-        self, A: np.ndarray, b: np.ndarray, c: np.ndarray
-    ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def remove_row_singleton(self, A: Csr, b: np.ndarray, c: np.ndarray) -> tuple[Csr, np.ndarray, np.ndarray]:
         """1つしか係数がかかっていない行は1つの値に定めることで次元数削除"""
         # 1つしか係数がない行の特定
         rows_remove = self.rows_only_one_nonzero(A)
@@ -207,9 +197,7 @@ class LPPreprocessor:
             return A, b, c
 
         # 1つしか係数がない行の係数とその列を取得
-        elements, columns_remove = self.only_one_nonzero_elements_and_columns(
-            A, rows_remove
-        )
+        elements, columns_remove = self.only_one_nonzero_elements_and_columns(A, rows_remove)
 
         # 変数の確定. もし負の値になってしまったら実行不可能
         x = b[rows_remove] / elements
@@ -217,20 +205,16 @@ class LPPreprocessor:
             raise ProblemInfeasibleError
 
         # 行が削除された結果
-        A_new, _, c_new = self._remove_rows_and_columns(
-            A, c=c, rows_remove=rows_remove, columns_remove=columns_remove
-        )
+        A_new, _, c_new = self._remove_rows_and_columns(A, c=c, rows_remove=rows_remove, columns_remove=columns_remove)
         # bのみ値が変わるため, 別で計算する
-        rows_output = [i for i in range(A.shape[0]) if i not in rows_remove]
+        rows_output = list({i for i in range(A.shape[0])} - set(rows_remove))
         b_new = b[rows_output] - A[np.ix_(rows_output, columns_remove)].dot(x)
 
         # 行を削除した結果, 再び要素が1つだけの行ができるかもしれないので再度実行
         A_out, b_out, c_out = self.remove_row_singleton(A_new, b_new, c_new)
         return A_out, b_out, c_out
 
-    def find_zero_columns_in_A(
-        self, A: np.ndarray, column: int
-    ) -> list[int]:
+    def find_zero_columns_in_A(self, A: np.ndarray, column: int) -> list[int]:
         """Aのj列に対して足して0になる列のリストを取得
 
         j-1列目までは確認していると考えて, j+1列目以降と比較する
@@ -239,7 +223,7 @@ class LPPreprocessor:
             A: 制約の係数行列
             column: Aのどの列と他の列が同じか参照するか（j列目）
         """
-        A_j_minus_A = A[:, column].reshape(A.shape[0], 1) + A[:, (column + 1):]
+        A_j_minus_A = A[:, column].reshape(A.shape[0], 1) + A[:, (column + 1) :]
         index_0 = np.where(np.all(A_j_minus_A == 0, axis=0))[0]
         return (index_0 + column + 1).tolist()
 
@@ -296,20 +280,29 @@ class LPPreprocessor:
         else:
             return A, b, c
 
-    def fix_variables_by_single_row(
-        self, A: np.ndarray, b: np.ndarray, c: np.ndarray
-    ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def fix_variables_by_single_row(self, A: Csr, b: np.ndarray, c: np.ndarray) -> tuple[Csr, np.ndarray, np.ndarray]:
         """bが負の時に制約が正の係数しか持たない, もしくはbが正の時に制約が負の係数しか
         もたない場合実行不可能. bが0の時に制約が正 or 負どちらかの係数しか持たない場合,
         解はすべて0として制約と変数を削除する
         """
         # 実行不可能性の確認
         rows_b_negative = np.where(b < 0)[0]
-        if np.any(np.all(A[rows_b_negative, :] >= 0, axis=1)):
-            raise ProblemInfeasibleError
+        for row in rows_b_negative:
+            if np.all(A[row, :].data > 0):
+                raise ProblemInfeasibleError(
+                    f"{row}th row of A has only semi-positive coefficients but negative b_{row}: {b[row]}"
+                )
+        # if np.any(np.all(A[rows_b_negative, :].toarray() >= 0, axis=1)):
+        #     raise ProblemInfeasibleError("A has only semi-positive coefficients in the row of negative b")
+
         rows_b_positive = np.where(b > 0)[0]
-        if np.any(np.all(A[rows_b_positive, :] <= 0, axis=1)):
-            raise ProblemInfeasibleError
+        for row in rows_b_positive:
+            if np.all(A[row, :].data < 0):
+                raise ProblemInfeasibleError(
+                    f"{row}th row of A has only semi-negative coefficients but positive b_{row}: {b[row]}"
+                )
+        # if np.any(np.all(A[rows_b_positive, :].toarray() <= 0, axis=1)):
+        #     raise ProblemInfeasibleError("A has only semi-negative coefficients in the row of positive b")
 
         # 制約, 変数の削除
         rows_remove = set()
@@ -317,9 +310,9 @@ class LPPreprocessor:
         rows_b_zero = np.where(b == 0)[0]
         for row in rows_b_zero:
             row_A = A[row, :]
-            columns_A_nonzero = np.where(row_A != 0)[0]
+            columns_A_nonzero = row_A.indices
             # 係数が正 or 負のどちらかしか持たない場合, 解はすべて0とする
-            if np.all(row_A >= 0) or np.all(row_A <= 0):
+            if np.all(row_A.toarray() >= 0) or np.all(row_A.toarray() <= 0):
                 rows_remove.add(row)
                 columns_remove = columns_remove | set(columns_A_nonzero)
 
@@ -333,9 +326,7 @@ class LPPreprocessor:
         )
 
         # 削除した結果, 再び同じ条件の行列ができるかもしれないので再度実行
-        A_out, b_out, c_out = self.fix_variables_by_single_row(
-            A_new, b_new, c_new
-        )
+        A_out, b_out, c_out = self.fix_variables_by_single_row(A_new, b_new, c_new)
         return A_out, b_out, c_out
 
     def fix_variables_by_multiple_rows(
@@ -354,7 +345,7 @@ class LPPreprocessor:
                 continue
 
             # b が同じだった場合
-            b_i_minus_b = b_i - b[i + 1:]
+            b_i_minus_b = b_i - b[i + 1 :]
             rows_zero = np.where(b_i_minus_b == 0)[0] + (i + 1)
             for j in set(rows_zero) - rows_remove:
                 A_i_minus_A_j = A[i, :] - A[j, :]
@@ -364,7 +355,7 @@ class LPPreprocessor:
                     columns_remove = columns_remove | set(columns_non_zero)
 
             # b が足して0だった場合
-            b_i_plus_b = b_i + b[i + 1:]
+            b_i_plus_b = b_i + b[i + 1 :]
             rows_zero = np.where(b_i_plus_b == 0)[0] + (i + 1)
             for j in set(rows_zero) - rows_remove:
                 A_i_plus_A_j = A[i, :] + A[j, :]
@@ -381,9 +372,8 @@ class LPPreprocessor:
         return A_new, b_new, c_new
 
     def fix_positive_variable_by_signs(
-        self, A: np.ndarray, b: np.ndarray, c: np.ndarray,
-        recursive_num: int = 0
-    ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+        self, A: Csr, b: np.ndarray, c: np.ndarray, recursive_num: int = 0
+    ) -> tuple[Csr, np.ndarray, np.ndarray]:
         """ある行がbと同じ符号の係数が1つしかなく, それ以外は反対の符号, もしくは0の場合
         bと同じ符号の変数は他の変数との和で固定する
 
@@ -396,32 +386,31 @@ class LPPreprocessor:
         # bが0以外の場合について, 条件に合致するAの行を取得
         for row in np.where(b != 0)[0]:
             # Aの要素がbの符号と同じ添え字を取得
-            indexs_A_alpha_with_b = np.where(
-                A[row, :] * b[row] / abs(b[row]) > 0
-            )[0]
+            indexs_A_alpha_with_b = np.where(A[row, :].toarray()[0] * b[row] / abs(b[row]) > 0)[0]
             # 要素が1つのみの場合, indexを取得し走査終了
             if len(indexs_A_alpha_with_b) == 1:
-                remove_row = row
-                remove_col = indexs_A_alpha_with_b[0]
+                remove_row: int = row
+                remove_col: int = indexs_A_alpha_with_b[0]
                 break
         # 該当する条件の行がなかった場合は入力された行列を出力へ
         else:
             return A, b, c
 
         # 各行, 列に対して値を更新
-        A_alpha = A[remove_row, :]
+        # Aはサイズが大きいことを想定するので, A.toarray() はメモリ観点で実行したくない
+        A_alpha = A[remove_row, :].toarray()[0]
         A_alpha_i = A_alpha[remove_col]
-        A_beta_i = A[:, remove_col].reshape(A.shape[0], 1)
+        A_beta = A[:, remove_col].toarray()
         A_new, b_new, c_new = self._remove_rows_and_columns(
-            A - A_beta_i * A_alpha.reshape(1, A.shape[1]) / A_alpha_i,
-            b=b - A[:, remove_col] * b[remove_row] / A_alpha_i,
+            A=A - Csr(A_beta) * Csr(A_alpha.reshape(1, A.shape[1]) / A_alpha_i),
+            b=b - A_beta.reshape(-1) * b[remove_row] / A_alpha_i,
             c=c - c[remove_col] * A_alpha / A_alpha_i,
-            rows_remove={remove_row}, columns_remove={remove_col}
+            rows_remove={remove_row},
+            columns_remove={remove_col},
         )
         # 不要なオブジェクトを削除して再帰
-        del A_alpha, A_beta_i, A, b, c
-        num = recursive_num + 1
-        return self.fix_positive_variable_by_signs(A_new, b_new, c_new, num)
+        del A_alpha, A_beta, A, b, c
+        return self.fix_positive_variable_by_signs(A_new, b_new, c_new, recursive_num + 1)
 
     def fix_singleton_by_two_rows(
         self, A: np.ndarray, b: np.ndarray, c: np.ndarray
@@ -432,7 +421,7 @@ class LPPreprocessor:
         もし固定した結果が負の値になる場合は実行不可能
         """
         for i in range(A.shape[0] - 1):
-            A_i_minus_A = A[i, :] - A[(i + 1):, :]
+            A_i_minus_A = A[i, :] - A[(i + 1) :, :]
             # 各行で非0要素になった数を集計
             counts_nonzero_by_row = np.count_nonzero(A_i_minus_A != 0, axis=1)
             # もしなければ次の行へ
@@ -450,8 +439,7 @@ class LPPreprocessor:
             # 値の更新
             b_updated = b - A[:, remove_column].flatten() * x
             A_new, b_new, c_new = self._remove_rows_and_columns(
-                A, b=b_updated, c=c,
-                rows_remove=[remove_row], columns_remove=[remove_column]
+                A, b=b_updated, c=c, rows_remove=[remove_row], columns_remove=[remove_column]
             )
             # 削除した結果, 再び同じ条件の行列ができるかもしれないので再度実行
             return self.fix_singleton_by_two_rows(A_new, b_new, c_new)
@@ -469,39 +457,43 @@ class LPPreprocessor:
             LPS: 前処理後の線形計画問題
         """
         logger.info("Start preprocessing.")
-        A = problem.A.copy()
+        A: Csr = problem.A.copy()
         b = problem.b.copy()
         c = problem.c.copy()
 
-        logger.info("1. Start removing empty rows.")
+        logger.info("1. Remove empty rows.")
         A, b = self.remove_empty_row(A, b)
-        # logger.info("2. Start removing duplicated rows.")
+        # logger.info("2. Remove duplicated rows.")
         # A, b = self.remove_duplicated_row(A, b)
-        logger.info("3. Start removing empty columns.")
+        logger.info("3. Remove empty columns.")
         A, c = self.remove_empty_column(A, c)
-        # logger.info("4. Start removing duplicated columns.")
+        # logger.info("4. Remove duplicated columns.")
         # A, c = self.remove_duplicated_column(A, c)
-        logger.info("5. Start removing row singletons.")
+        logger.info("5. Remove row singletons.")
         A, b, c = self.remove_row_singleton(A, b, c)
-        # logger.info("6. Start removing free variables.")
+        # logger.info("6. Remove free variables.")
         # A, b, c = self.remove_free_variables(A, b, c)
-        logger.info("7. Start fixing variables by single row.")
+        logger.info("7. Fix variables by single row.")
         A, b, c = self.fix_variables_by_single_row(A, b, c)
-        # logger.info("8. Start fixing variables by multiple rows.")
+        # logger.info("8. Fix variables by multiple rows.")
         # A, b, c = self.fix_variables_by_multiple_rows(A, b, c)
-        logger.info("9. Start fixing positive variable by sings.")
+        logger.info("9. Fix positive variable by sings.")
         A, b, c = self.fix_positive_variable_by_signs(A, b, c)
-        # logger.info("10. Start fixing singleton by two rows.")
+        # logger.info("10. Fix singleton by two rows.")
         # A, b, c = self.fix_singleton_by_two_rows(A, b, c)
 
         # A, b, c について変更されているか確認し, もしされていなければ出力
-        logger.info("Checking changing...")
+        logger.info("Checking change...")
         # まずは次元の確認から. 一致していることがわかった後に要素の確認をしないとサイズ違いでエラーとなる
+        logger.debug(f"{A.shape}, {b.shape}, {c.shape}")
         if A.shape == problem.A.shape and b.shape == problem.b.shape and c.shape == problem.c.shape:
-            if np.all(A == problem.A) and np.all(b == problem.b) and np.all(c == problem.c):
+            logger.debug(f"{(A - problem.A).nnz}, {np.all(b == problem.b)}, {np.all(c == problem.c)}")
+            # scipy sparse は行列で比較して0以外の要素がなければok
+            if (A - problem.A).nnz == 0 and np.all(b == problem.b) and np.all(c == problem.c):
                 logger.info("End preprocessing.")
-                if not problem.is_full_row_rank():
-                    logger.warning("This problem is not full row rank!")
+                # 時間かかるのでいったん抜く
+                # if not problem.is_full_row_rank():
+                #     logger.warning("This problem is not full row rank!")
                 return problem
         # されていればもう一度実行
         logger.info("Restart Preprocessing for changing coefficients.")

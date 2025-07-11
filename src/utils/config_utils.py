@@ -39,9 +39,7 @@ def read_config(
     return config[default_section]
 
 
-def write_config(
-    file_name: str, contents: dict[str, str], section: str = default_section
-):
+def write_config(file_name: str, contents: dict[str, str], section: str = default_section):
     """config ディレクトリ配下のファイルに内容を書き出す. すでにファイルが存在する場合は内容を書き換え
 
     Args:
@@ -66,5 +64,5 @@ def write_config(
         config.set(section, key, val)
 
     # 指定したconfigファイルを書き込み
-    with open(file_name, 'w') as configfile:
+    with open(file_name, "w") as configfile:
         config.write(configfile)
