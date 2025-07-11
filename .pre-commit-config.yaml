@@ -4,13 +4,13 @@ repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
     hooks:
-    -   id: trailing-whitespace
+      - id: trailing-whitespace
         types: [python]
-    -   id: end-of-file-fixer
+      - id: end-of-file-fixer
         types: [python]
-    -   id: check-yaml
-    -   id: check-added-large-files
-    -   id: detect-private-key
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: detect-private-key
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.5.0
@@ -18,23 +18,21 @@ repos:
       - id: ruff
         args: [--fix]
       - id: ruff-format
-
-  # - repo: local
-  #   hooks:
-  #   -   id: pdoc
-  #       name: Create documents for python
-  #       description: 'pdoc: Auto-generate API documentation for Python projects'
-  #       entry: poetry run pdoc src --html -o docs --force && git add docs/src/*
-  #       language: system
-  #       types: [python]
-  #       require_serial: true
-  #       pass_filenames: false
+        args: [--check]
 
   - repo: https://github.com/python-poetry/poetry
-    rev: '1.8.0'  # add version here
+    rev: "1.8.0" # add version here
     hooks:
-    -   id: poetry-check
-    -   id: poetry-lock
-    -   id: poetry-install
-    -   id: poetry-export
-        args: ["--dev", "-f", "requirements.txt", "-o", "requirements.txt", "--without-hashes"]
+      - id: poetry-check
+      - id: poetry-lock
+      - id: poetry-install
+      - id: poetry-export
+        args:
+          [
+            "--dev",
+            "-f",
+            "requirements.txt",
+            "-o",
+            "requirements.txt",
+            "--without-hashes",
+          ]

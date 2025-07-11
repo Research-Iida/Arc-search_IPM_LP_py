@@ -17,6 +17,7 @@ class LPVariables:
         y: 制約にかかるラグランジュ係数 λ
         s: 双対問題の変数 s
     """
+
     x: np.ndarray
     y: np.ndarray
     s: np.ndarray
@@ -27,8 +28,7 @@ class LPVariables:
 
     @property
     def mu(self) -> float:
-        """双対パラメータμを取得する
-        """
+        """双対パラメータμを取得する"""
         return np.dot(self.x, self.s) / self.x.shape[0]
 
     def __add__(self, addend: LPVariables) -> LPVariables:
@@ -72,7 +72,7 @@ class LPVariables:
         y_inserted[idx_not_change] = self.y
         return LPVariables(self.x, y_inserted, self.s)
 
-    def isclose(self, other: LPVariables, threshold: float = 10**(-6)) -> bool:
+    def isclose(self, other: LPVariables, threshold: float = 10 ** (-6)) -> bool:
         """変数同士で比較して近いか確認する
 
         Args:

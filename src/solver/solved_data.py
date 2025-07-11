@@ -29,6 +29,7 @@ class SolvedSummary:
         max_r_b: 主問題の制約に関する infeasiblity. 絶対値の最大値
         max_r_c: 双対問題の制約に関する infeasiblity. 絶対値の最大値
     """
+
     problem_name: str
     solver_name: str
     config_section: str
@@ -73,6 +74,7 @@ class SolvedDetail:
         lst_residual_inexact_vddot: inexact に二階微分を求めた際の誤差
         lst_tolerance_inexact_vddot: inexact に二階微分を求める際の誤差許容度
     """
+
     aSolvedSummary: SolvedSummary
     v: LPVariables
     problem: LinearProgrammingProblemStandard
@@ -95,18 +97,15 @@ class SolvedDetail:
 
     @property
     def mu_0(self):
-        """問題が解かれる前 mu.
-        """
+        """問題が解かれる前 mu."""
         return self.v_0.mu
 
     @property
     def max_r_b_0(self):
-        """主問題の制約に関する, 問題が解かれる前の infeasibility
-        """
-        return np.linalg.norm(self.problem_0.residual_main_constraint(self.v_0.x), np.inf),
+        """主問題の制約に関する, 問題が解かれる前の infeasibility"""
+        return (np.linalg.norm(self.problem_0.residual_main_constraint(self.v_0.x), np.inf),)
 
     @property
     def max_r_c_0(self):
-        """双対問題の制約に関する, 問題が解かれる前の infeasibility
-        """
+        """双対問題の制約に関する, 問題が解かれる前の infeasibility"""
         return np.linalg.norm(self.problem_0.residual_dual_constraint(self.v_0.y, self.v_0.s), np.inf)
