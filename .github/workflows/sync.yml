@@ -12,14 +12,10 @@ jobs:
   sync:
     runs-on: ubuntu-latest
 
-    steps:
-      - name: Exit early if running in public repo
-        run: |
-          if [[ "${{ github.repository }}" == "Research-Iida/Arc-search_IPM_LP_py" ]]; then
-            echo "🛑 This is the public repository. Skipping sync job."
-            exit 0
-          fi
+    # 👇 public リポジトリではこのジョブを実行しない
+    if: github.repository != 'Research-Iida/Arc-search_IPM_LP_py'
 
+    steps:
       - name: Checkout private tag commit
         uses: actions/checkout@v4
         with:
@@ -38,8 +34,8 @@ jobs:
           echo "Main commit: $MAIN_COMMIT"
 
           if [ "$TAG_COMMIT" != "$MAIN_COMMIT" ]; then
-            echo "🛑 Tag is not on latest master commit. Skipping sync job."
-            exit 0
+            echo "❌ Tag is not on latest master commit. Aborting."
+            exit 1
           fi
           echo "✅ Tag is on latest master commit."
 
