@@ -2,7 +2,6 @@ import numpy as np
 import pytest
 
 from src.infra.julia.hhl import HHLJuliaLinearSystemSolver
-from src.infra.python.hhl import HHLLinearSystemSolver
 from src.solver.linear_system_solver.inexact_linear_system_solver import CGLinearSystemSolver
 
 
@@ -32,25 +31,3 @@ def test_HHL_julia():
 
     assert np.linalg.norm(A @ test_result - b) <= 0.1
     assert np.allclose(test_result, solution, atol=0.1)
-
-
-@pytest.mark.skip("qiskit の HHL が解けないので省略")
-def test_HHL():
-    """HHL アルゴリズムで求解できるか確認
-
-    HHL 自体が不安定で tolerance を設定してもその許容解まで解けないという背景があり,
-    精度は二の次で考える
-    """
-    tolerance = 10**-3
-    # A はエルミート, 正定値
-    A = np.array([[1, -1 / 3, 0], [-1 / 3, 1, -1 / 3], [0, -1 / 3, 1]])
-    b = np.array([1, 0, 0])
-    # A = np.array([[1, 1], [1, 2]])
-    # b = np.array([3, 4])
-    solver = HHLLinearSystemSolver()
-
-    test_sol = solver.solve(A, b, tolerance)
-
-    # assert np.linalg.norm(A @ test_sol - b) <= tolerance
-    exact_sol = np.linalg.inv(A) @ b
-    assert np.allclose(test_sol, exact_sol, atol=tolerance)
