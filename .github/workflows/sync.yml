@@ -20,13 +20,13 @@ jobs:
             exit 0
           fi
 
-      - name: Checkout private repo
+      - name: Checkout private tag commit
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Fetch master branch
-        run: git fetch origin master
+      - name: Fetch master branch explicitly
+        run: git fetch origin master:refs/heads/master
 
       - name: Verify tag is on HEAD of master
         id: verify
@@ -38,8 +38,8 @@ jobs:
           echo "Main commit: $MAIN_COMMIT"
 
           if [ "$TAG_COMMIT" != "$MAIN_COMMIT" ]; then
-            echo "❌ Tag is not on latest master commit. Aborting."
-            exit 1
+            echo "🛑 Tag is not on latest master commit. Skipping sync job."
+            exit 0
           fi
           echo "✅ Tag is on latest master commit."
 
