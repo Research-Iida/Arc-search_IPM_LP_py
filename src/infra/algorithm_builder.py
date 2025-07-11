@@ -32,7 +32,6 @@ from ..solver.solved_checker import (
     RelativeSolvedChecker,
     SolvedChecker,
 )
-from .python.hhl import HHLLinearSystemSolver
 from .python.mnes_search_direction_calculator import MNESSearchDirectionCalculator
 
 logger = get_main_logger()
@@ -110,8 +109,6 @@ class AlgorithmBuilder:
                 return inexact_linear_system_solver.QMRLinearSystemSolver()
             case "TFQMR":
                 return inexact_linear_system_solver.TFQMRLinearSystemSolver()
-            case "HHL":
-                return HHLLinearSystemSolver()
             case "HHLJulia":
                 # いちいち import すると Julia のコンパイルに時間がかかるので指定されたときだけ
                 from .julia.hhl import HHLJuliaLinearSystemSolver
