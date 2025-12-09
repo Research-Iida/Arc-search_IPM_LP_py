@@ -127,21 +127,21 @@ class ILPSolvingAlgorithm(ILPSolver, metaclass=abc.ABCMeta):
     ) -> SolvedSummary:
         """最適化の結果の概要を出力する"""
         output = SolvedSummary(
-            problem.name,
-            self.__class__.__name__,
-            self.config_section,
-            False,
-            problem.n,
-            problem.m,
-            is_solved,
-            iter_num,
+            problem_name=problem.name,
+            solver_name=self.__class__.__name__,
+            config_section=self.config_section,
+            is_error=False,
+            n=problem.n,
+            m=problem.m,
+            is_solved=is_solved,
+            iter_num=iter_num,
             # 反復回数上限に達し, それでもまだ解けてない場合に反復を追加しようとするので over upper
-            is_iteration_number_reached_upper and not is_solved,
-            round(elapsed_time, 2),
-            self.is_calculation_time_reached_upper(elapsed_time) and not is_solved,
-            problem.objective_main(v.x),
-            v.mu,
-            np.linalg.norm(problem.residual_main_constraint(v.x), np.inf),
-            np.linalg.norm(problem.residual_dual_constraint(v.y, v.s), np.inf),
+            is_iter_over_upper=is_iteration_number_reached_upper and not is_solved,
+            elapsed_time=round(elapsed_time, 2),
+            is_calc_time_over_upper=self.is_calculation_time_reached_upper(elapsed_time) and not is_solved,
+            obj=problem.objective_main(v.x),
+            mu=v.mu,
+            max_r_b=np.linalg.norm(problem.residual_main_constraint(v.x), np.inf),
+            max_r_c=np.linalg.norm(problem.residual_dual_constraint(v.y, v.s), np.inf),
         )
         return output

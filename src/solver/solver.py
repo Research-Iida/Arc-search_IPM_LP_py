@@ -57,7 +57,13 @@ class ILPSolver(abc.ABC):
         except Exception:
             logger.exception("Error occurred - ")
             aSolvedSummary = SolvedSummary(
-                problem.name, self.solver_name, self.solver_config_section, True, problem.n, problem.m, False
+                problem_name=problem.name,
+                solver_name=self.solver_name,
+                config_section=self.solver_config_section,
+                is_error=True,
+                n=problem.n,
+                m=problem.m,
+                is_solved=False,
             )
             aSolvedDetail = SolvedDetail(aSolvedSummary, v_0, problem, v_0, problem)
 

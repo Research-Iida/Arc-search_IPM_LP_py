@@ -1,12 +1,13 @@
-import numpy as np
 from dataclasses import dataclass, field
+
+import numpy as np
+from pydantic import BaseModel
 
 from ..problem import LinearProgrammingProblemStandard
 from .variables import LPVariables
 
 
-@dataclass
-class SolvedSummary:
+class SolvedSummary(BaseModel):
     """最適化された際の結果を概要でまとめるクラス
 
     csv に書き込みすることができるように, list などarray型の要素は入れない.

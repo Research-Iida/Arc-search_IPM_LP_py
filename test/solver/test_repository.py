@@ -32,21 +32,21 @@ def remove_written_directory() -> Path:
 def test_write_SolvedSummary(aSolvedDataRepository, remove_written_directory):
     """最適化の実行によって得られた諸データを書き込めるか"""
     aSolvedSummary = SolvedSummary(
-        "test_problem",
-        "test_solver",
-        "TEST",
-        False,
-        3,
-        2,
-        True,
-        30,
-        False,
-        0.14,
-        False,
-        0,
-        0.001,
-        0,
-        0,
+        problem_name="test_problem",
+        solver_name="test_solver",
+        config_section="TEST",
+        is_error=False,
+        n=3,
+        m=2,
+        is_solved=True,
+        iter_num=30,
+        is_iter_over_upper=False,
+        elapsed_time=0.14,
+        is_calc_time_over_upper=False,
+        obj=0,
+        mu=0.00001,
+        max_r_b=0,
+        max_r_c=0,
     )
     aSolvedDataRepository.write_SolvedSummary([], filename_written, path=remove_written_directory)
     aSolvedDataRepository.write_SolvedSummary(
