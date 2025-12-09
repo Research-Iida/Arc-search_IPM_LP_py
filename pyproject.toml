@@ -16,7 +16,10 @@ pydantic = "^2.0"
 slack-sdk = "^3.21.3"
 julia = "^0.6.2"
 certifi = "^2025.7.9"
-docplex = "^2.30.251"
+docplex = [
+    { version = "^2.29.0", python = "==3.10" },
+    { version = "^2.30.251",  python = ">=3.11" }
+]
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.2"
@@ -29,7 +32,9 @@ ruff = "^0.4.10"
 pdoc3 = "^0.11.0"
 
 [tool.poetry.group.local.dependencies]
-cplex = "^22.1.2.0"
+cplex = [
+    { version = "^22.1.2.0",  python = ">=3.11" }
+]
 pre-commit = "^3.7.1"
 
 [tool.black]
