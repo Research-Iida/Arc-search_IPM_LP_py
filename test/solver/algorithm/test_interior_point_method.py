@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 from scipy.sparse import csr_matrix as Csr
 
-from src.infra.algorithm_builder import AlgorithmBuilder
+from src.app.algorithm_builder import AlgorithmBuilder
 from src.problem import LinearProgrammingProblemStandard as LPS
 from src.solver.variables import LPVariables
 from src.utils.config_utils import test_section

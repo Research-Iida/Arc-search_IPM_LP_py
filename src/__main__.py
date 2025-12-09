@@ -4,8 +4,8 @@ import sys
 from datetime import date
 from pathlib import Path
 
+from .app.get_solvers import get_solvers
 from .drawer import Drawer
-from .infra.get_solvers import get_solvers
 from .infra.julia.repository_problem import JuliaLPRepository
 from .infra.path_generator import PathGenerator
 from .infra.repository_solved_data import SolvedDataRepository

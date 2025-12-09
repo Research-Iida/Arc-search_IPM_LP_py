@@ -1,4 +1,4 @@
-from src.infra.algorithm_builder import AlgorithmBuilder
+from src.app.algorithm_builder import AlgorithmBuilder
 from src.utils.config_utils import read_config, test_section
 
 from .utils import make_test_LP_and_initial_point
