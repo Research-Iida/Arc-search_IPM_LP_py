@@ -208,6 +208,23 @@ class InexactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
         """
         return (1 - (1 - self.beta) * step_size) * v.mu - v_alpha.mu >= 0
 
+    def is_x_s_positive_and_v_in_neighborhood(
+        self,
+        v_alpha: LPVariables,
+        v: LPVariables,
+        alpha: float,
+        problem: LPS,
+        gamma_2: float,
+    ) -> bool:
+        if min(v_alpha.x) < 0 or min(v_alpha.s) < 0:
+            return False
+        if not self.is_G_no_less_than_0(v_alpha):
+            return False
+        if not self.is_g_no_less_than_0(v_alpha, v, alpha):
+            return False
+        # 理論的には G>=0, g>=0 で近傍に入ることは成立するが, 数値誤差の影響で近傍に入らない場合があるため, 念のため確認
+        return self.is_in_center_path_neighborhood(v_alpha, problem, gamma_2)
+
     def decide_step_size(
         self,
         v: LPVariables,
@@ -228,23 +245,15 @@ class InexactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
         """
         alpha = self.variable_updater.max_alpha
 
-        def is_x_s_positive_and_v_in_neighborhood(v_alpha: LPVariables, alpha: float) -> bool:
-            if min(v_alpha.x) < 0 or min(v_alpha.s) < 0:
-                return False
-            if not self.is_G_no_less_than_0(v_alpha):
-                return False
-            if not self.is_g_no_less_than_0(v_alpha, v, alpha):
-                return False
-            # 理論的には G>=0, g>=0 で近傍に入ることは成立するが, 数値誤差の影響で近傍に入らない場合があるため, 念のため確認
-            return self.is_in_center_path_neighborhood(v_alpha, problem, gamma_2)
-
         while alpha > self.min_step_size:
             v_alpha = LPVariables(
                 self.variable_updater.run(v.x, x_dot, x_ddot, alpha),
                 self.variable_updater.run(v.y, y_dot, y_ddot, alpha),
                 self.variable_updater.run(v.s, s_dot, s_ddot, alpha),
             )
-            if is_x_s_positive_and_v_in_neighborhood(v_alpha, alpha) and self.is_h_no_less_than_0(v_alpha, v, alpha):
+            if self.is_x_s_positive_and_v_in_neighborhood(
+                v_alpha, v, alpha, problem, gamma_2
+            ) and self.is_h_no_less_than_0(v_alpha, v, alpha):
                 break
             alpha *= 3 / 4
 
@@ -753,23 +762,15 @@ class InexactArcSearchIPMWithoutProof(InexactArcSearchIPM):
         """
         alpha = np.pi / 2
 
-        def is_x_s_positive_and_v_in_neighborhood(v_alpha: LPVariables, alpha: float) -> bool:
-            if min(v_alpha.x) < 0 or min(v_alpha.s) < 0:
-                return False
-            if not self.is_G_no_less_than_0(v_alpha):
-                return False
-            if not self.is_g_no_less_than_0(v_alpha, v, alpha):
-                return False
-            # 理論的には G>=0, g>=0 で近傍に入ることは成立するが, 数値誤差の影響で近傍に入らない場合があるため, 念のため確認
-            return self.is_in_center_path_neighborhood(v_alpha, problem, gamma_2)
-
         while alpha > self.min_step_size:
             v_alpha = LPVariables(
                 self.variable_updater.run(v.x, x_dot, x_ddot, alpha),
                 self.variable_updater.run(v.y, y_dot, y_ddot, alpha),
                 self.variable_updater.run(v.s, s_dot, s_ddot, alpha),
             )
-            if is_x_s_positive_and_v_in_neighborhood(v_alpha, alpha) and self.is_h_no_less_than_0(v_alpha, v, alpha):
+            if self.is_x_s_positive_and_v_in_neighborhood(
+                v_alpha, v, alpha, problem, gamma_2
+            ) and self.is_h_no_less_than_0(v_alpha, v, alpha):
                 break
 
             # pi - alpha とした場合
@@ -779,9 +780,9 @@ class InexactArcSearchIPMWithoutProof(InexactArcSearchIPM):
                 self.variable_updater.run(v.y, y_dot, y_ddot, pi_minus_alpha),
                 self.variable_updater.run(v.s, s_dot, s_ddot, pi_minus_alpha),
             )
-            if is_x_s_positive_and_v_in_neighborhood(v_alpha, pi_minus_alpha) and self.is_h_no_less_than_0(
-                v_alpha, v, pi_minus_alpha
-            ):
+            if self.is_x_s_positive_and_v_in_neighborhood(
+                v_alpha, v, alpha, problem, gamma_2
+            ) and self.is_h_no_less_than_0(v_alpha, v, pi_minus_alpha):
                 alpha = pi_minus_alpha
                 break
             alpha *= 3 / 4
