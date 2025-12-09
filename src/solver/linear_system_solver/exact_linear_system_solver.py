@@ -9,7 +9,7 @@ from abc import ABCMeta, abstractmethod
 from typing import Callable
 
 import numpy as np
-from scipy.sparse import csr_matrix as Csr
+from scipy.sparse import csr_matrix as CsrMatrix
 from scipy.sparse.linalg import factorized
 
 from ...logger import get_main_logger
@@ -25,14 +25,14 @@ class AbstractLinearSystemSolver(metaclass=ABCMeta):
             再び同じ前処理をしなくて済むように持っておく
     """
 
-    prev_A: Csr | None = None
+    prev_A: CsrMatrix | None = None
 
     @abstractmethod
-    def solve(self, A: Csr, b: np.ndarray, tolerance: float | None = 10**-7, *args) -> np.ndarray:
+    def solve(self, A: CsrMatrix, b: np.ndarray, tolerance: float | None = 10**-7, *args) -> np.ndarray:
         """線形方程式 Ax=b を解き, x を求める
 
         Args:
-            A (Csr): 係数行列
+            A (CsrMatrix): 係数行列
             b (np.ndarray): 右辺のベクトル
             tolerance (float): 出した解が厳密解とどれだけ離れるかの許容度
 
@@ -55,7 +55,7 @@ class ExactLinearSystemSolver(AbstractLinearSystemSolver):
 
     prev_factorized: Callable | None = None
 
-    def solve(self, A: Csr, b: np.ndarray, tolerance: float | None = None) -> np.ndarray:
+    def solve(self, A: CsrMatrix, b: np.ndarray, tolerance: float | None = None) -> np.ndarray:
         """線形方程式 Ax=b を numpy によるLU分解によって解く"""
         if self.prev_factorized is not None:
             if self.prev_A.shape == A.shape and (self.prev_A - A).nnz == 0:

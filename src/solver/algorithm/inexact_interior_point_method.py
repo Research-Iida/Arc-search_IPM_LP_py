@@ -315,7 +315,7 @@ class InexactLineSearchIPM(InexactInteriorPointMethod):
         # upper = self.parameters.ITER_UPPER
         return iter_num >= upper
 
-    def run(self, problem_0: LPS, v_0: LPVariables | None) -> SolvedDetail:
+    def _execute(self, problem_0: LPS, v_0: LPVariables | None) -> SolvedDetail:
         """反復で解く line-saarch の実行, 線形方程式は inexact に解く
 
         Args:
@@ -579,7 +579,7 @@ class InexactArcSearchIPM(InexactInteriorPointMethod):
 
         return x_ddot, y_ddot, s_ddot, norm_residual
 
-    def run(self, problem_0: LPS, v_0: LPVariables | None) -> SolvedDetail:
+    def _execute(self, problem_0: LPS, v_0: LPVariables | None) -> SolvedDetail:
         """反復で解く arc-saarch の実行, 線形方程式は inexact に解く
 
         Args:

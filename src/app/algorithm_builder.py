@@ -1,3 +1,4 @@
+from ..infra.python.mnes_search_direction_calculator import MNESSearchDirectionCalculator
 from ..logger import get_main_logger
 from ..solver.algorithm.algorithm import ILPSolvingAlgorithm
 from ..solver.algorithm.inexact_interior_point_method import (
@@ -35,7 +36,7 @@ from ..solver.solved_checker import (
     RelativeSolvedChecker,
     SolvedChecker,
 )
-from .python.mnes_search_direction_calculator import MNESSearchDirectionCalculator
+from .cplex_solver import LPCPLEXSolver
 
 logger = get_main_logger()
 
@@ -114,7 +115,7 @@ class AlgorithmBuilder:
                 return inexact_linear_system_solver.TFQMRLinearSystemSolver()
             case "HHLJulia":
                 # いちいち import すると Julia のコンパイルに時間がかかるので指定されたときだけ
-                from .julia.hhl import HHLJuliaLinearSystemSolver
+                from ..infra.julia.hhl import HHLJuliaLinearSystemSolver
 
                 return HHLJuliaLinearSystemSolver(self.parameters.INEXACT_HHL_NUM_PHASE_ESTIMATOR_QUBITS)
             case "exact":
@@ -256,6 +257,8 @@ class AlgorithmBuilder:
                     initial_point_maker=initial_point_maker,
                     search_direction_calculator=search_direction_calculator,
                 )
+            case "CPLEX":
+                algorithm = LPCPLEXSolver(self.config_section, self.parameters)
             case _:
                 raise SelectionError(f"Don't match inner algorithm: {algorithm}")
 

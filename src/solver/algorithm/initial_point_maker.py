@@ -1,7 +1,7 @@
 import abc
 
 import numpy as np
-from scipy.sparse import csr_matrix as Csr
+from scipy.sparse import csr_matrix as CsrMatrix
 
 from ...problem import LinearProgrammingProblemStandard as LPS
 from ..linear_system_solver.exact_linear_system_solver import AbstractLinearSystemSolver
@@ -25,7 +25,7 @@ class ILinearSystemSolvingInitialPointMaker(IInitialPointMaker):
     def __init__(self, linear_system_solver: AbstractLinearSystemSolver):
         self.linear_system_solver = linear_system_solver
 
-    def solve_linear_system(self, A: Csr, b: np.ndarray) -> np.ndarray:
+    def solve_linear_system(self, A: CsrMatrix, b: np.ndarray) -> np.ndarray:
         return self.linear_system_solver.solve(A, b)
 
 

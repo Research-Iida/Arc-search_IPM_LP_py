@@ -117,7 +117,7 @@ class ArcSearchIPMWithRestartingStrategy(IPMWithRestartingStrategyBase, Mehrotra
         """
         return super().restart_variable(v_current, problem, v_previous)
 
-    def run(self, problem_0: LPS, v_0: LPVariables | None) -> SolvedDetail:
+    def _execute(self, problem_0: LPS, v_0: LPVariables | None) -> SolvedDetail:
         """Nesterov の加速法を組み入れた内点法の実行
 
         変数の対応がわかりづらいのでメモ
@@ -338,7 +338,7 @@ class ArcSearchIPMWithRestartingStrategyProven(IPMWithRestartingStrategyBase):
 
         return result
 
-    def run(self, problem_0: LPS, v_0: LPVariables | None) -> SolvedDetail:
+    def _execute(self, problem_0: LPS, v_0: LPVariables | None) -> SolvedDetail:
         """Nesterov の加速法を組み入れた内点法の実行
         理論的な証明を施したもの
 

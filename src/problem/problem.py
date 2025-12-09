@@ -8,9 +8,9 @@ from functools import cached_property
 
 import numpy as np
 import scipy
-from scipy.sparse import csr_matrix as Csr
+from scipy.sparse import csr_matrix as CsrMatrix
 from scipy.sparse import eye, hstack, vstack
-from scipy.sparse import lil_matrix as Lil
+from scipy.sparse import lil_matrix as LilMatrix
 from scipy.sparse.linalg import eigsh, inv
 
 from ..logger.logger import get_main_logger
@@ -38,7 +38,7 @@ class LinearProgrammingProblemStandard:
         name: 問題名. デフォルトは空白
     """
 
-    A: Csr
+    A: CsrMatrix
     b: np.ndarray
     c: np.ndarray
     name: str = ""
@@ -97,12 +97,12 @@ class LinearProgrammingProblemStandard:
         return np.sqrt(min_eig_val[0])
 
     @property
-    def AA_T_inv(self) -> Csr:
+    def AA_T_inv(self) -> CsrMatrix:
         """inv(A @ A.T).
         A が csr_matrix であるため, 知識の集約のためにメソッド化
 
         Returns:
-            Csr: inv(A @ A.T)
+            CsrMatrix: inv(A @ A.T)
         """
         # scipy.sparce.linalg.inv にかける時は csc_matrix の方が効率よい
         return inv((self.A @ self.A.T).tocsc())
@@ -205,11 +205,11 @@ class LinearProgrammingProblem:
         name: 問題名. デフォルトは空白
     """
 
-    A_E: Lil
+    A_E: LilMatrix
     b_E: np.ndarray
-    A_G: Lil
+    A_G: LilMatrix
     b_G: np.ndarray
-    A_L: Lil
+    A_L: LilMatrix
     b_L: np.ndarray
     LB_index: list[int]
     LB: np.ndarray
@@ -274,8 +274,8 @@ class LinearProgrammingProblem:
     # データが入っていなくても実行可能なため classmethod
     @classmethod
     def reverse_non_lower_bound(
-        cls, lb: np.ndarray, ub: np.ndarray, A: Lil, c: np.ndarray
-    ) -> tuple[np.ndarray, np.ndarray, Lil, np.ndarray]:
+        cls, lb: np.ndarray, ub: np.ndarray, A: LilMatrix, c: np.ndarray
+    ) -> tuple[np.ndarray, np.ndarray, LilMatrix, np.ndarray]:
         """変数の下限が存在せず, 上限が存在する場合, 対応する変数の添え字の符号を反転させる
 
         Args:
@@ -287,7 +287,7 @@ class LinearProgrammingProblem:
         Returns:
             np.ndarray: 変数の lower bound
             np.ndarray: 変数の upper bound
-            Lil: A. のちにどの制約かによって区分けするが, ここでの出力はひとまとめにしたもの
+            LilMatrix: A. のちにどの制約かによって区分けするが, ここでの出力はひとまとめにしたもの
             np.ndarray: c
         """
         # 下限が存在せず, 上限が存在する添え字の取得
@@ -307,8 +307,8 @@ class LinearProgrammingProblem:
 
     @classmethod
     def separate_free_variable(
-        cls, lb: np.ndarray, ub: np.ndarray, A: Lil, c: np.ndarray
-    ) -> tuple[np.ndarray, np.ndarray, Lil, np.ndarray]:
+        cls, lb: np.ndarray, ub: np.ndarray, A: LilMatrix, c: np.ndarray
+    ) -> tuple[np.ndarray, np.ndarray, LilMatrix, np.ndarray]:
         """変数に下限も上限もない自由変数の場合, 新しい変数列を作成して正の部分と負の部分に分ける
 
         正部分に関する変数は同じ場所に残し, 負部分に関する変数は末尾に追加する
@@ -324,7 +324,7 @@ class LinearProgrammingProblem:
         Returns:
             np.ndarray: 変数の lower bound
             np.ndarray: 変数の upper bound
-            Lil: A
+            LilMatrix: A
             np.ndarray: c
         """
         # 自由変数の添え字の取得
@@ -351,7 +351,7 @@ class LinearProgrammingProblem:
         return lb_out, ub_out, A_out, c_out
 
     @classmethod
-    def make_standard_A(cls, A_E: Lil, A_G: Lil, A_L: Lil, ub: np.ndarray) -> Csr:
+    def make_standard_A(cls, A_E: LilMatrix, A_G: LilMatrix, A_L: LilMatrix, ub: np.ndarray) -> CsrMatrix:
         """等式制約, 不等式制約から標準形式の係数行列を作成する
 
         Args:
@@ -370,17 +370,17 @@ class LinearProgrammingProblem:
         m_b = len(lst_index_up)
 
         # box constraint に関する単位行列を作成
-        A_B = Lil((m_b, n))
+        A_B = LilMatrix((m_b, n))
         for i, index_up in enumerate(lst_index_up):
             A_B[i, index_up] = 1
 
         # 組み合わせて一つの行列に
         output = vstack(
             [
-                hstack([A_E, Lil((m_e, m_g + m_l + m_b))]),
-                hstack([A_G, -eye(m_g), Lil((m_g, m_l + m_b))]),
-                hstack([A_L, Lil((m_l, m_g)), eye(m_l), Lil((m_l, m_b))]),
-                hstack([A_B, Lil((m_b, m_g + m_l)), eye(m_b)]),
+                hstack([A_E, LilMatrix((m_e, m_g + m_l + m_b))]),
+                hstack([A_G, -eye(m_g), LilMatrix((m_g, m_l + m_b))]),
+                hstack([A_L, LilMatrix((m_l, m_g)), eye(m_l), LilMatrix((m_l, m_b))]),
+                hstack([A_B, LilMatrix((m_b, m_g + m_l)), eye(m_b)]),
             ]
         )
         return output.tocsr()
@@ -419,7 +419,7 @@ class LinearProgrammingProblem:
     def convert_standard(self) -> LinearProgrammingProblemStandard:
         """等式制約のみの標準形線形計画問題に修正する"""
         # 変数の正負, 自由変数において変更があるため A はまとめておく
-        A: Lil = vstack([self.A_E, self.A_G, self.A_L]).tolil()
+        A: LilMatrix = vstack([self.A_E, self.A_G, self.A_L]).tolil()
 
         # 変数の上下限が存在しない箇所は発散させておく
         lb = np.full(self.n, -np.inf)
@@ -443,7 +443,7 @@ class LinearProgrammingProblem:
 
         # 変形して標準形式の A, b, c 作成
         logger.info("Make standard coefficient matrix 'A'.")
-        A_out: Csr = self.make_standard_A(A_E, A_G, A_L, ub_tmp)
+        A_out: CsrMatrix = self.make_standard_A(A_E, A_G, A_L, ub_tmp)
         logger.info(f"End making A. shape: {A_out.shape}")
         logger.info("Make standard right hand side of constraints 'b'.")
         b_out = self.make_standard_b(A_E, A_G, A_L, self.b_E, self.b_G, self.b_L, lb_tmp, ub_tmp)

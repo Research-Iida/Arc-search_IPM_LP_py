@@ -1,7 +1,7 @@
 """探索方向の計算方法についてまとめたモジュール"""
 
 import numpy as np
-from scipy.sparse import csr_matrix as Csr
+from scipy.sparse import csr_matrix as CsrMatrix
 from scipy.sparse import diags
 
 from ...logger import get_main_logger
@@ -40,14 +40,14 @@ class NESSearchDirectionCalculator(AbstractSearchDirectionCalculator):
         """
         m = problem.m
         n = problem.n
-        A: Csr = problem.A
+        A: CsrMatrix = problem.A
         x_divided_s = v.x / v.s
         AXS_inv = A @ diags(x_divided_s)
 
         # NES に変形
         if self.pre_x_divided_s is None or np.any(self.pre_x_divided_s != x_divided_s):
             logger.info("Update coefficient matrix.")
-            coef_matrix: Csr = AXS_inv @ A.T
+            coef_matrix: CsrMatrix = AXS_inv @ A.T
             # logger.debug(f"{indent}NES coef matrix condition number: {np.linalg.cond(coef_matrix)}")
 
             self.pre_x_divided_s = x_divided_s

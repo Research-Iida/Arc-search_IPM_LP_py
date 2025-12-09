@@ -3,7 +3,7 @@
 import itertools
 
 import numpy as np
-from scipy.sparse import csr_matrix as Csr
+from scipy.sparse import csr_matrix as CsrMatrix
 from scipy.sparse.linalg import inv
 
 from ...logger import get_main_logger, indent
@@ -133,7 +133,7 @@ class MNESSearchDirectionCalculator(AbstractSearchDirectionCalculator):
         """
         m = problem.m
         n = problem.n
-        A: Csr = problem.A
+        A: CsrMatrix = problem.A
         x_divided_s = v.x / v.s
         AXS_inv = A @ np.diag(x_divided_s)
 
@@ -145,7 +145,7 @@ class MNESSearchDirectionCalculator(AbstractSearchDirectionCalculator):
         if self.pre_x_divided_s is None or np.any(self.pre_x_divided_s != x_divided_s):
             logger.info("Update coefficient matrix.")
             # 事前に NES での係数行列を作ると A.T をかけることで数値誤差が出てきてしまうらしい. なのでここで一気に作成
-            coef_matrix: Csr = D_B_inv_A_B_inv @ AXS_inv @ A.T @ D_B_inv_A_B_inv.T
+            coef_matrix: CsrMatrix = D_B_inv_A_B_inv @ AXS_inv @ A.T @ D_B_inv_A_B_inv.T
             logger.info(f"{indent}MNES coef matrix condition number: {np.linalg.cond(coef_matrix.toarray())}")
 
             self.pre_x_divided_s = x_divided_s

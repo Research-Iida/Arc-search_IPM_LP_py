@@ -16,6 +16,7 @@ target_algorithms: list[str] = [
     "inexact_arc",
     "inexact_line",
     "iterative_refinement",
+    "CPLEX",
 ]
 
 

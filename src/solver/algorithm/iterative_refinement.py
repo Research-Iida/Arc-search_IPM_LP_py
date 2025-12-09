@@ -77,7 +77,7 @@ class IterativeRefinementMethod(ILPSolvingAlgorithm):
         logger.info(f"{'-' * 3} inner solver end {'-' * 50}")
         return result
 
-    def run(self, problem_0: LPS, v_0: LPVariables | None) -> SolvedDetail:
+    def _execute(self, problem_0: LPS, v_0: LPVariables | None) -> SolvedDetail:
         """反復で解くアルゴリズム部分の実行
 
         Returns:

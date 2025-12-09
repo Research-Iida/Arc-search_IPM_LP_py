@@ -3,7 +3,7 @@
 from abc import ABCMeta, abstractmethod
 
 import numpy as np
-from scipy.sparse import csr_matrix as Csr
+from scipy.sparse import csr_matrix as CsrMatrix
 
 from ...logger import get_main_logger
 from ...problem import LinearProgrammingProblemStandard as LPS
@@ -16,7 +16,7 @@ logger = get_main_logger()
 class AbstractSearchDirectionCalculator(metaclass=ABCMeta):
     # 変数が変わっていなければ係数行列は変わらないため, 不要な計算を省くために前回の計算を記録しておく
     pre_x_divided_s: np.ndarray | None = None
-    coef_matrix: Csr | None = None
+    coef_matrix: CsrMatrix | None = None
 
     def __init__(self, linear_system_solver: AbstractLinearSystemSolver):
         self.linear_system_solver: AbstractLinearSystemSolver = linear_system_solver

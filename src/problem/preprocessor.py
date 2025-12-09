@@ -3,7 +3,7 @@
 from collections import Counter
 
 import numpy as np
-from scipy.sparse import csr_matrix as Csr
+from scipy.sparse import csr_matrix as CsrMatrix
 from tqdm import tqdm
 
 from ..logger import get_main_logger, indent
@@ -29,7 +29,7 @@ class LPPreprocessor:
 
     def _remove_rows_and_columns(
         self,
-        A: Csr,
+        A: CsrMatrix,
         b: np.ndarray = None,
         c: np.ndarray = None,
         rows_remove: set[int] = set(),
@@ -65,7 +65,7 @@ class LPPreprocessor:
 
         return A_out, b_out, c_out
 
-    def remove_empty_row(self, A: Csr, b: np.ndarray) -> tuple[Csr, np.ndarray]:
+    def remove_empty_row(self, A: CsrMatrix, b: np.ndarray) -> tuple[CsrMatrix, np.ndarray]:
         """空行で制約が存在しないAの行は削除する
 
         もしAの係数がないのにbが0以外の場合, どうやってもその制約は満たせないのでエラー
@@ -131,7 +131,7 @@ class LPPreprocessor:
         A_out, b_out, _ = self._remove_rows_and_columns(A, b=b, rows_remove=rows_remove)
         return A_out, b_out
 
-    def remove_empty_column(self, A: Csr, c: np.ndarray) -> tuple[Csr, np.ndarray]:
+    def remove_empty_column(self, A: CsrMatrix, c: np.ndarray) -> tuple[CsrMatrix, np.ndarray]:
         """空列で制約が存在しない変数は自由な値を取れるので, 削除する
 
         自由な値がとれる場合, cが正ならば0が最適値
@@ -173,21 +173,23 @@ class LPPreprocessor:
         A_out, _, c_out = self._remove_rows_and_columns(A, c=c, columns_remove=columns_remove)
         return A_out, c_out
 
-    def rows_only_one_nonzero(self, A: Csr) -> list[int]:
+    def rows_only_one_nonzero(self, A: CsrMatrix) -> list[int]:
         """Aの行のうち1つしか0以外の係数が存在しない行のインデックス取得"""
         row_element_counter = Counter(A.nonzero()[0].tolist())
         result = [row for row, count in row_element_counter.items() if count == 1]
         return result
 
     def only_one_nonzero_elements_and_columns(
-        self, A: Csr, row_indexs_only_one_nonzero: list[int]
-    ) -> tuple[Csr, list[int]]:
+        self, A: CsrMatrix, row_indexs_only_one_nonzero: list[int]
+    ) -> tuple[CsrMatrix, list[int]]:
         """1つしか係数がない行の係数のベクトル形式と, 列のインデックスを取得"""
         A_only_one_nonzero = A[row_indexs_only_one_nonzero, :]
         indexes_tmp = A_only_one_nonzero.indices
         return A_only_one_nonzero.data, indexes_tmp
 
-    def remove_row_singleton(self, A: Csr, b: np.ndarray, c: np.ndarray) -> tuple[Csr, np.ndarray, np.ndarray]:
+    def remove_row_singleton(
+        self, A: CsrMatrix, b: np.ndarray, c: np.ndarray
+    ) -> tuple[CsrMatrix, np.ndarray, np.ndarray]:
         """1つしか係数がかかっていない行は1つの値に定めることで次元数削除"""
         # 1つしか係数がない行の特定
         rows_remove = self.rows_only_one_nonzero(A)
@@ -280,7 +282,9 @@ class LPPreprocessor:
         else:
             return A, b, c
 
-    def fix_variables_by_single_row(self, A: Csr, b: np.ndarray, c: np.ndarray) -> tuple[Csr, np.ndarray, np.ndarray]:
+    def fix_variables_by_single_row(
+        self, A: CsrMatrix, b: np.ndarray, c: np.ndarray
+    ) -> tuple[CsrMatrix, np.ndarray, np.ndarray]:
         """bが負の時に制約が正の係数しか持たない, もしくはbが正の時に制約が負の係数しか
         もたない場合実行不可能. bが0の時に制約が正 or 負どちらかの係数しか持たない場合,
         解はすべて0として制約と変数を削除する
@@ -372,8 +376,8 @@ class LPPreprocessor:
         return A_new, b_new, c_new
 
     def fix_positive_variable_by_signs(
-        self, A: Csr, b: np.ndarray, c: np.ndarray, recursive_num: int = 0
-    ) -> tuple[Csr, np.ndarray, np.ndarray]:
+        self, A: CsrMatrix, b: np.ndarray, c: np.ndarray, recursive_num: int = 0
+    ) -> tuple[CsrMatrix, np.ndarray, np.ndarray]:
         """ある行がbと同じ符号の係数が1つしかなく, それ以外は反対の符号, もしくは0の場合
         bと同じ符号の変数は他の変数との和で固定する
 
@@ -402,7 +406,7 @@ class LPPreprocessor:
         A_alpha_i = A_alpha[remove_col]
         A_beta = A[:, remove_col].toarray()
         A_new, b_new, c_new = self._remove_rows_and_columns(
-            A=A - Csr(A_beta) * Csr(A_alpha.reshape(1, A.shape[1]) / A_alpha_i),
+            A=A - CsrMatrix(A_beta) * CsrMatrix(A_alpha.reshape(1, A.shape[1]) / A_alpha_i),
             b=b - A_beta.reshape(-1) * b[remove_row] / A_alpha_i,
             c=c - c[remove_col] * A_alpha / A_alpha_i,
             rows_remove={remove_row},
@@ -457,7 +461,7 @@ class LPPreprocessor:
             LPS: 前処理後の線形計画問題
         """
         logger.info("Start preprocessing.")
-        A: Csr = problem.A.copy()
+        A: CsrMatrix = problem.A.copy()
         b = problem.b.copy()
         c = problem.c.copy()
 

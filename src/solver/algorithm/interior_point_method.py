@@ -268,7 +268,7 @@ class MehrotraTypeIPM(ExactInteriorPointMethod, metaclass=abc.ABCMeta):
     アルゴリズムが異なってくるので別にした
     """
 
-    def run(self, problem_0: LPS, v_0: LPVariables | None) -> SolvedDetail:
+    def _execute(self, problem_0: LPS, v_0: LPVariables | None) -> SolvedDetail:
         """反復で解く内点法の実行
         アルゴリズムは基本的に異なるため abstractmethod.
         ただし ArcSearchIPM と LineSearchIPM は同じアルゴリズムとなるため,

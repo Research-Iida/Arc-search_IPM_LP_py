@@ -338,6 +338,19 @@ files = [
 ]
 
 [[package]]
+name = "docplex"
+version = "2.30.251"
+description = "The IBM Decision Optimization CPLEX Modeling for Python"
+optional = false
+python-versions = "*"
+files = [
+    {file = "docplex-2.30.251.tar.gz", hash = "sha256:6503219f5b51275a7e4e77ca4332903b0f80925d205030a48d3f6aa7ca0dbf2a"},
+]
+
+[package.dependencies]
+six = "*"
+
+[[package]]
 name = "exceptiongroup"
 version = "1.3.1"
 description = "Backport of PEP 654 (exception groups)"
@@ -1705,4 +1718,4 @@ test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.13"
-content-hash = "44725acab327c5f17a23c56c56d1213612a430126fd6318d67d3cd2fc149ce35"
+content-hash = "30a089c463e5fae18c495b3b76242974fe1ec4e4e05be182e96d1c347697e580"

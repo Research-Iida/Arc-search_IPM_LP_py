@@ -4,35 +4,33 @@
 インターフェイスを使用して変更に対して柔軟な設計をできるようにしておく
 """
 
+import abc
+
+import numpy as np
+
 from ..logger import get_main_logger, indent
 from ..problem import LinearProgrammingProblemStandard as LPS
-from .algorithm.algorithm import ILPSolvingAlgorithm
 from .solved_data import SolvedDetail, SolvedSummary
 from .variables import LPVariables
 
 logger = get_main_logger()
 
 
-class LPSolver:
-    """LPを解くためのソルバーに関する抽象クラス"""
-
-    algorithm: ILPSolvingAlgorithm
-
-    def __init__(
-        self,
-        algorithm: ILPSolvingAlgorithm,
-    ):
-        """インスタンス初期化. アルゴリズムを設定する"""
-        self.algorithm = algorithm
+class ILPSolver(abc.ABC):
+    @property
+    @abc.abstractmethod
+    def solver_name(self) -> str:
+        pass
 
     @property
-    def algorithm_config_section(self) -> str:
-        """algorithm の config_section. logging でたびたび使用.
+    @abc.abstractmethod
+    def solver_config_section(self) -> str:
+        pass
 
-        Returns:
-            str: `algorithm.config_section`
-        """
-        return self.algorithm.config_section
+    @abc.abstractmethod
+    def _execute(self, problem: LPS, v_0: LPVariables | None) -> SolvedDetail:
+        """最適化問題を解く. 解き方は具象クラスで定義する"""
+        pass
 
     def run(self, problem: LPS, v_0: LPVariables | None = None) -> SolvedDetail:
         """入力されたLPに対してアルゴリズムを実行
@@ -46,23 +44,22 @@ class LPSolver:
         Returns:
             SolvedDetail: 最適解に関する情報をまとめたインスタンス
         """
-        algorithm_name = self.algorithm.__class__.__name__
-        algorithm_config_section = self.algorithm.config_section
-        logger.info(f"[{algorithm_name}] [{algorithm_config_section}] Start solving {problem.name}.")
+        msg_prefix = f"[{self.solver_name}] [{self.solver_config_section}]"
+        logger.info(f"{msg_prefix} Start solving {problem.name}.")
 
         # アルゴリズムの実行
         try:
-            aSolvedDetail = self.algorithm.run(problem, v_0)
+            aSolvedDetail = self._execute(problem, v_0)
 
-            logger.info(f"[{algorithm_name}] [{algorithm_config_section}] End solving {problem.name}.")
+            logger.info(f"{msg_prefix} End solving {problem.name}.")
             self.log_solved_data(aSolvedDetail)
         # 計算上でエラーが起きても計算が止まらないようにエラー文を生成だけして結果を書き込む
-        except Exception as e:
-            logger.exception("Error occured - ", exc_info=e)
+        except Exception:
+            logger.exception("Error occurred - ")
             aSolvedSummary = SolvedSummary(
                 problem_name=problem.name,
-                solver_name=algorithm_name,
-                config_section=algorithm_config_section,
+                solver_name=self.solver_name,
+                config_section=self.solver_config_section,
                 is_error=True,
                 n=problem.n,
                 m=problem.m,
@@ -72,7 +69,7 @@ class LPSolver:
 
         # 求解不可能だった場合, ログに残す
         if not aSolvedDetail.aSolvedSummary.is_solved:
-            logger.warning(f"{algorithm_name} cannot solve this problem.")
+            logger.warning(f"{msg_prefix} Cannot solve {problem.name}.")
 
         return aSolvedDetail
 
@@ -93,4 +90,17 @@ class LPSolver:
         logger.info("Max constraint violation:")
         logger.info(f"{indent}main: {aSolvedSummary.max_r_b}")
         logger.info(f"{indent}dual: {aSolvedSummary.max_r_c}")
-        self.algorithm.log_positive_variables_negativity(aSolvedDetail.v)
+        self.log_positive_variables_negativity(aSolvedDetail.v)
+
+    def log_positive_variables_negativity(self, v: LPVariables):
+        """もし x, s が負になってしまった場合アルゴリズムが狂うので, 負になっていないか確認"""
+        logger.info("Check x and s negativity.")
+        min_x = min(v.x)
+        min_s = min(v.s)
+        logger.info(f"{indent}min x: {min_x}, min s: {min_s}")
+        if min_x < 0:
+            idx_ = np.where(v.x < 0)[0]
+            logger.warning(f"x is negative! Negative index: {idx_}")
+        if min_s < 0:
+            idx_ = np.where(v.s < 0)[0]
+            logger.warning(f"s is negative! Negative index: {idx_}")

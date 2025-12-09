@@ -9,7 +9,7 @@ from abc import ABCMeta
 
 import numpy as np
 import scipy.sparse.linalg as spla
-from scipy.sparse import csr_matrix as Csr
+from scipy.sparse import csr_matrix as CsrMatrix
 from scipy.sparse import diags
 
 from ...logger import get_main_logger
@@ -31,19 +31,19 @@ class CGLinearSystemSolver(AbstractInexactLinearSystemSolver):
         prev_coef_matrix_preprocessed: `prev_A` に前処理を施した後の係数行列
     """
 
-    prev_coef_matrix_preprocessed: Csr = None
+    prev_coef_matrix_preprocessed: CsrMatrix = None
     method_name: str = "Conjugate Gradient method"
 
-    def solve(self, A: Csr, b: np.ndarray, tolerance: float = 10**-7, *args) -> np.ndarray:
+    def solve(self, A: CsrMatrix, b: np.ndarray, tolerance: float = 10**-7, *args) -> np.ndarray:
         """線形方程式 Ax=b を共役勾配法によって解く
 
         Args:
-            A (Csr): 係数行列. CG法の入力となるので正定値対称行列である必要あり
+            A (CsrMatrix): 係数行列. CG法の入力となるので正定値対称行列である必要あり
             b (np.ndarray): 右辺のベクトル
             tolerance (float): 絶対誤差での許容度なので, ||Ax-b||<=tolerance となる
         """
         # 数値誤差により係数行列が対称にならない場合があるため, 少し修正
-        coef_matrix: Csr = (A + A.T) / 2
+        coef_matrix: CsrMatrix = (A + A.T) / 2
         right_hand_side = b.copy()
 
         # もし A が前に使ったものと同じでなければ前処理を施す
@@ -92,7 +92,7 @@ class CGLinearSystemSolver(AbstractInexactLinearSystemSolver):
 
         self.prev_A = A.copy()
         # 疎行列にして保管しておく
-        self.prev_coef_matrix_preprocessed = Csr(coef_matrix)
+        self.prev_coef_matrix_preprocessed = CsrMatrix(coef_matrix)
         return result
 
 
@@ -103,7 +103,7 @@ class BiCGLinearSystemSolver(AbstractInexactLinearSystemSolver):
         prev_coef_matrix_preprocessed: `prev_A` に前処理を施した後の係数行列
     """
 
-    prev_coef_matrix_preprocessed: Csr = None
+    prev_coef_matrix_preprocessed: CsrMatrix = None
     method_name: str = "BiCG"
 
     def solve(self, A: np.ndarray, b: np.ndarray, tolerance: float = 10**-7, *args) -> np.ndarray:
@@ -141,7 +141,7 @@ class BiCGLinearSystemSolver(AbstractInexactLinearSystemSolver):
 
         self.prev_A = A.copy()
         # 疎行列にして保管しておく
-        self.prev_coef_matrix_preprocessed = Csr(coef_matrix)
+        self.prev_coef_matrix_preprocessed = CsrMatrix(coef_matrix)
         return result
 
 
@@ -152,7 +152,7 @@ class BiCGStabLinearSystemSolver(AbstractInexactLinearSystemSolver):
         prev_coef_matrix_preprocessed: `prev_A` に前処理を施した後の係数行列
     """
 
-    prev_coef_matrix_preprocessed: Csr = None
+    prev_coef_matrix_preprocessed: CsrMatrix = None
     method_name: str = "BiCGStab"
 
     def solve(self, A: np.ndarray, b: np.ndarray, tolerance: float = 10**-7, *args) -> np.ndarray:
@@ -188,7 +188,7 @@ class BiCGStabLinearSystemSolver(AbstractInexactLinearSystemSolver):
             logger.warning("Illegal input or breakdown in Linear System.")
 
         self.prev_A = A.copy()
-        self.prev_coef_matrix_preprocessed = Csr(coef_matrix)
+        self.prev_coef_matrix_preprocessed = CsrMatrix(coef_matrix)
         return result
 
 
@@ -199,7 +199,7 @@ class CGSLinearSystemSolver(AbstractInexactLinearSystemSolver):
         prev_coef_matrix_preprocessed: `prev_A` に前処理を施した後の係数行列
     """
 
-    prev_coef_matrix_preprocessed: Csr = None
+    prev_coef_matrix_preprocessed: CsrMatrix = None
     method_name: str = "CGS"
 
     def solve(self, A: np.ndarray, b: np.ndarray, tolerance: float = 10**-7, *args) -> np.ndarray:
@@ -235,7 +235,7 @@ class CGSLinearSystemSolver(AbstractInexactLinearSystemSolver):
             logger.warning("Illegal input or breakdown in Linear System.")
 
         self.prev_A = A.copy()
-        self.prev_coef_matrix_preprocessed = Csr(coef_matrix)
+        self.prev_coef_matrix_preprocessed = CsrMatrix(coef_matrix)
         return result
 
 
@@ -246,7 +246,7 @@ class QMRLinearSystemSolver(AbstractInexactLinearSystemSolver):
         prev_coef_matrix_preprocessed: `prev_A` に前処理を施した後の係数行列
     """
 
-    prev_coef_matrix_preprocessed: Csr = None
+    prev_coef_matrix_preprocessed: CsrMatrix = None
     method_name: str = "Quasi-Minimal Residual method"
 
     def solve(self, A: np.ndarray, b: np.ndarray, tolerance: float = 10**-7, *args) -> np.ndarray:
@@ -282,7 +282,7 @@ class QMRLinearSystemSolver(AbstractInexactLinearSystemSolver):
             logger.warning("Illegal input or breakdown in Linear System.")
 
         self.prev_A = A.copy()
-        self.prev_coef_matrix_preprocessed = Csr(coef_matrix)
+        self.prev_coef_matrix_preprocessed = CsrMatrix(coef_matrix)
         return result
 
 
@@ -293,7 +293,7 @@ class TFQMRLinearSystemSolver(AbstractInexactLinearSystemSolver):
         prev_coef_matrix_preprocessed: `prev_A` に前処理を施した後の係数行列
     """
 
-    prev_coef_matrix_preprocessed: Csr = None
+    prev_coef_matrix_preprocessed: CsrMatrix = None
     method_name: str = "TFQMR"
 
     def solve(self, A: np.ndarray, b: np.ndarray, tolerance: float = 10**-7, *args) -> np.ndarray:
@@ -329,5 +329,5 @@ class TFQMRLinearSystemSolver(AbstractInexactLinearSystemSolver):
             logger.warning("Illegal input or breakdown in Linear System.")
 
         self.prev_A = A.copy()
-        self.prev_coef_matrix_preprocessed = Csr(coef_matrix)
+        self.prev_coef_matrix_preprocessed = CsrMatrix(coef_matrix)
         return result

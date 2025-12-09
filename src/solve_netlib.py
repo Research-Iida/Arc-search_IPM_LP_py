@@ -3,8 +3,8 @@ import sys
 from datetime import date
 from pathlib import Path
 
+from .app.get_solvers import get_solvers
 from .drawer import Drawer
-from .infra.get_solvers import get_solvers
 from .infra.path_generator import PathGenerator
 from .infra.python.repository_problem import LPRepository
 from .infra.repository_solved_data import SolvedDataRepository
