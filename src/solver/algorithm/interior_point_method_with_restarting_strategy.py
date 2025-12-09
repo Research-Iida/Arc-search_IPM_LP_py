@@ -135,7 +135,9 @@ class ArcSearchIPMWithRestartingStrategy(IPMWithRestartingStrategyBase, Mehrotra
         # 初期点時点で最適解だった場合, そのまま出力
         if self.solved_checker.run(v_0, problem_0):
             logger.info("Initial point satisfies solved condition.")
-            aSolvedSummary = self.make_SolvedSummary(v_0, problem_0, True, 0, False, time.time() - start_time)
+            aSolvedSummary = self.create_non_error_solved_summary(
+                v_0, problem_0, True, 0, False, time.time() - start_time
+            )
             return SolvedDetail(aSolvedSummary, v_0, problem_0, v_0, problem_0)
 
         # 初期点を現在の点として初期化
@@ -267,7 +269,7 @@ class ArcSearchIPMWithRestartingStrategy(IPMWithRestartingStrategyBase, Mehrotra
         elapsed_time = time.time() - start_time
 
         # 出力の作成
-        aSolvedSummary = self.make_SolvedSummary(
+        aSolvedSummary = self.create_non_error_solved_summary(
             v, problem, is_solved, iter_num, self.is_iteration_number_reached_upper(iter_num, problem), elapsed_time
         )
         output = SolvedDetail(
@@ -357,7 +359,9 @@ class ArcSearchIPMWithRestartingStrategyProven(IPMWithRestartingStrategyBase):
         # 初期点時点で最適解だった場合, そのまま出力
         if self.solved_checker.run(v_0, problem_0):
             logger.info("Initial point satisfies solved condition.")
-            aSolvedSummary = self.make_SolvedSummary(v_0, problem_0, True, 0, False, time.time() - start_time)
+            aSolvedSummary = self.create_non_error_solved_summary(
+                v_0, problem_0, True, 0, False, time.time() - start_time
+            )
             return SolvedDetail(aSolvedSummary, v_0, problem_0, v_0, problem_0)
 
         # 初期点を現在の点として初期化
@@ -482,7 +486,7 @@ class ArcSearchIPMWithRestartingStrategyProven(IPMWithRestartingStrategyBase):
         logger.debug(f"s: {v.s}")
 
         # 出力の作成
-        aSolvedSummary = self.make_SolvedSummary(
+        aSolvedSummary = self.create_non_error_solved_summary(
             v, problem, is_solved, iter_num, self.is_iteration_number_reached_upper(iter_num, problem), elapsed_time
         )
         output = SolvedDetail(

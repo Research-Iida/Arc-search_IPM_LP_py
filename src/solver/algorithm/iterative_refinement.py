@@ -210,7 +210,7 @@ class IterativeRefinementMethod(ILPSolvingAlgorithm):
         # delta_k での判定は iterative refinement 特有のもので問題自体を解けたかは不明. なので relative な判定を行う
         is_solved = self.solved_checker.run(v_star, problem_0)
         # 反復回数上限に達したかどうかは iterative refinement を何回行ったかで判断
-        aSolvedSummary = self.make_SolvedSummary(
+        aSolvedSummary = self.create_non_error_solved_summary(
             v_star,
             problem_0,
             is_solved,

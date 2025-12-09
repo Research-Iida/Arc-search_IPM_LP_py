@@ -38,6 +38,7 @@ def test_write_SolvedSummary(aSolvedDataRepository, remove_written_directory):
         is_error=False,
         n=3,
         m=2,
+        num_nonzero=3,
         is_solved=True,
         iter_num=30,
         is_iter_over_upper=False,

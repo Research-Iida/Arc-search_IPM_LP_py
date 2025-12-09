@@ -32,6 +32,52 @@ class ILPSolver(abc.ABC):
         """最適化問題を解く. 解き方は具象クラスで定義する"""
         pass
 
+    def create_solved_summary(
+        self,
+        problem: LPS,
+        is_error: bool,
+        is_solved: bool,
+        iter_num: int | None = None,
+        elapsed_time: float | None = None,
+        v_star: LPVariables | None = None,
+        is_iter_over_upper: bool | None = None,
+        is_calc_time_over_upper: bool | None = None,
+        **kwargs,
+    ) -> SolvedSummary:
+        """最適化の結果を作成する. 同じクラスから複数の状態を取得できるので, これを基準として作っていく
+
+        Args:
+            problem (LPS): 対象の最適化問題
+            v_star (LPVariables): solver が実行した結果得られる解
+        """
+        # 求まっていて SolvedSummary に含めることができるものは追加する
+        if iter_num is not None:
+            kwargs["iter_num"] = iter_num
+        if elapsed_time is not None:
+            kwargs["elapsed_time"] = round(elapsed_time, 2)
+        if v_star is not None:
+            kwargs["mu"] = v_star.mu
+            kwargs["obj"] = problem.objective_main(v_star.x)
+            kwargs["max_r_b"] = np.linalg.norm(problem.residual_main_constraint(v_star.x), np.inf)
+            kwargs["max_r_c"] = np.linalg.norm(problem.residual_dual_constraint(v_star.y, v_star.s), np.inf)
+        if is_iter_over_upper is not None:
+            kwargs["is_iter_over_upper"] = is_iter_over_upper
+        if is_calc_time_over_upper is not None:
+            kwargs["is_calc_time_over_upper"] = is_calc_time_over_upper
+
+        result = SolvedSummary(
+            problem_name=problem.name,
+            solver_name=self.solver_name,
+            config_section=self.solver_config_section,
+            is_error=is_error,
+            n=problem.n,
+            m=problem.m,
+            num_nonzero=problem.num_nonzero,
+            is_solved=is_solved,
+            **kwargs,
+        )
+        return result
+
     def run(self, problem: LPS, v_0: LPVariables | None = None) -> SolvedDetail:
         """入力されたLPに対してアルゴリズムを実行
 
@@ -56,15 +102,7 @@ class ILPSolver(abc.ABC):
         # 計算上でエラーが起きても計算が止まらないようにエラー文を生成だけして結果を書き込む
         except Exception:
             logger.exception("Error occurred - ")
-            aSolvedSummary = SolvedSummary(
-                problem_name=problem.name,
-                solver_name=self.solver_name,
-                config_section=self.solver_config_section,
-                is_error=True,
-                n=problem.n,
-                m=problem.m,
-                is_solved=False,
-            )
+            aSolvedSummary = self.create_solved_summary(problem=problem, is_error=True, is_solved=False)
             aSolvedDetail = SolvedDetail(aSolvedSummary, v_0, problem, v_0, problem)
 
         # 求解不可能だった場合, ログに残す

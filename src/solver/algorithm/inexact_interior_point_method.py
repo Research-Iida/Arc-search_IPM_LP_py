@@ -334,7 +334,9 @@ class InexactLineSearchIPM(InexactInteriorPointMethod):
         # 初期点時点で最適解だった場合, そのまま出力
         if self.solved_checker.run(v_0, problem_0):
             logger.info("Initial point satisfies solved condition.")
-            aSolvedSummary = self.make_SolvedSummary(v_0, problem_0, True, 0, False, time.perf_counter() - start_time)
+            aSolvedSummary = self.create_non_error_solved_summary(
+                v_0, problem_0, True, 0, False, time.perf_counter() - start_time
+            )
             return SolvedDetail(aSolvedSummary, v_0, problem_0, v_0, problem_0)
 
         # 初期点を現在の点として初期化
@@ -438,7 +440,7 @@ class InexactLineSearchIPM(InexactInteriorPointMethod):
         elapsed_time = time.perf_counter() - start_time
 
         # 出力の作成
-        aSolvedSummary = self.make_SolvedSummary(
+        aSolvedSummary = self.create_non_error_solved_summary(
             v,
             problem,
             is_solved,
@@ -598,7 +600,9 @@ class InexactArcSearchIPM(InexactInteriorPointMethod):
         # 初期点時点で最適解だった場合, そのまま出力
         if self.solved_checker.run(v_0, problem_0):
             logger.info("Initial point satisfies solved condition.")
-            aSolvedSummary = self.make_SolvedSummary(v_0, problem_0, True, 0, False, time.perf_counter() - start_time)
+            aSolvedSummary = self.create_non_error_solved_summary(
+                v_0, problem_0, True, 0, False, time.perf_counter() - start_time
+            )
             return SolvedDetail(aSolvedSummary, v_0, problem_0, v_0, problem_0)
 
         # 初期点を現在の点として初期化
@@ -707,7 +711,7 @@ class InexactArcSearchIPM(InexactInteriorPointMethod):
         # 時間計測終了
         elapsed_time = time.perf_counter() - start_time
 
-        aSolvedSummary = self.make_SolvedSummary(
+        aSolvedSummary = self.create_non_error_solved_summary(
             v,
             problem,
             is_solved,

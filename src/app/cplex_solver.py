@@ -5,7 +5,7 @@ from scipy.sparse import csr_matrix
 
 from ..problem.problem import LinearProgrammingProblemStandard as LPS
 from ..solver.optimization_parameters import OptimizationParameters
-from ..solver.solved_data import SolvedDetail, SolvedSummary
+from ..solver.solved_data import SolvedDetail
 from ..solver.solver import ILPSolver
 from ..solver.variables import LPVariables
 
@@ -79,15 +79,10 @@ class LPCPLEXSolver(ILPSolver):
         elapsed_time = time.perf_counter() - start_time
 
         # 実行不可能だった場合
-
         if sol is None:
-            solved_summary = SolvedSummary(
-                problem_name=problem.name,
-                solver_name=self.solver_name,
-                config_section=self.solver_config_section,
+            solved_summary = self.create_solved_summary(
+                problem=problem,
                 is_error=False,
-                n=problem.n,
-                m=problem.m,
                 is_solved=False,
                 elapsed_time=elapsed_time,
             )
@@ -100,13 +95,9 @@ class LPCPLEXSolver(ILPSolver):
 
         # TODO: LPVariables の中身を格納できるようにする
         # x_val = np.array([sol.get_value(x[j]) for j in range(n)], dtype=float)
-        solved_summary = SolvedSummary(
-            problem_name=problem.name,
-            solver_name=self.solver_name,
-            config_section=self.solver_config_section,
+        solved_summary = self.create_solved_summary(
+            problem=problem,
             is_error=False,
-            n=problem.n,
-            m=problem.m,
             is_solved=True,
             iter_num=barrier_iter_num,
             elapsed_time=elapsed_time,

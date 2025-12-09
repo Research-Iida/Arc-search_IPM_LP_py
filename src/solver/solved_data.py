@@ -20,6 +20,7 @@ class SolvedSummary(BaseModel):
         is_error: エラーが起きた問題かどうか
         n: 問題の変数次元数
         m: 問題の制約数
+        num_nonzero: 問題の制約行列の非ゼロ数
         is_solved: 最適化されたか否か
         iter_num: 反復回数
         is_iter_over_upper: 反復回数上限に達したか
@@ -37,6 +38,7 @@ class SolvedSummary(BaseModel):
     is_error: bool
     n: int
     m: int
+    num_nonzero: int
     is_solved: bool
     iter_num: int | None = None
     is_iter_over_upper: bool | None = None
