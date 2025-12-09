@@ -1,3 +1,5 @@
+import abc
+
 import numpy as np
 
 from ...logger import get_main_logger, indent
@@ -11,7 +13,7 @@ from ..variables import LPVariables
 logger = get_main_logger()
 
 
-class ILPSolvingAlgorithm(ILPSolver):
+class ILPSolvingAlgorithm(ILPSolver, metaclass=abc.ABCMeta):
     """LP を解くアルゴリズムのインターフェース. IPM などが実装にあたる"""
 
     config_section: str
