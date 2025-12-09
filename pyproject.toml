@@ -17,6 +17,7 @@ slack-sdk = "^3.21.3"
 julia = "^0.6.2"
 certifi = "^2025.7.9"
 docplex = "^2.30.251"
+cplex = "^22.1.2.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.2"
