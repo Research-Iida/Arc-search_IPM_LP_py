@@ -310,11 +310,31 @@ toml = ["tomli ; python_full_version <= \"3.11.0a6\""]
 
 [[package]]
 name = "cplex"
+version = "22.1.1.0"
+description = "A Python interface to the CPLEX Callable Library, Community Edition."
+optional = false
+python-versions = "*"
+groups = ["local"]
+markers = "python_version == \"3.10\""
+files = [
+    {file = "cplex-22.1.1.0-cp310-cp310-macosx_10_6_x86_64.whl", hash = "sha256:06940514b5bb9392e529b704d881669d02333ef8417a30ef4289b4bf9107a250"},
+    {file = "cplex-22.1.1.0-cp310-cp310-manylinux1_x86_64.whl", hash = "sha256:828519463c00ba09c5262eeb90a74fd29119f993a192bf0259e79cbb7c2eb597"},
+    {file = "cplex-22.1.1.0-cp310-cp310-manylinux2014_ppc64le.whl", hash = "sha256:24092dac9345e893b4c4f756c7a4b36c65620bb368573e30e58a10c223511bb4"},
+    {file = "cplex-22.1.1.0-cp310-cp310-win_amd64.whl", hash = "sha256:b1d760f789ad002ba11ac119ee8f23980905f466199f22adcf50b3e1edb24d3e"},
+    {file = "cplex-22.1.1.0-cp39-cp39-macosx_10_6_x86_64.whl", hash = "sha256:516625586ed6dffc8f0195614633d54535299dc52ca3987ade2f1116a3855654"},
+    {file = "cplex-22.1.1.0-cp39-cp39-manylinux1_x86_64.whl", hash = "sha256:b90a77b818180a5d2588185d6d608b9c757fe80c08314ed5bd15ad5f2f85c7ec"},
+    {file = "cplex-22.1.1.0-cp39-cp39-manylinux2014_ppc64le.whl", hash = "sha256:c3382f273d15fed9121559698db6a1fcf2c98965b923fc4d971bdece0e9ec8ff"},
+    {file = "cplex-22.1.1.0-cp39-cp39-win_amd64.whl", hash = "sha256:e2116b32009bb6d419e478ec72459171b4091d5f8636e761e30d23a83055e5c7"},
+]
+
+[[package]]
+name = "cplex"
 version = "22.1.2.0"
 description = "A Python interface to the CPLEX Callable Library, Community Edition."
 optional = false
 python-versions = ">=3.9"
 groups = ["local"]
+markers = "python_version >= \"3.11\""
 files = [
     {file = "cplex-22.1.2.0-cp310-cp310-manylinux2014_aarch64.whl", hash = "sha256:05aa14e05a374eef925618b7b229fb6720932573247aae7f1766efb74385a534"},
     {file = "cplex-22.1.2.0-cp310-cp310-manylinux2014_ppc64le.whl", hash = "sha256:e7097f6cc23180e97a63d5dfdcb37ab9833fffdc38fa7ee34e7ec6e5d34a8d0f"},
@@ -1803,4 +1823,4 @@ test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.13"
-content-hash = "c7863553a4228da3ed42521b2031b7b44d038d7537d3b9d3d12729b80a5cefb8"
+content-hash = "5efb406eaa01b2c17ad45271a5f807c7810aac9e99b9586a9ce4c6682fab53e6"
