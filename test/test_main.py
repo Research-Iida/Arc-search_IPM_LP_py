@@ -4,9 +4,9 @@ import os
 import pytest
 
 from src.__main__ import main, name_result
+from src.app.decide_solve_problem import decide_solved_problems
 from src.infra.path_generator import PathGenerator
 from src.infra.python.repository_problem import LPRepository
-from src.problem.decide_solve_problem import decide_solved_problems
 from src.utils.config_utils import test_section
 
 path_generator = PathGenerator(test_section)

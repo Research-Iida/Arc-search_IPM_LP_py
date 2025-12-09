@@ -1,5 +1,5 @@
 from ..logger import get_main_logger
-from .repository import ILPRepository
+from ..problem.repository import ILPRepository
 
 logger = get_main_logger()
 
