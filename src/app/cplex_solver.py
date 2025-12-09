@@ -1,4 +1,5 @@
 import time
+from datetime import datetime
 
 from docplex.mp.model import Model
 from scipy.sparse import csr_matrix
@@ -71,7 +72,9 @@ class LPCPLEXSolver(ILPSolver):
             mdl.add(mdl.sum(vals[k] * x[cols[k]] for k in range(len(cols))) == float(b[i]))
 
         # 求解
-        sol = mdl.solve(log_output=True)
+        with open(f"log/{datetime.now().strftime('%Y%m%d%H%M%S')}_{problem.name}_cplex.log", "w") as f:
+            mdl.log_output = f
+            sol = mdl.solve()
         elapsed_time = time.perf_counter() - start_time
 
         # 実行不可能だった場合
