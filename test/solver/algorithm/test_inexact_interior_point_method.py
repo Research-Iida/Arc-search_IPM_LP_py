@@ -5,7 +5,7 @@ from src.solver.algorithm.algorithm import ILPSolvingAlgorithm
 from src.solver.optimization_parameters import OptimizationParameters
 from src.utils.config_utils import read_config, test_section
 
-from .utils import make_test_LP_and_initial_point, problem_name
+from ...utils import make_test_LP_and_initial_point, problem_name
 
 
 def test_parameter_settings():

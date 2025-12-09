@@ -1,7 +1,7 @@
 from src.app.algorithm_builder import AlgorithmBuilder
 from src.utils.config_utils import read_config, test_section
 
-from .utils import make_test_LP_and_initial_point
+from ...utils import make_test_LP_and_initial_point
 
 config_base = read_config(section=test_section)
 config_opt = read_config(config_base.get("PATH_CONFIG") + config_base.get("CONFIG_OPTIMIZER"), section=test_section)

@@ -38,17 +38,13 @@ class LPCPLEXSolver(ILPSolver):
         # 内点法（バリア法）で解く
         mdl.parameters.lpmethod = 4
         # crossover を切る（反復回数の純粋性を保つ）
-        mdl.parameters.barrier.crossover = -1
+        mdl.parameters.barrier.crossover = 1
         # 許容誤差
         mdl.parameters.barrier.convergetol = 1e-9
-        # 最大反復回数
-        mdl.parameters.barrier.maxit = 100
         # 並列スレッド数
         mdl.parameters.threads = 1
         # duality measure 閾値
         mdl.parameters.barrier.convergetol = self.parameters.STOP_CRITERIA_PARAMETER
-        # 反復回数上限
-        mdl.parameters.barrier.maxit = self.parameters.ITER_UPPER
         # 時間制限（秒）
         mdl.parameters.timelimit = self.parameters.CALC_TIME_UPPER
 
