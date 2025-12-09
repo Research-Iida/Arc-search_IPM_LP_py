@@ -1,7 +1,7 @@
+import csv
 from pathlib import Path
 
 import numpy as np
-from dataclass_csv import DataclassWriter
 
 from ..logger import get_main_logger
 from ..solver.repository import ISolvedDataRepository
@@ -29,27 +29,27 @@ class SolvedDataRepository(ISolvedDataRepository):
         """
         file_util.create_dir_if_not_exists(path)
         filename = str_util.add_suffix_csv(name)
+        filepath = path / filename
 
-        if is_append:
-            mode = "a+"
-        else:
-            mode = "w"
+        # 書き込みモード
+        mode = "a+" if is_append else "w"
 
-        with open(path.joinpath(filename), mode, newline="") as f:
-            w = DataclassWriter(f, lst_solved_summary, SolvedSummary)
-            w.write(skip_header=is_append)
+        # ヘッダを書くかどうか
+        write_header = not is_append or not filepath.exists()
 
-    # def write_numpy_as_csv(self, filename: str, data: np.ndarray, path: Path):
-    #     """numpy のデータをcsvファイルに書き出す
+        with open(filepath, mode, newline="", encoding="utf-8") as f:
+            writer = None
 
-    #     Args:
-    #         filename: ファイル名. `.csv` がなくともメソッドの中でつけるので問題ない
-    #         data: 書き込み対象の numpy データ
-    #         path: 書き込み先のpath
-    #     """
-    #     fullpath_filename = str_util.add_suffix_csv(f"{path}{filename}")
-    #     np.savetxt(fullpath_filename, data, delimiter=",")
-    #     logger.info(f"{fullpath_filename} is written.")
+            for solved_summary in lst_solved_summary:
+                row = solved_summary.model_dump()
+
+                # 最初の行でヘッダー定義
+                if writer is None:
+                    writer = csv.DictWriter(f, fieldnames=row.keys())
+                    if write_header:
+                        writer.writeheader()
+
+                writer.writerow(row)
 
     def write_variables_by_iteration(self, aSolvedDetail: SolvedDetail):
         """変数の反復列を出力"""

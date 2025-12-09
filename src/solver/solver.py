@@ -60,7 +60,13 @@ class LPSolver:
         except Exception as e:
             logger.exception("Error occured - ", exc_info=e)
             aSolvedSummary = SolvedSummary(
-                problem.name, algorithm_name, algorithm_config_section, True, problem.n, problem.m, False
+                problem_name=problem.name,
+                solver_name=algorithm_name,
+                config_section=algorithm_config_section,
+                is_error=True,
+                n=problem.n,
+                m=problem.m,
+                is_solved=False,
             )
             aSolvedDetail = SolvedDetail(aSolvedSummary, v_0, problem, v_0, problem)
 
