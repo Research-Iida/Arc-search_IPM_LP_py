@@ -164,8 +164,8 @@ class InexactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
         resi_dual = problem.residual_dual_constraint(v.y, v.s)
         return np.linalg.norm(np.concatenate([resi_main, resi_dual])) <= gamma_2 * mu
 
-    def is_G_and_g_no_less_than_0(self, v_alpha: LPVariables, v: LPVariables, alpha: float) -> bool:
-        """論文上の G^k, g^k が0以上になっているかを判定する関数
+    def is_G_no_less_than_0(self, v_alpha: LPVariables) -> bool:
+        """論文上の G^k が0以上になっているかを判定する関数
         理論的には gamma_2 が適切に設定されていれば中心パスに入るが,
         数値誤差でずれることもあるため正しく計算する
 
@@ -177,27 +177,36 @@ class InexactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
         Returns:
             bool: 近傍の条件を満たしていれば True
         """
-        # G_i^k >= 0
-        mu_alpha = v_alpha.mu
-        x_s_minus_gamma_mu = v_alpha.x * v_alpha.s - self.gamma_1 * mu_alpha
-        if any(x_s_minus_gamma_mu < 0):
-            return False
+        x_s_minus_gamma_mu = v_alpha.x * v_alpha.s - self.gamma_1 * v_alpha.mu
+        return all(x_s_minus_gamma_mu >= 0)
 
-        # g^k >= 0
-        return mu_alpha >= (1 - alpha) * v.mu
+    def is_g_no_less_than_0(self, v_alpha: LPVariables, v: LPVariables, step_size: float) -> bool:
+        """論文上の g^k が0以上になっているかを判定する関数
+        理論的には gamma_2 が適切に設定されていれば中心パスに入るが,
+        数値誤差でずれることもあるため正しく計算する
 
-    def is_h_no_less_than_0(self, v_alpha: LPVariables, v: LPVariables, alpha: float) -> bool:
+        Args:
+            v_alpha (LPVariables): 与えられた step size だけ移動したと仮定した場合の変数
+            v (LPVariables): 現在の反復点. 初期点が近傍に入っているかを確認することもある.
+            step_size (float): step size. arc の時は sin(alpha), line の時は (alpha) となる
+
+        Returns:
+            bool: 近傍の条件を満たしていれば True
+        """
+        return v_alpha.mu >= (1 - step_size) * v.mu
+
+    def is_h_no_less_than_0(self, v_alpha: LPVariables, v: LPVariables, step_size: float) -> bool:
         """論文上の h^k が0以上になっているかを判定する関数
 
         Args:
             v_alpha (LPVariables): 与えられた step size だけ移動したと仮定した場合の変数
             v (LPVariables): 現在の反復点
-            alpha (float): step size
+            step_size (float): step size. arc の時は sin(alpha), line の時は (alpha) となる
 
         Returns:
-            bool: h^k(alpha) >= 0 なら True
+            bool: h^k(step_size) >= 0 なら True
         """
-        return (1 - (1 - self.beta) * np.sin(alpha)) * v.mu - v_alpha.mu >= 0
+        return (1 - (1 - self.beta) * step_size) * v.mu - v_alpha.mu >= 0
 
     def decide_step_size(
         self,
@@ -217,20 +226,17 @@ class InexactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
         Returns:
             float: step size
         """
-        # alpha_x_max = self.variable_updater.max_step_size_guarantee_positive(v.x, x_dot, x_ddot)
-        # alpha_s_max = self.variable_updater.max_step_size_guarantee_positive(v.s, s_dot, s_ddot)
-        # max_alpha_xs_positive = min(alpha_x_max, alpha_s_max)
-
-        alpha = self.variable_updater.max_step_size
+        alpha = self.variable_updater.max_alpha
 
         def is_x_s_positive_and_v_in_neighborhood(v_alpha: LPVariables, alpha: float) -> bool:
             if min(v_alpha.x) < 0 or min(v_alpha.s) < 0:
                 return False
-            if not self.is_in_center_path_neighborhood(v_alpha, problem, gamma_2):
+            if not self.is_G_no_less_than_0(v_alpha):
                 return False
-            if not self.is_G_and_g_no_less_than_0(v_alpha, v, alpha):
+            if not self.is_g_no_less_than_0(v_alpha, v, alpha):
                 return False
-            return True
+            # 理論的には G>=0, g>=0 で近傍に入ることは成立するが, 数値誤差の影響で近傍に入らない場合があるため, 念のため確認
+            return self.is_in_center_path_neighborhood(v_alpha, problem, gamma_2)
 
         while alpha > self.min_step_size:
             v_alpha = LPVariables(
@@ -721,3 +727,62 @@ class InexactArcSearchIPM(InexactInteriorPointMethod):
             lst_tolerance_inexact_vddot=lst_tolerance_inexact_vddot,
         )
         return output
+
+
+class InexactArcSearchIPMWithoutProof(InexactArcSearchIPM):
+    """inexact arc-search を基本として, 理論的証明はないが数値実験的に良くなるであろう実装を施したクラス"""
+
+    def decide_step_size(
+        self,
+        v: LPVariables,
+        problem: LPS,
+        gamma_2: float,
+        x_dot: np.ndarray,
+        y_dot: np.ndarray,
+        s_dot: np.ndarray,
+        x_ddot: np.ndarray,
+        y_ddot: np.ndarray,
+        s_ddot: np.ndarray,
+    ) -> float:
+        """step size を決定.
+        近傍に入る step size になるまで Armijo のルールに従う.
+        pi/2 から確認をはじめ, alpha が近傍に入らなかった場合, pi - alpha の場合も入るか確認する（sin(alpha)=sin(pi - alpha) であるため, 選択肢が増えた分収束も早くなるはず）
+
+        Returns:
+            float: step sizea
+        """
+        alpha = np.pi / 2
+
+        def is_x_s_positive_and_v_in_neighborhood(v_alpha: LPVariables, alpha: float) -> bool:
+            if min(v_alpha.x) < 0 or min(v_alpha.s) < 0:
+                return False
+            if not self.is_G_no_less_than_0(v_alpha):
+                return False
+            if not self.is_g_no_less_than_0(v_alpha, v, alpha):
+                return False
+            # 理論的には G>=0, g>=0 で近傍に入ることは成立するが, 数値誤差の影響で近傍に入らない場合があるため, 念のため確認
+            return self.is_in_center_path_neighborhood(v_alpha, problem, gamma_2)
+
+        while alpha > self.min_step_size:
+            v_alpha = LPVariables(
+                self.variable_updater.run(v.x, x_dot, x_ddot, alpha),
+                self.variable_updater.run(v.y, y_dot, y_ddot, alpha),
+                self.variable_updater.run(v.s, s_dot, s_ddot, alpha),
+            )
+            if is_x_s_positive_and_v_in_neighborhood(v_alpha, alpha) and self.is_h_no_less_than_0(v_alpha, v, alpha):
+                break
+
+            # pi - alpha とした場合
+            pi_minus_alpha = np.pi - alpha
+            v_alpha = LPVariables(
+                self.variable_updater.run(v.x, x_dot, x_ddot, pi_minus_alpha),
+                self.variable_updater.run(v.y, y_dot, y_ddot, pi_minus_alpha),
+                self.variable_updater.run(v.s, s_dot, s_ddot, pi_minus_alpha),
+            )
+            if is_x_s_positive_and_v_in_neighborhood(v_alpha, pi_minus_alpha) and self.is_h_no_less_than_0(
+                v_alpha, v, pi_minus_alpha
+            ):
+                alpha = pi_minus_alpha
+                break
+            alpha *= 3 / 4
+        return alpha

@@ -1,7 +1,10 @@
 from ..logger import get_main_logger
 from ..solver.algorithm.algorithm import ILPSolvingAlgorithm
-from ..solver.algorithm.inexact_arc_search_without_proof import InexactArcSearchIPMWithoutProof
-from ..solver.algorithm.inexact_interior_point_method import InexactArcSearchIPM, InexactLineSearchIPM
+from ..solver.algorithm.inexact_interior_point_method import (
+    InexactArcSearchIPM,
+    InexactArcSearchIPMWithoutProof,
+    InexactLineSearchIPM,
+)
 from ..solver.algorithm.initial_point_maker import (
     ConstantInitialPointMaker,
     IInitialPointMaker,
