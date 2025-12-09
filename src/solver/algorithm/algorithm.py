@@ -116,7 +116,7 @@ class ILPSolvingAlgorithm(ILPSolver, metaclass=abc.ABCMeta):
             return False
         return elapsed_time > upper_bound
 
-    def make_SolvedSummary(
+    def create_non_error_solved_summary(
         self,
         v: LPVariables,
         problem: LPS,
@@ -126,22 +126,15 @@ class ILPSolvingAlgorithm(ILPSolver, metaclass=abc.ABCMeta):
         elapsed_time: float,
     ) -> SolvedSummary:
         """最適化の結果の概要を出力する"""
-        output = SolvedSummary(
-            problem_name=problem.name,
-            solver_name=self.__class__.__name__,
-            config_section=self.config_section,
+        output = self.create_solved_summary(
+            problem=problem,
             is_error=False,
-            n=problem.n,
-            m=problem.m,
             is_solved=is_solved,
             iter_num=iter_num,
+            elapsed_time=round(elapsed_time, 2),
+            v_star=v,
             # 反復回数上限に達し, それでもまだ解けてない場合に反復を追加しようとするので over upper
             is_iter_over_upper=is_iteration_number_reached_upper and not is_solved,
-            elapsed_time=round(elapsed_time, 2),
             is_calc_time_over_upper=self.is_calculation_time_reached_upper(elapsed_time) and not is_solved,
-            obj=problem.objective_main(v.x),
-            mu=v.mu,
-            max_r_b=np.linalg.norm(problem.residual_main_constraint(v.x), np.inf),
-            max_r_c=np.linalg.norm(problem.residual_dual_constraint(v.y, v.s), np.inf),
         )
         return output

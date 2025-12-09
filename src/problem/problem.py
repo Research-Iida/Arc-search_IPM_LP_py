@@ -53,6 +53,11 @@ class LinearProgrammingProblemStandard:
         """制約の数"""
         return self.A.shape[0]
 
+    @property
+    def num_nonzero(self) -> int:
+        """制約行列における非ゼロの値の数を出力"""
+        return self.A.nnz
+
     def __post_init__(self):
         """設定された定数の次元が正しいか確認し, 正しくなければエラーを返す"""
         m = self.m

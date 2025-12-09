@@ -1,2 +1,2 @@
-problem_name,solver_name,config_section,is_error,n,m,is_solved,iter_num,is_iter_over_upper,elapsed_time,is_calc_time_over_upper,obj,mu,max_r_b,max_r_c
-test_problem,test_solver,TEST,False,3,2,True,30,False,0.14,False,0.0,1e-05,0.0,0.0
+problem_name,solver_name,config_section,is_error,n,m,num_nonzero,is_solved,iter_num,is_iter_over_upper,elapsed_time,is_calc_time_over_upper,obj,mu,max_r_b,max_r_c
+test_problem,test_solver,TEST,False,3,2,3,True,30,False,0.14,False,0.0,1e-05,0.0,0.0
