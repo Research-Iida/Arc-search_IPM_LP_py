@@ -79,7 +79,7 @@ class SolvedDetail:
     """
 
     aSolvedSummary: SolvedSummary
-    v: LPVariables
+    v: LPVariables | None
     problem: LinearProgrammingProblemStandard
     v_0: LPVariables
     problem_0: LinearProgrammingProblemStandard
