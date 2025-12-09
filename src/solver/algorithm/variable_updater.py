@@ -8,8 +8,6 @@ import numpy as np
 
 
 class VariableUpdater(metaclass=ABCMeta):
-    max_step_size: float
-
     def __init__(self, delta_xs: float):
         """初期化
 
@@ -18,8 +16,23 @@ class VariableUpdater(metaclass=ABCMeta):
         """
         self._delta_xs = delta_xs
 
-    def is_max_step_size(self, step_size: float) -> bool:
-        return step_size == self.max_step_size
+    @property
+    @abstractmethod
+    def max_alpha(self) -> float:
+        pass
+
+    @staticmethod
+    @abstractmethod
+    def calc_step_size(alpha: float) -> float:
+        """step size の算出. arc の場合は sin(alpha) に変換する必要があるため, 明示的に分けるためにも導入"""
+        pass
+
+    def is_max_alpha(self, step_size: float) -> bool:
+        return step_size == self.max_alpha
+
+    @abstractmethod
+    def max_alpha_guarantee_positive(self, xs: np.ndarray, xs_dot: np.ndarray, xs_ddot: np.ndarray) -> float:
+        pass
 
     def max_alpha_guarantee_positive_with_line(self, xs: np.ndarray, xs_dot: np.ndarray) -> float:
         """x-x_dot, s-s_dot が0以上となることを保証する最大のステップサイズの取得
@@ -54,15 +67,18 @@ class VariableUpdater(metaclass=ABCMeta):
         """
         pass
 
-    @abstractmethod
-    def max_step_size_guarantee_positive(self, xs: np.ndarray, xs_dot: np.ndarray, xs_ddot: np.ndarray) -> float:
-        pass
-
 
 class LineVariableUpdater(VariableUpdater):
-    max_step_size: float = 1
+    @property
+    def max_alpha(self) -> float:
+        return 1.0
 
-    def max_step_size_guarantee_positive(self, xs: np.ndarray, xs_dot: np.ndarray, xs_ddot: np.ndarray) -> float:
+    @staticmethod
+    def calc_step_size(alpha: float) -> float:
+        """line の場合はそのままが step size となる"""
+        return alpha
+
+    def max_alpha_guarantee_positive(self, xs: np.ndarray, xs_dot: np.ndarray, xs_ddot: np.ndarray) -> float:
         """line search の更新で x, s が非負になる最大のステップサイズの取得
 
         xs は負の値になってはいけないため, 少量分の割合を差し引いてからstep size を決定する
@@ -80,12 +96,12 @@ class LineVariableUpdater(VariableUpdater):
         target_positive = xs_dot_minus_xs_ddot[xs_dot_minus_xs_ddot > 0]
         # もし alpha の出力対象がない場合は1を返す
         if len(target_positive) == 0:
-            return self.max_step_size
+            return self.max_alpha
 
         # すべての要素が0以上となる最大のalphaの出力
         xs_positive = xs[xs_dot_minus_xs_ddot > 0] * (1 - self._delta_xs)
         output = min(xs_positive / target_positive)
-        return min([output, self.max_step_size])
+        return min([output, self.max_alpha])
 
     def run(self, v: np.ndarray, v_dot: np.ndarray, v_ddot: np.ndarray, alpha: float) -> np.ndarray:
         """line search に従って変数の更新
@@ -96,19 +112,27 @@ class LineVariableUpdater(VariableUpdater):
             v_ddot: x, s, もしくはλの二次微分
             alpha: 対応する step size
         """
-        return v - alpha * (v_dot - v_ddot)
+        return v - self.calc_step_size(alpha) * (v_dot - v_ddot)
 
 
 class ArcVariableUpdater(VariableUpdater):
-    max_step_size: float = np.pi / 2
+    @property
+    def max_alpha(self) -> float:
+        """最大の alpha を出力. sin(alpha) = 1 となるように, pi/2 を出力"""
+        return np.pi / 2
 
-    def max_step_size_guarantee_positive(self, xs: np.ndarray, xs_dot: np.ndarray, xs_ddot: np.ndarray) -> float:
+    @staticmethod
+    def calc_step_size(alpha: float) -> float:
+        """arc の場合の step size は, 一階微分にかかる sin(alpha) を出力する"""
+        return np.sin(alpha)
+
+    def max_alpha_guarantee_positive(self, xs: np.ndarray, xs_dot: np.ndarray, xs_ddot: np.ndarray) -> float:
         """arc-search の更新で x, s が非負になる最大の alpha の出力
 
         xs は負の値になってはいけないため, 少量分の割合を差し引いてからstep size を決定する
         """
         # 出力の最大値は pi/2. 変数の各要素に応じてこの値が変化
-        alpha = self.max_step_size
+        alpha = self.max_alpha
         xs_pos = xs * (1 - self._delta_xs)
         # Case 番号は論文参照
         for xs_i, xs_dot_i, xs_ddot_i in zip(xs_pos, xs_dot, xs_ddot):
@@ -152,4 +176,4 @@ class ArcVariableUpdater(VariableUpdater):
             v_ddot: x, s, もしくはλの二次微分
             alpha: 対応する step size
         """
-        return v - v_dot * np.sin(alpha) + v_ddot * (1 - np.cos(alpha))
+        return v - v_dot * self.calc_step_size(alpha) + v_ddot * (1 - np.cos(alpha))

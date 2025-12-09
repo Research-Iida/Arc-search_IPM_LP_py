@@ -179,8 +179,8 @@ class ArcSearchIPMWithRestartingStrategy(IPMWithRestartingStrategyBase, Mehrotra
             z_ddot, y_ddot, s_ddot = self.calc_second_derivative(v_restarted, z_dot, y_dot, s_dot, problem)
 
             # step size の決定
-            alpha_z_max = self.variable_updater.max_step_size_guarantee_positive(v_restarted.x, z_dot, z_ddot)
-            alpha_s_max = self.variable_updater.max_step_size_guarantee_positive(v_restarted.s, s_dot, s_ddot)
+            alpha_z_max = self.variable_updater.max_alpha_guarantee_positive(v_restarted.x, z_dot, z_ddot)
+            alpha_s_max = self.variable_updater.max_alpha_guarantee_positive(v_restarted.s, s_dot, s_ddot)
 
             # 停止条件を満たしていれば終了
             v_max_step = LPVariables(
@@ -409,8 +409,8 @@ class ArcSearchIPMWithRestartingStrategyProven(IPMWithRestartingStrategyBase):
             z_ddot, y_ddot, s_ddot = self.calc_second_derivative(v_restarted, z_dot, y_dot, s_dot, problem, sigma=0)
 
             # step size の決定, scaling は近傍に入るようにすれば正の値になるので不要
-            alpha_z = self.variable_updater.max_step_size_guarantee_positive(z, z_dot, z_ddot)
-            alpha_s = self.variable_updater.max_step_size_guarantee_positive(v_restarted.s, s_dot, s_ddot)
+            alpha_z = self.variable_updater.max_alpha_guarantee_positive(z, z_dot, z_ddot)
+            alpha_s = self.variable_updater.max_alpha_guarantee_positive(v_restarted.s, s_dot, s_ddot)
             alpha = min(alpha_z, alpha_s)
 
             # 近傍に入る step size になるまでアルミホのルールに従う

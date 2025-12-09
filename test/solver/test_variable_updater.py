@@ -23,7 +23,7 @@ def test_update_variable():
     np.testing.assert_array_equal(test_vec, sol_vec)
 
 
-def test_max_step_size_guarantee_positive():
+def test_max_alpha_guarantee_positive():
     """step size の最大値が各ケースごとに正しく出力されているか"""
     config_base = read_config(section=test_section)
     config_opt = read_config(
@@ -36,7 +36,7 @@ def test_max_step_size_guarantee_positive():
     x_minus_delta = x * (1 - delta_xs)
 
     def calc_alpha(x_dot: np.array, x_ddot: np.array):
-        output = ArcVariableUpdater(delta_xs).max_step_size_guarantee_positive(x, x_dot, x_ddot)
+        output = ArcVariableUpdater(delta_xs).max_alpha_guarantee_positive(x, x_dot, x_ddot)
         return output
 
     # Case 1
