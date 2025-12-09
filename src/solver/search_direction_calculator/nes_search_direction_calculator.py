@@ -46,7 +46,7 @@ class NESSearchDirectionCalculator(AbstractSearchDirectionCalculator):
 
         # NES に変形
         if self.pre_x_divided_s is None or np.any(self.pre_x_divided_s != x_divided_s):
-            logger.info("Update coefficient matrix.")
+            logger.debug("Update coefficient matrix.")
             coef_matrix: CsrMatrix = AXS_inv @ A.T
             # logger.debug(f"{indent}NES coef matrix condition number: {np.linalg.cond(coef_matrix)}")
 

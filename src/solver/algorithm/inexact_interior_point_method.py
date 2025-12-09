@@ -434,7 +434,7 @@ class InexactLineSearchIPM(InexactInteriorPointMethod):
                 r_c=r_c,
             )
 
-            logger.info(f"{indent}Calc time of the iteration: {time.perf_counter() - start_calc_iteration:.2f} sec")
+            logger.debug(f"{indent}Calc time of the iteration: {time.perf_counter() - start_calc_iteration:.2f} sec")
 
         # 時間計測終了
         elapsed_time = time.perf_counter() - start_time

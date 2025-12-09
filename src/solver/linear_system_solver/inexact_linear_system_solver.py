@@ -49,7 +49,7 @@ class CGLinearSystemSolver(AbstractInexactLinearSystemSolver):
         # もし A が前に使ったものと同じでなければ前処理を施す
         if self.prev_A is not None and self.prev_A.shape == A.shape:
             if (self.prev_A - A).nnz == 0:
-                logger.info("Use prev_A information.")
+                logger.debug("Use prev_A information.")
                 coef_matrix = self.prev_coef_matrix_preprocessed
 
         logger.info(f"{self.method_name} start.")

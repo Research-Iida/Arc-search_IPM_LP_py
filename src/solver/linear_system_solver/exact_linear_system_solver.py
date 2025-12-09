@@ -59,7 +59,7 @@ class ExactLinearSystemSolver(AbstractLinearSystemSolver):
         """線形方程式 Ax=b を numpy によるLU分解によって解く"""
         if self.prev_factorized is not None:
             if self.prev_A.shape == A.shape and (self.prev_A - A).nnz == 0:
-                logger.info("Use prev_A information.")
+                logger.debug("Use prev_A information.")
                 return self.prev_factorized(b)
 
         self.prev_A = A.copy()
