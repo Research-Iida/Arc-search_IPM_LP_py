@@ -38,17 +38,13 @@ class SolvedDataRepository(ISolvedDataRepository):
         write_header = not is_append or not filepath.exists()
 
         with open(filepath, mode, newline="", encoding="utf-8") as f:
-            writer = None
+            writer = csv.DictWriter(f, fieldnames=SolvedSummary.model_fields.keys())
+
+            if write_header:
+                writer.writeheader()
 
             for solved_summary in lst_solved_summary:
                 row = solved_summary.model_dump()
-
-                # 最初の行でヘッダー定義
-                if writer is None:
-                    writer = csv.DictWriter(f, fieldnames=row.keys())
-                    if write_header:
-                        writer.writeheader()
-
                 writer.writerow(row)
 
     def write_variables_by_iteration(self, aSolvedDetail: SolvedDetail):
