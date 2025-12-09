@@ -173,7 +173,7 @@ class IterativeRefinementSolvedChecker(SolvedChecker):
         """Iterative Refinement が最適性を満たし, 最適解にたどり着いたかを確認
 
         アルゴリズム実行中は delta_k が存在するので, relative に加えてそちらでも判定を行う.
-        もしなければ（LPSolver で SolvedSummary 作るときとか）は relative のみで判定
+        もしなければ（ILPSolver で SolvedSummary 作るときとか）は relative のみで判定
         """
         # x, s のどちらかが0未満だった場合実行不可能となる
         if not self.is_xs_positive(v):

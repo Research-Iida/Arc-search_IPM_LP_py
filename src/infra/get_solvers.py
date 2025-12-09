@@ -1,6 +1,6 @@
 from collections.abc import Iterator
 
-from ..solver.solver import LPSolver
+from ..solver.solver import ILPSolver
 from ..utils.config_utils import default_section
 from .algorithm_builder import AlgorithmBuilder
 
@@ -89,17 +89,17 @@ class SolverSelectionError(Exception):
     pass
 
 
-def get_solver(algorithm: str, config_section: str) -> LPSolver:
+def get_solver(algorithm: str, config_section: str) -> ILPSolver:
     """線形計画問題のソルバー取得
 
     Args:
         solver: 取得したいソルバーの種類名
         config_section: 使用する config のセクション名
     """
-    return LPSolver(AlgorithmBuilder(config_section).build(algorithm))
+    return AlgorithmBuilder(config_section).build(algorithm)
 
 
-def get_solvers(name_solver: str | None, config_section: str | None) -> Iterator[LPSolver]:
+def get_solvers(name_solver: str | None, config_section: str | None) -> Iterator[ILPSolver]:
     """対象のソルバー群から複数のソルバー取得"""
     if name_solver is None:
         if config_section is None:

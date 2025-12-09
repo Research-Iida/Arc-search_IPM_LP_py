@@ -7,7 +7,7 @@ from ..problem.repository import ILPRepository
 from ..slack.slack import get_slack_api
 from .repository import ISolvedDataRepository
 from .solved_data import SolvedDetail
-from .solver import LPSolver
+from .solver import ILPSolver
 from .variables import LPVariables
 
 logger = get_main_logger()
@@ -32,7 +32,7 @@ def preprocess(problem_name: str, aLPRepository: ILPRepository) -> LPS:
     return aLP
 
 
-def optimize(aLP: LPS, aLPSolver: LPSolver, v_0: LPVariables | None = None) -> SolvedDetail:
+def optimize(aLP: LPS, aLPSolver: ILPSolver, v_0: LPVariables | None = None) -> SolvedDetail:
     """最適化の実行. ロギングなども同時に行う
 
     Args:
@@ -45,7 +45,7 @@ def optimize(aLP: LPS, aLPSolver: LPSolver, v_0: LPVariables | None = None) -> S
     """
     problem_name = aLP.name
 
-    msg_prefix = f"[{aLPSolver.algorithm.__class__.__name__}] [{aLPSolver.algorithm_config_section}]"
+    msg_prefix = f"[{aLPSolver.solver_name}] [{aLPSolver.solver_config_section}]"
     msg_start = f"{msg_prefix} Start solving {problem_name}."
     logger.info(msg_start)
     aSlack.notify(msg_start)
@@ -58,13 +58,13 @@ def optimize(aLP: LPS, aLPSolver: LPSolver, v_0: LPVariables | None = None) -> S
 
     # 求解できなかったら warning
     if not output.aSolvedSummary.is_solved:
-        msg = f"{msg_prefix} Algorithm cannot solve {problem_name}!"
+        msg = f"{msg_prefix} Cannot solve {problem_name}!"
         logger.warning(msg)
         aSlack.notify(msg)
     return output
 
 
-def solve(problem_name: str, aLPSolver: LPSolver, aLPRepository: ILPRepository) -> SolvedDetail:
+def solve(problem_name: str, aLPSolver: ILPSolver, aLPRepository: ILPRepository) -> SolvedDetail:
     """ベンチマークの問題を読み取り, 解く
 
     すでに問題を前処理したファイルが存在する場合, そこから読み取ることで時間を短縮する
@@ -92,7 +92,7 @@ def solve(problem_name: str, aLPSolver: LPSolver, aLPRepository: ILPRepository) 
 
 def solve_and_write(
     filename: str,
-    solver: LPSolver,
+    solver: ILPSolver,
     aLPRepository: ILPRepository,
     aSolvedDataRepository: ISolvedDataRepository,
     name_result: str,

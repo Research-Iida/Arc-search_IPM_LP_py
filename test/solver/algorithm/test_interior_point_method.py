@@ -4,7 +4,6 @@ from scipy.sparse import csr_matrix as Csr
 
 from src.infra.algorithm_builder import AlgorithmBuilder
 from src.problem import LinearProgrammingProblemStandard as LPS
-from src.solver.solver import LPSolver
 from src.solver.variables import LPVariables
 from src.utils.config_utils import test_section
 
@@ -83,24 +82,15 @@ def test_calc_second_derivative(algorithm):
 
 def test_run_line():
     """line search で求解できるか確認"""
-    solver_by_test_LP(LPSolver(AlgorithmBuilder(test_section).build("line")))
+    solver_by_test_LP(AlgorithmBuilder(test_section).build("line"))
 
 
-@pytest.fixture
-def solver(algorithm):
-    """初期設定でのアルゴリズムインスタンスは使用頻度が高いので fixture
-
-    arc search のほうが使用率が高いため arc search とする
-    """
-    return LPSolver(algorithm)
-
-
-def test_run_arc(solver):
+def test_run_arc(algorithm):
     """求解できるか確認
 
     x の出力で0に近いものは削除される
     """
-    solver_by_test_LP(solver)
+    solver_by_test_LP(algorithm)
 
 
 def test_run_arc_restarting():

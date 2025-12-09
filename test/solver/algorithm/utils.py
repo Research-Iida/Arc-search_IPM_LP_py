@@ -7,7 +7,7 @@ from scipy.sparse import csr_matrix as Csr
 
 from src.problem import LinearProgrammingProblemStandard as LPS
 from src.solver.optimization_parameters import OptimizationParameters
-from src.solver.solver import LPSolver
+from src.solver.solver import ILPSolver
 from src.solver.variables import LPVariables
 
 problem_name = "test"
@@ -30,7 +30,7 @@ def make_test_LP_and_initial_point() -> tuple[LPS, LPVariables]:
     return LPS(A, b, c, problem_name), v_0
 
 
-def solver_by_test_LP(aLPSolver: LPSolver):
+def solver_by_test_LP(aLPSolver: ILPSolver):
     """テスト用問題をソルバーに解かせ, 結果は最適解と同じか確認する
 
     テストの問題名も同じになっているか確認する

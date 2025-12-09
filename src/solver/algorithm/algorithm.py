@@ -1,18 +1,17 @@
-import abc
-
 import numpy as np
 
 from ...logger import get_main_logger, indent
 from ...problem import LinearProgrammingProblemStandard as LPS
 from ..optimization_parameters import OptimizationParameters
 from ..solved_checker import SolvedChecker
-from ..solved_data import SolvedDetail, SolvedSummary
+from ..solved_data import SolvedSummary
+from ..solver import ILPSolver
 from ..variables import LPVariables
 
 logger = get_main_logger()
 
 
-class ILPSolvingAlgorithm(abc.ABC):
+class ILPSolvingAlgorithm(ILPSolver):
     """LP を解くアルゴリズムのインターフェース. IPM などが実装にあたる"""
 
     config_section: str
@@ -35,6 +34,14 @@ class ILPSolvingAlgorithm(abc.ABC):
         self.parameters = parameters
         self.solved_checker = solved_checker
         logger.info(f"Checking solved by the method of {self.solved_checker.__class__.__name__}")
+
+    @property
+    def solver_name(self) -> str:
+        return self.__class__.__name__
+
+    @property
+    def solver_config_section(self) -> str:
+        return self.config_section
 
     @property
     def min_step_size(self) -> float:
@@ -136,12 +143,3 @@ class ILPSolvingAlgorithm(abc.ABC):
             np.linalg.norm(problem.residual_dual_constraint(v.y, v.s), np.inf),
         )
         return output
-
-    @abc.abstractmethod
-    def run(self, problem_0: LPS, v_0: LPVariables | None) -> SolvedDetail:
-        """反復で解くアルゴリズム部分の実行
-
-        Returns:
-            SolvedDetail: 最適解に関する詳細情報を格納したデータ構造
-        """
-        pass

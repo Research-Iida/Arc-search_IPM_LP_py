@@ -1,8 +1,8 @@
 import pytest
 
 from src.infra.algorithm_builder import AlgorithmBuilder
+from src.solver.algorithm.algorithm import ILPSolvingAlgorithm
 from src.solver.optimization_parameters import OptimizationParameters
-from src.solver.solver import LPSolver
 from src.utils.config_utils import read_config, test_section
 
 from .utils import make_test_LP_and_initial_point, problem_name
@@ -32,7 +32,7 @@ def test_parameter_settings():
         ("inexact arc CG without proof", AlgorithmBuilder(test_section).build("inexact_arc_without_proof")),
     ],
 )
-def test_run(name, algorithm):
+def test_run(name, algorithm: ILPSolvingAlgorithm):
     """inexact IPM の実行テスト.
     収束条件が `test/utils.py` にある `solver_by_test_LP` とは異なるため,
     別で書き出す
@@ -41,7 +41,7 @@ def test_run(name, algorithm):
     parameters = OptimizationParameters.import_(test_section)
     test_tolerance = parameters.STOP_CRITERIA_PARAMETER
 
-    aSolvedDetail = LPSolver(algorithm).run(aLP, v_0)
+    aSolvedDetail = algorithm.run(aLP, v_0)
 
     assert aSolvedDetail.problem.name == problem_name
     assert aSolvedDetail.aSolvedSummary.mu <= test_tolerance
