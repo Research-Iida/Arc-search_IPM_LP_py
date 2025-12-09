@@ -40,8 +40,6 @@ class LPCPLEXSolver(ILPSolver):
         mdl.parameters.lpmethod = 4
         # crossover を切る（反復回数の純粋性を保つ）
         mdl.parameters.barrier.crossover = 1
-        # 許容誤差
-        mdl.parameters.barrier.convergetol = 1e-9
         # 並列スレッド数
         mdl.parameters.threads = 1
         # duality measure 閾値
