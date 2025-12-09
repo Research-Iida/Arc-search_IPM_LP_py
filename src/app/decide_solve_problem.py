@@ -12,12 +12,11 @@ skip_problems = {
     "BLEND",
     "FORPLAN",
     "GFRD-PNC",
-    "DFL001",  # SIFファイルに問題あるが, 手作業で修正して読み込めるようにした
+	# "DFL001",  # SIFファイルに問題あるが, 手作業で修正して読み込めるようにした
     # exact に線形方程式を解くにはサイズがでかすぎる
     "KEN-18",
     "OSA-60",
     "PDS-20",
-    "STOCFOR3",
 }
 # Kennington によるサイズの大きい問題群. 普段は skip の対象
 kennington_problems = {
