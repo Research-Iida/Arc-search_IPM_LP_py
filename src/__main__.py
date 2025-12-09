@@ -6,8 +6,8 @@ from pathlib import Path
 
 from .drawer import Drawer
 from .infra.get_solvers import get_solvers
-from .infra.julia.repository_problem import JuliaLPRepository
 from .infra.path_generator import PathGenerator
+from .infra.python.repository_problem import LPRepository
 from .infra.repository_solved_data import SolvedDataRepository
 from .logger import get_main_logger, setup_logger
 from .problem.decide_solve_problem import decide_solved_problems
@@ -69,7 +69,7 @@ def main(
     aSlack.notify(msg)
 
     # 各種インスタンスの用意
-    aLPRepository = JuliaLPRepository(path_generator)
+    aLPRepository = LPRepository(path_generator)
     aSolvedDataRepository = SolvedDataRepository(path_generator)
 
     # 対象の問題の決定
