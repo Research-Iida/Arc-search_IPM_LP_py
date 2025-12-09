@@ -16,7 +16,6 @@ target_algorithms: list[str] = [
     "inexact_arc",
     "inexact_line",
     "iterative_refinement",
-    "CPLEX",
 ]
 
 
@@ -32,6 +31,7 @@ class TestSolveKB2:
 
         yield
 
+    @pytest.mark.slow
     @pytest.mark.parametrize("algorithm", target_algorithms)
     def test_solve_KB2_with_all_algorithms(self, algorithm, remove_KB2_processed):
         """`data/test/raw/netlib/KB2.mps` から問題を読み込み,

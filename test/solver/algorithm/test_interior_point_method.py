@@ -7,7 +7,7 @@ from src.problem import LinearProgrammingProblemStandard as LPS
 from src.solver.variables import LPVariables
 from src.utils.config_utils import test_section
 
-from .utils import solver_by_test_LP
+from ...utils import solver_by_test_LP
 
 
 @pytest.fixture

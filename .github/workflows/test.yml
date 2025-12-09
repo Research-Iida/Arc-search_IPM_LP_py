@@ -43,7 +43,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          poetry install --no-interaction --no-root
+          poetry install --without local --no-interaction --no-root
           poetry run python -c "import julia; julia.install()"
 
       - name: Lint with ruff
@@ -52,7 +52,7 @@ jobs:
         run: poetry run ruff format . --check --diff
 
       - name: Test with coverage
-        run: poetry run pytest -v --cov=src/ -m 'slow or not slow'
+        run: poetry run pytest -v --cov=src/ -m 'not cplex'
 
       - name: Set test result output
         id: set-output

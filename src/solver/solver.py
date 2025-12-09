@@ -128,7 +128,8 @@ class ILPSolver(abc.ABC):
         logger.info("Max constraint violation:")
         logger.info(f"{indent}main: {aSolvedSummary.max_r_b}")
         logger.info(f"{indent}dual: {aSolvedSummary.max_r_c}")
-        self.log_positive_variables_negativity(aSolvedDetail.v)
+        if aSolvedDetail.v is not None:
+            self.log_positive_variables_negativity(aSolvedDetail.v)
 
     def log_positive_variables_negativity(self, v: LPVariables):
         """もし x, s が負になってしまった場合アルゴリズムが狂うので, 負になっていないか確認"""
