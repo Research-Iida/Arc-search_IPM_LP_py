@@ -14,6 +14,7 @@ target_algorithms: list[str] = [
     "inexact_line",
     # "iterative_refinement",
     # "inexact_arc_without_proof",
+    "CPLEX",
 ]
 # アルゴリズム別計算対象の config セクション一覧
 # 計算対象にさせたくないアルゴリズムは, すべての config セクションをコメントアウトする
@@ -80,6 +81,7 @@ target_config_sections_by_algorithm: dict[str, list[str]] = {
         # "INEXACT_ARC_HHLJULIA_NES_IN_SERVER",
     ],
     "inexact_arc_without_proof": ["INEXACT_ARC_CG_NES_CONSTANT"],
+    "CPLEX": [default_section],
 }
 
 
@@ -101,7 +103,9 @@ def get_solver(algorithm: str, config_section: str) -> ILPSolver:
 
 def get_solvers(name_solver: str | None, config_section: str | None) -> Iterator[ILPSolver]:
     """対象のソルバー群から複数のソルバー取得"""
+    # ソルバー名が明示的に与えられなかった場合, 本スクリプトで定義しているリストからすべての solver を取得
     if name_solver is None:
+        # config_section が明示的に与えられなかった場合も同様
         if config_section is None:
             solvers = (get_solver(a, c) for a in target_algorithms for c in target_config_sections_by_algorithm[a])
         else:

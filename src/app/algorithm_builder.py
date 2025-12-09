@@ -36,6 +36,7 @@ from ..solver.solved_checker import (
     RelativeSolvedChecker,
     SolvedChecker,
 )
+from .cplex_solver import LPCPLEXSolver
 
 logger = get_main_logger()
 
@@ -256,6 +257,8 @@ class AlgorithmBuilder:
                     initial_point_maker=initial_point_maker,
                     search_direction_calculator=search_direction_calculator,
                 )
+            case "CPLEX":
+                algorithm = LPCPLEXSolver(self.config_section, self.parameters)
             case _:
                 raise SelectionError(f"Don't match inner algorithm: {algorithm}")
 

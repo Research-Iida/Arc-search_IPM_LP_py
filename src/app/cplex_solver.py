@@ -1,20 +1,39 @@
-# import time
+import time
 
-import numpy as np
 from docplex.mp.model import Model
 from scipy.sparse import csr_matrix
 
 from ..problem.problem import LinearProgrammingProblemStandard as LPS
-from ..solver.solved_data import SolvedDetail
+from ..solver.optimization_parameters import OptimizationParameters
+from ..solver.solved_data import SolvedDetail, SolvedSummary
 from ..solver.solver import ILPSolver
 from ..solver.variables import LPVariables
 
 
 class LPCPLEXSolver(ILPSolver):
-    def _execute(self, problem: LPS, v_0: LPVariables | None) -> SolvedDetail:
-        # start_time = time.perf_counter()
+    config_section: str
+    parameters: OptimizationParameters
 
-        # モデル作成
+    def __init__(
+        self,
+        config_section: str,
+        parameters: OptimizationParameters,
+    ):
+        self.config_section = config_section
+        self.parameters = parameters
+
+    @property
+    def solver_name(self) -> str:
+        return "CPLEX"
+
+    @property
+    def solver_config_section(self) -> str:
+        return self.config_section
+
+    def _execute(self, problem: LPS, v_0: LPVariables | None) -> SolvedDetail:
+        start_time = time.perf_counter()
+
+        # モデル作成, 設定
         mdl = Model(name=problem.name)
         # 内点法（バリア法）で解く
         mdl.parameters.lpmethod = 4
@@ -26,6 +45,12 @@ class LPCPLEXSolver(ILPSolver):
         mdl.parameters.barrier.maxit = 100
         # 並列スレッド数
         mdl.parameters.threads = 1
+        # duality measure 閾値
+        mdl.parameters.barrier.convergetol = self.parameters.STOP_CRITERIA_PARAMETER
+        # 反復回数上限
+        mdl.parameters.barrier.maxit = self.parameters.ITER_UPPER
+        # 時間制限（秒）
+        mdl.parameters.timelimit = self.parameters.CALC_TIME_UPPER
 
         n = problem.n
         m = problem.m
@@ -51,32 +76,41 @@ class LPCPLEXSolver(ILPSolver):
 
         # 求解
         sol = mdl.solve(log_output=True)
-        # elapsed_time = time.perf_counter() - start_time
+        elapsed_time = time.perf_counter() - start_time
 
         # 実行不可能だった場合
 
         if sol is None:
-            # TODO: 反復回数の反映
-            # solved_summary = SolvedSummary(
-            #     problem.name,
-            #     self.solver_name,
-            #     self.solver_config_section,
-            #     False,
-            #     problem.n,
-            #     problem.m,
-            #     False,
-            #     elapsed_time=elapsed_time,
-            # )
-            return {
-                "status": "infeasible_or_unbounded",
-                "objective": None,
-                "x": None,
-            }
+            solved_summary = SolvedSummary(
+                problem_name=problem.name,
+                solver_name=self.solver_name,
+                config_section=self.solver_config_section,
+                is_error=False,
+                n=problem.n,
+                m=problem.m,
+                is_solved=False,
+                elapsed_time=elapsed_time,
+            )
+            solved_detail = SolvedDetail(solved_summary, v_0, problem, v_0, problem)
+            return solved_detail
 
-        x_val = np.array([sol.get_value(x[j]) for j in range(n)], dtype=float)
+        # 情報取得
+        cpx = mdl.get_cplex()
+        barrier_iter_num = cpx.solution.progress.get_num_barrier_iterations()
 
-        return {
-            "status": sol.solve_status,
-            "objective": sol.objective_value,
-            "x": x_val,
-        }
+        # TODO: LPVariables の中身を格納できるようにする
+        # x_val = np.array([sol.get_value(x[j]) for j in range(n)], dtype=float)
+        solved_summary = SolvedSummary(
+            problem_name=problem.name,
+            solver_name=self.solver_name,
+            config_section=self.solver_config_section,
+            is_error=False,
+            n=problem.n,
+            m=problem.m,
+            is_solved=True,
+            iter_num=barrier_iter_num,
+            elapsed_time=elapsed_time,
+            obj=sol.objective_value,
+        )
+        solved_detail = SolvedDetail(solved_summary, v_0, problem, v_0, problem)
+        return solved_detail

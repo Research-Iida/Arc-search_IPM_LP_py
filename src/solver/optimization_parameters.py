@@ -10,6 +10,7 @@ class OptimizationParameters:
     STOP_CRITERIA_PARAMETER: float
     CALC_TIME_UPPER: int
     ITER_UPPER: int
+
     ITER_UPPER_COEF: int
     MIN_STEP_SIZE: float
     THRESHOLD_XS_NEGATIVE: float
