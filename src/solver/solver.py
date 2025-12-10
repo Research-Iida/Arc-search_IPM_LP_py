@@ -98,7 +98,6 @@ class ILPSolver(abc.ABC):
             aSolvedDetail = self._execute(problem, v_0)
 
             logger.info(f"{msg_prefix} End solving {problem.name}.")
-            self.log_solved_data(aSolvedDetail)
         # 計算上でエラーが起きても計算が止まらないようにエラー文を生成だけして結果を書き込む
         except Exception:
             logger.exception("Error occurred - ")
@@ -106,7 +105,9 @@ class ILPSolver(abc.ABC):
             aSolvedDetail = SolvedDetail(aSolvedSummary, v_0, problem, v_0, problem)
 
         # 求解不可能だった場合, ログに残す
-        if not aSolvedDetail.aSolvedSummary.is_solved:
+        if aSolvedDetail.aSolvedSummary.is_solved:
+            self.log_solved_data(aSolvedDetail)
+        else:
             logger.warning(f"{msg_prefix} Cannot solve {problem.name}.")
 
         return aSolvedDetail
