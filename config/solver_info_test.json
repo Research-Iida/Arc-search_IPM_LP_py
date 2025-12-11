@@ -1,5 +1,6 @@
 {
-    "inexact_arc": ["SOLVE_LARGE_PROBLEMS", "SOLVE_LARGE_PROBLEMS_WITH_YANG_INITIAL_POINT"],
-    "inexact_line": ["SOLVE_LARGE_PROBLEMS", "SOLVE_LARGE_PROBLEMS_WITH_YANG_INITIAL_POINT"],
+    "arc": ["DEFAULT"],
+    "inexact_arc": ["SOLVE_LARGE_PROBLEMS"],
+    "inexact_line": ["SOLVE_LARGE_PROBLEMS"],
     "CPLEX": ["DEFAULT"]
 }
