@@ -3,7 +3,7 @@ import sys
 from datetime import date
 from pathlib import Path
 
-from .app.get_solvers import get_solvers
+from .app.get_solvers import get_solvers, load_solver_info
 from .drawer import Drawer
 from .infra.path_generator import PathGenerator
 from .infra.python.repository_problem import LPRepository
@@ -33,8 +33,9 @@ def main(problem_name: str, solver_name: str | None, config_section: str | None,
     # csvのヘッダーを書き出す
     aSolvedDataRepository.write_SolvedSummary([], name_result, path=Path(path_result_by_problem))
 
+    path_solver_info = path_generator.generate_path_solver_info()
     # ソルバーごとに解く
-    for solver in get_solvers(solver_name, config_section):
+    for solver in get_solvers(load_solver_info(path_solver_info), solver_name, config_section):
         aSolvedDetail = solve_and_write(
             problem_name, solver, repository, aSolvedDataRepository, name_result, path_result_by_problem
         )

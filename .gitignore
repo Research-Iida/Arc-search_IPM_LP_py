@@ -125,3 +125,5 @@ profile/*.prof
 Manifest.toml
 
 config/config_slack.ini
+# solver の情報はサーバーと異なるようにしたいので, 別で扱う
+config/solver_info.json

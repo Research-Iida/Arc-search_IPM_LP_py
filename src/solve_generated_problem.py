@@ -4,7 +4,7 @@ import sys
 import numpy as np
 
 from .app.generate_problem import generate_problem
-from .app.get_solvers import get_solvers
+from .app.get_solvers import get_solvers, load_solver_info
 from .drawer import Drawer
 from .infra.path_generator import PathGenerator
 from .infra.repository_solved_data import SolvedDataRepository
@@ -34,8 +34,10 @@ def main(n: int, m: int, solver_name: str | None, config_section: str | None, ra
 
     problem, opt_sol = generate_problem(n, m)
 
+    path_solver_info = path_generator.generate_path_solver_info()
+
     # ソルバーごとに解く
-    for solver in get_solvers(solver_name, config_section):
+    for solver in get_solvers(load_solver_info(path_solver_info), solver_name, config_section):
         aSolvedDetail = optimize(problem, solver)
         if not aSolvedDetail.v.isclose(opt_sol, threshold=10 ** (-3)):
             logger.warning(f"Isn't close solution! opt: {opt_sol}, sol: {aSolvedDetail.v}")

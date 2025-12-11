@@ -61,9 +61,10 @@ class InexactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
             result = self.initial_point_maker.make_initial_point(problem)
 
         # 初期点が近傍に入っていなければ, 新しく近傍に入る初期点を作成
-        if not self.is_in_center_path_neighborhood(result, problem, self.calculate_gamma_2(result, problem)):
-            logger.info("Initial points is not in neighborhood! Start with general initial point.")
-            result = ConstantInitialPointMaker(self.parameters.INITIAL_POINT_SCALE).make_initial_point(problem)
+        if self.parameters.GUARANTEE_INITIAL_POINT_IN_NEIGHBORHOOD:
+            if not self.is_in_center_path_neighborhood(result, problem, self.calculate_gamma_2(result, problem)):
+                logger.info("Initial points is not in neighborhood! Start with general initial point.")
+                result = ConstantInitialPointMaker(self.parameters.INITIAL_POINT_SCALE).make_initial_point(problem)
 
         return result
 
@@ -397,7 +398,7 @@ class InexactLineSearchIPM(InexactInteriorPointMethod):
                 self.variable_updater.run(v.y, y_dot, y_ddot, alpha),
                 self.variable_updater.run(v.s, s_dot, xs_ddot, alpha),
             )
-            logger.info(f"{indent}Step size: {alpha}")
+            logger.info(f"{indent}Alpha: {alpha}, Step size: {self.variable_updater.calc_step_size(alpha)}")
 
             # もし x, s が負になってしまった場合アルゴリズムが狂うので, 負になっていないか確認
             self.log_positive_variables_negativity(v)
@@ -671,7 +672,7 @@ class InexactArcSearchIPM(InexactInteriorPointMethod):
                 self.variable_updater.run(v.y, y_dot, y_ddot, alpha),
                 self.variable_updater.run(v.s, s_dot, s_ddot, alpha),
             )
-            logger.info(f"{indent}Step size: {alpha}")
+            logger.info(f"{indent}Alpha: {alpha}, Step size: {self.variable_updater.calc_step_size(alpha)}")
 
             # もし x, s が負になってしまった場合アルゴリズムが狂うので, 負になっていないか確認
             self.log_positive_variables_negativity(v)

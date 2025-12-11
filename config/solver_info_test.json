@@ -1,0 +1,6 @@
+{
+    "arc": ["DEFAULT"],
+    "inexact_arc": ["SOLVE_LARGE_PROBLEMS"],
+    "inexact_line": ["SOLVE_LARGE_PROBLEMS"],
+    "CPLEX": ["DEFAULT"]
+}

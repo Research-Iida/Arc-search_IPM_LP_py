@@ -334,9 +334,10 @@ class ArcSearchIPMWithRestartingStrategyProven(IPMWithRestartingStrategyBase):
             result = self.initial_point_maker.make_initial_point(problem)
 
         # 初期点が近傍に入っていなければ, 理論的収束性を担保できない
-        if not self.is_in_center_path_neighborhood(result):
-            logger.info("Initial point is not in neighborhood! Start with general initial point.")
-            result = ConstantInitialPointMaker(self.parameters.INITIAL_POINT_SCALE).make_initial_point(problem)
+        if self.parameters.GUARANTEE_INITIAL_POINT_IN_NEIGHBORHOOD:
+            if not self.is_in_center_path_neighborhood(result):
+                logger.info("Initial point is not in neighborhood! Start with general initial point.")
+                result = ConstantInitialPointMaker(self.parameters.INITIAL_POINT_SCALE).make_initial_point(problem)
 
         return result
 

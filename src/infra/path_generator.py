@@ -75,3 +75,6 @@ class PathGenerator:
 
     def generate_path_config_optimizer(self) -> Path:
         return Path(self.config.get("PATH_CONFIG")).joinpath(self.config.get("CONFIG_OPTIMIZER"))
+
+    def generate_path_solver_info(self) -> Path:
+        return Path(self.config.get("PATH_SOLVER_INFO"))
