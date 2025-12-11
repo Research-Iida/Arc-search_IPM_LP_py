@@ -27,7 +27,7 @@ name_result = str_util.add_suffix_csv(f"{str_today}_result")
 msg_for_logging_today = f"[{str_today}] "
 
 
-def copy_parameters(path_result: Path, path_generator: PathGenerator, path_solver_info: Path):
+def copy_parameters(path_result: Path, path_generator: PathGenerator):
     """ソルバー情報と, `config_optimizer.ini` を結果を格納するディレクトリにコピー
 
     Args:
@@ -38,6 +38,7 @@ def copy_parameters(path_result: Path, path_generator: PathGenerator, path_solve
     logger.info(f"Write {origin_config_opt} to {destination_config_opt}")
     shutil.copyfile(origin_config_opt, destination_config_opt)
 
+    path_solver_info = path_generator.generate_path_solver_info()
     destination_solver_info = path_result / path_solver_info.name
     logger.info(f"Write {path_solver_info} to {destination_solver_info}")
     shutil.copyfile(path_solver_info, destination_solver_info)
@@ -82,9 +83,9 @@ def main(
     logger.info(f"Target problems number: {target_problem_number}")
 
     path_result = path_generator.generate_path_result_by_date()
-    path_solver_info = Path("./solver_info.json")
+    path_solver_info = path_generator.generate_path_solver_info()
     # 対象ソルバー情報, パラメータもコピーしておく
-    copy_parameters(path_result, path_generator, path_solver_info)
+    copy_parameters(path_result, path_generator)
 
     # csvのヘッダーを書き出す
     aSolvedDataRepository.write_SolvedSummary([], name_result, path=path_result)

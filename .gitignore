@@ -126,5 +126,4 @@ Manifest.toml
 
 config/config_slack.ini
 # solver の情報はサーバーと異なるようにしたいので, 別で扱う
-solver_info.json
-!test/app/solver_info.json
+config/solver_info.json

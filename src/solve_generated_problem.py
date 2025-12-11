@@ -1,6 +1,5 @@
 import argparse
 import sys
-from pathlib import Path
 
 import numpy as np
 
@@ -35,7 +34,7 @@ def main(n: int, m: int, solver_name: str | None, config_section: str | None, ra
 
     problem, opt_sol = generate_problem(n, m)
 
-    path_solver_info = Path("./solver_info.json")
+    path_solver_info = path_generator.generate_path_solver_info()
 
     # ソルバーごとに解く
     for solver in get_solvers(load_solver_info(path_solver_info), solver_name, config_section):

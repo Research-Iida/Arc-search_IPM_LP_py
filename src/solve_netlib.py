@@ -33,7 +33,7 @@ def main(problem_name: str, solver_name: str | None, config_section: str | None,
     # csvのヘッダーを書き出す
     aSolvedDataRepository.write_SolvedSummary([], name_result, path=Path(path_result_by_problem))
 
-    path_solver_info = Path("./solver_info.json")
+    path_solver_info = path_generator.generate_path_solver_info()
     # ソルバーごとに解く
     for solver in get_solvers(load_solver_info(path_solver_info), solver_name, config_section):
         aSolvedDetail = solve_and_write(
