@@ -43,8 +43,9 @@ def get_solvers(
             return iter(get_solver(a, c) for a in target_algorithms for c in target_algorithms_and_sections[a])
         return iter(get_solver(a, config_section) for a in target_algorithms)
 
-    if name_solver not in target_algorithms_and_sections:
-        raise SolverSelectionError(f"solver '{name_solver}' is not found")
     if config_section is None:
+        # config が与えられなかった場合, dict から読み込むが, その際に対象ソルバーが存在しなければエラー
+        if name_solver not in target_algorithms_and_sections:
+            raise SolverSelectionError(f"solver '{name_solver}' is not found")
         return iter(get_solver(name_solver, c) for c in target_algorithms_and_sections[name_solver])
     return iter([get_solver(name_solver, config_section)])
