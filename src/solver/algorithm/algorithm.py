@@ -106,14 +106,15 @@ class ILPSolvingAlgorithm(ILPSolver, metaclass=abc.ABCMeta):
 
     def is_calculation_time_reached_upper(self, elapsed_time: float) -> bool:
         """計算時間が上限に達したか.
-        もし設定が 0以下の値であれば, 時間無制限とする
+        設定がなければ一律 False を返す
 
         Args:
             elapsed_time (float): 経過秒数. `time.time()` で得られる秒数を基準
         """
-        upper_bound = self.parameters.CALC_TIME_UPPER
-        if upper_bound <= 0:
+        if self.parameters.CALC_TIME_UPPER is None:
             return False
+
+        upper_bound = self.parameters.CALC_TIME_UPPER
         return elapsed_time > upper_bound
 
     def create_non_error_solved_summary(

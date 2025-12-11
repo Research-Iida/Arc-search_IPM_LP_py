@@ -39,13 +39,14 @@ class LPCPLEXSolver(ILPSolver):
         # 内点法（バリア法）で解く
         mdl.parameters.lpmethod = 4
         # crossover を切る（反復回数の純粋性を保つ）
-        mdl.parameters.barrier.crossover = 1
+        # mdl.parameters.solutiontype = 2
         # 並列スレッド数
         mdl.parameters.threads = 1
         # duality measure 閾値
         mdl.parameters.barrier.convergetol = self.parameters.STOP_CRITERIA_PARAMETER
         # 時間制限（秒）
-        mdl.parameters.timelimit = self.parameters.CALC_TIME_UPPER
+        if self.parameters.CALC_TIME_UPPER:
+            mdl.parameters.timelimit = self.parameters.CALC_TIME_UPPER
 
         n = problem.n
         m = problem.m
@@ -73,6 +74,7 @@ class LPCPLEXSolver(ILPSolver):
         with open(f"log/{datetime.now().strftime('%Y%m%d%H%M%S')}_{problem.name}_cplex.log", "w") as f:
             mdl.log_output = f
             sol = mdl.solve()
+        # sol = mdl.solve(log_output=True)
         elapsed_time = time.perf_counter() - start_time
 
         # 実行不可能だった場合

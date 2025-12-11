@@ -1,14 +1,12 @@
 from __future__ import annotations
 
-import pydantic
+from pydantic import BaseModel, Field
 
 from ..utils import config_utils
 
 
-@pydantic.dataclasses.dataclass
-class OptimizationParameters:
+class OptimizationParameters(BaseModel):
     STOP_CRITERIA_PARAMETER: float
-    CALC_TIME_UPPER: int
     ITER_UPPER: int
 
     ITER_UPPER_COEF: int
@@ -39,7 +37,9 @@ class OptimizationParameters:
     ITERATIVE_REFINEMENT_SCALING_MULTIPLIER: float
     ITERATIVE_REFINEMENT_ITER_UPPER: int
 
-    # TODO: クラス自体が読み込みに責務を持つのはおかしい. repository があるべき
+    CALC_TIME_UPPER: int | None = Field(None, gt=0)
+
+    # TODO: クラス自体が読み込みに責務を持つのはおかしい. loader のクラスがあるべき
     @classmethod
     def import_(cls, config_section: str) -> OptimizationParameters:
         config = config_utils.read_config(section=config_section)
