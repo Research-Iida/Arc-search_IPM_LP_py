@@ -14,7 +14,7 @@ target_algorithms: list[str] = [
     "inexact_line",
     # "iterative_refinement",
     # "inexact_arc_without_proof",
-    "CPLEX",
+    # "CPLEX",
 ]
 # アルゴリズム別計算対象の config セクション一覧
 # 計算対象にさせたくないアルゴリズムは, すべての config セクションをコメントアウトする
@@ -45,6 +45,7 @@ target_config_sections_by_algorithm: dict[str, list[str]] = {
     "inexact_arc": [
         "SOLVE_LARGE_PROBLEMS",
         # "SOLVE_LARGE_PROBLEMS_WITH_INEXACT_INITIAL_POINT",
+        "SOLVE_LARGE_PROBLEMS_WITH_YANG_INITIAL_POINT",
         # "INEXACT_ARC_CG_MNES",
         # "INEXACT_ARC_CG_NES",
         # "INEXACT_ARC_CG_NES_LUSTING",
@@ -63,6 +64,7 @@ target_config_sections_by_algorithm: dict[str, list[str]] = {
     "inexact_line": [
         "SOLVE_LARGE_PROBLEMS",
         # "SOLVE_LARGE_PROBLEMS_WITH_INEXACT_INITIAL_POINT",
+        "SOLVE_LARGE_PROBLEMS_WITH_YANG_INITIAL_POINT",
         # "INEXACT_LINE_CG_MNES",
         # "INEXACT_LINE_CG_NES",
         # "INEXACT_LINE_CG_NES_LUSTING",

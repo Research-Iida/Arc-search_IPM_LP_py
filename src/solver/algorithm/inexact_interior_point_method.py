@@ -61,9 +61,10 @@ class InexactInteriorPointMethod(InteriorPointMethod, metaclass=ABCMeta):
             result = self.initial_point_maker.make_initial_point(problem)
 
         # 初期点が近傍に入っていなければ, 新しく近傍に入る初期点を作成
-        if not self.is_in_center_path_neighborhood(result, problem, self.calculate_gamma_2(result, problem)):
-            logger.info("Initial points is not in neighborhood! Start with general initial point.")
-            result = ConstantInitialPointMaker(self.parameters.INITIAL_POINT_SCALE).make_initial_point(problem)
+        if self.parameters.GUARANTEE_INITIAL_POINT_IN_NEIGHBORHOOD:
+            if not self.is_in_center_path_neighborhood(result, problem, self.calculate_gamma_2(result, problem)):
+                logger.info("Initial points is not in neighborhood! Start with general initial point.")
+                result = ConstantInitialPointMaker(self.parameters.INITIAL_POINT_SCALE).make_initial_point(problem)
 
         return result
 
