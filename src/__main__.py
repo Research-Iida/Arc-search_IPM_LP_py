@@ -5,7 +5,7 @@ from datetime import date
 from pathlib import Path
 
 from .app.decide_solve_problem import decide_solved_problems
-from .app.get_solvers import get_solvers
+from .app.get_solvers import get_solvers, load_solver_info
 from .drawer import Drawer
 from .infra.path_generator import PathGenerator
 from .infra.python.repository_problem import LPRepository
@@ -27,16 +27,20 @@ name_result = str_util.add_suffix_csv(f"{str_today}_result")
 msg_for_logging_today = f"[{str_today}] "
 
 
-def copy_optimization_parameters(path_result: Path, path_generator: PathGenerator):
-    """`config_optimizer.ini` を結果を格納するディレクトリにコピー
+def copy_parameters(path_result: Path, path_generator: PathGenerator, path_solver_info: Path):
+    """ソルバー情報と, `config_optimizer.ini` を結果を格納するディレクトリにコピー
 
     Args:
         path_result (Path): 結果を書き込む先のディレクトリ
     """
     origin_config_opt = path_generator.generate_path_config_optimizer()
-    destination_config_opt = path_result.joinpath(origin_config_opt.name)
+    destination_config_opt = path_result / origin_config_opt.name
     logger.info(f"Write {origin_config_opt} to {destination_config_opt}")
     shutil.copyfile(origin_config_opt, destination_config_opt)
+
+    destination_solver_info = path_result / path_solver_info.name
+    logger.info(f"Write {path_solver_info} to {destination_solver_info}")
+    shutil.copyfile(path_solver_info, destination_solver_info)
 
 
 def main(
@@ -77,10 +81,10 @@ def main(
     target_problem_number = len(problem_files)
     logger.info(f"Target problems number: {target_problem_number}")
 
-    # 書き込み先のディレクトリを作成
     path_result = path_generator.generate_path_result_by_date()
-    # パラメータもコピーしておく
-    copy_optimization_parameters(path_result, path_generator)
+    path_solver_info = Path("./solver_info.json")
+    # 対象ソルバー情報, パラメータもコピーしておく
+    copy_parameters(path_result, path_generator, path_solver_info)
 
     # csvのヘッダーを書き出す
     aSolvedDataRepository.write_SolvedSummary([], name_result, path=path_result)
@@ -100,7 +104,7 @@ def main(
         # _ = solve(filename, get_solver("line", config_utils.test_section), aLPRepository)
 
         # ソルバーごとに解く. 毎回初期化した方が都合がいいので for 構文の中で取り出す
-        for solver in get_solvers(name_solver, config_section):
+        for solver in get_solvers(load_solver_info(path_solver_info), name_solver, config_section):
             aSolvedDetail = solve_and_write(
                 filename, solver, aLPRepository, aSolvedDataRepository, name_result, path_result
             )
