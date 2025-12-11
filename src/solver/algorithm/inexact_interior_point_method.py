@@ -398,7 +398,7 @@ class InexactLineSearchIPM(InexactInteriorPointMethod):
                 self.variable_updater.run(v.y, y_dot, y_ddot, alpha),
                 self.variable_updater.run(v.s, s_dot, xs_ddot, alpha),
             )
-            logger.info(f"{indent}Step size: {alpha}")
+            logger.info(f"{indent}Alpha: {alpha}, Step size: {self.variable_updater.calc_step_size(alpha)}")
 
             # もし x, s が負になってしまった場合アルゴリズムが狂うので, 負になっていないか確認
             self.log_positive_variables_negativity(v)
@@ -672,7 +672,7 @@ class InexactArcSearchIPM(InexactInteriorPointMethod):
                 self.variable_updater.run(v.y, y_dot, y_ddot, alpha),
                 self.variable_updater.run(v.s, s_dot, s_ddot, alpha),
             )
-            logger.info(f"{indent}Step size: {alpha}")
+            logger.info(f"{indent}Alpha: {alpha}, Step size: {self.variable_updater.calc_step_size(alpha)}")
 
             # もし x, s が負になってしまった場合アルゴリズムが狂うので, 負になっていないか確認
             self.log_positive_variables_negativity(v)

@@ -14,7 +14,7 @@ target_algorithms: list[str] = [
     "inexact_line",
     # "iterative_refinement",
     # "inexact_arc_without_proof",
-    # "CPLEX",
+    "CPLEX",
 ]
 # アルゴリズム別計算対象の config セクション一覧
 # 計算対象にさせたくないアルゴリズムは, すべての config セクションをコメントアウトする
