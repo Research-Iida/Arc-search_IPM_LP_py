@@ -25,7 +25,7 @@ def remove_written_file():
     yield
 
 
-@pytest.mark.julia
+@pytest.mark.slow
 def test_main(remove_written_file):
     """main関数のテスト. section は TEST なので書き込み先も result/test 配下
     問題ごとに軌跡の描画も行うため, 対象のディレクトリが存在するかも確認

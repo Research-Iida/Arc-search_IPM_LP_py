@@ -47,4 +47,4 @@ def get_solvers(
         raise SolverSelectionError(f"solver '{name_solver}' is not found")
     if config_section is None:
         return iter(get_solver(name_solver, c) for c in target_algorithms_and_sections[name_solver])
-    return iter[get_solver(name_solver, config_section)]
+    return iter([get_solver(name_solver, config_section)])
