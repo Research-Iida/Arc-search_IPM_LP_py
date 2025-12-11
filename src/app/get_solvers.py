@@ -44,7 +44,7 @@ target_config_sections_by_algorithm: dict[str, list[str]] = {
     ],
     "inexact_arc": [
         "SOLVE_LARGE_PROBLEMS",
-        "SOLVE_LARGE_PROBLEMS_WITH_INEXACT_INITIAL_POINT",
+        # "SOLVE_LARGE_PROBLEMS_WITH_INEXACT_INITIAL_POINT",
         # "INEXACT_ARC_CG_MNES",
         # "INEXACT_ARC_CG_NES",
         # "INEXACT_ARC_CG_NES_LUSTING",
@@ -62,7 +62,7 @@ target_config_sections_by_algorithm: dict[str, list[str]] = {
     ],
     "inexact_line": [
         "SOLVE_LARGE_PROBLEMS",
-        "SOLVE_LARGE_PROBLEMS_WITH_INEXACT_INITIAL_POINT",
+        # "SOLVE_LARGE_PROBLEMS_WITH_INEXACT_INITIAL_POINT",
         # "INEXACT_LINE_CG_MNES",
         # "INEXACT_LINE_CG_NES",
         # "INEXACT_LINE_CG_NES_LUSTING",
